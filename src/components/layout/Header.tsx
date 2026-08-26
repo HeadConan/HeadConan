@@ -25,6 +25,7 @@ interface HeaderProps {
   onOpenFeedModal: () => void;
   onOpenNotesModal: () => void;
   onOpenAtlas?: () => void;
+  onOpenLayoutLab?: () => void;
   selectedEngine: AIProviderId;
   onSelectEngine: (engine: AIProviderId) => void;
   activeRole: RoleSlot;
@@ -40,6 +41,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenFeedModal,
   onOpenNotesModal,
   onOpenAtlas,
+  onOpenLayoutLab,
   selectedEngine,
   onSelectEngine,
   activeRole,
@@ -201,6 +203,19 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <Compass className="w-3.5 h-3.5 text-indigo-400" />
             <span className="hidden lg:inline">Atlas</span>
+          </button>
+        )}
+
+        {/* Layout Lab Research Button */}
+        {onOpenLayoutLab && (
+          <button
+            id="btn-open-layout-lab"
+            onClick={onOpenLayoutLab}
+            className="px-2.5 py-1.5 rounded-xl bg-purple-950/40 hover:bg-purple-900/50 border border-purple-500/30 text-xs font-medium text-purple-200 transition-colors flex items-center space-x-1.5 shadow-sm"
+            title="Open HeadConan Layout Lab (6 Dynamic Spatial Compositions)"
+          >
+            <Layers className="w-3.5 h-3.5 text-purple-400" />
+            <span className="hidden lg:inline">Layout Lab</span>
           </button>
         )}
 
