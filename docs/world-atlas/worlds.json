@@ -1,0 +1,82 @@
+{
+  "version": "0.1.0",
+  "generatedAt": "2026-08-26",
+  "schema": "HeadConan World Atlas Specification v0",
+  "goldenWorldsCount": 12,
+  "benchmarkWorldsCount": 4,
+  "totalCatalogCount": 72,
+  "benchmarks": [
+    {
+      "id": "atlas-spy-family",
+      "benchmarkType": "SOCIAL",
+      "name": "SPY × FAMILY (Berlint Cold War)",
+      "capabilityTested": "Multi-Agent Concealment, Private Agendas & Social Camouflage",
+      "hypothesis": "Can HeadConan create a convincing social world where multiple characters maintain secret identities, conflicting hidden goals, and domestic camouflage without breaking epistemic isolation?",
+      "primaryAffordances": ["Cover Suspicion Meter", "Public vs Covert Dual Dossier", "Domestic Dialogue Radar"]
+    },
+    {
+      "id": "atlas-got",
+      "benchmarkType": "POLITICAL",
+      "name": "Game of Thrones (Westeros War of the Five Kings)",
+      "capabilityTested": "Multi-Faction Statecraft, Asymmetric Power & Cascading Policy Consequences",
+      "hypothesis": "Can HeadConan maintain a persistent political simulation where macro decrees alter multi-faction power balances, economic resources, and military stances, producing emergent diplomatic crises rather than scripted narrative dead-ends?",
+      "primaryAffordances": ["Strategic Realm Map", "Raven Scroll Inbox", "Faction Balance Wheel", "Treasury & Grain Ledger"]
+    },
+    {
+      "id": "atlas-outer-wilds",
+      "benchmarkType": "EXPLORATION",
+      "name": "Outer Wilds (22-Minute Solar Loop)",
+      "capabilityTested": "Spatial Wonder, Ontological Physics Rules & Epistemic Progression",
+      "hypothesis": "Can HeadConan simulate a geographically and physically coherent world where environmental rules remain constant, exploration is driven by user curiosity, and discovered lore directly unlocks solutions to physical environmental puzzles?",
+      "primaryAffordances": ["Planetary Orbital Vector Radar", "Ship Log Knowledge-Web", "Signalscope Tuner", "Nomai Text Translator"]
+    },
+    {
+      "id": "atlas-sherlock",
+      "benchmarkType": "MYSTERY",
+      "name": "Victorian Sherlock London (Baker Street 1895)",
+      "capabilityTested": "Forensic Deduction, Incomplete Information & Immutable Ground Truth",
+      "hypothesis": "Can HeadConan maintain a sealed ground truth for complex mysteries, allowing users to discover clues incrementally, connect evidence nodes on an interactive pinboard, and deduce perpetrators through valid inference rather than forced scripted reveals?",
+      "primaryAffordances": ["Forensic Evidence Pinboard + Yarn Links", "Witness Alibi Consistency Matrix", "London Gazette Dispatch"]
+    }
+  ],
+  "goldenWorlds": [
+    "atlas-spy-family",
+    "atlas-hogwarts",
+    "atlas-sherlock",
+    "atlas-got",
+    "atlas-cyberpunk-edge",
+    "atlas-outer-wilds",
+    "atlas-ancient-rome",
+    "atlas-heian-kyoto",
+    "atlas-elite-university",
+    "atlas-silicon-valley-1999",
+    "atlas-disco-elysium",
+    "atlas-papers-please"
+  ],
+  "categories": [
+    "Fictional IP",
+    "Historical World",
+    "Real-World / Life World",
+    "Original Archetype"
+  ],
+  "rightsStatuses": [
+    "public_domain",
+    "historical_real_world",
+    "original_archetype",
+    "licensed_required",
+    "unclear"
+  ],
+  "humanFantasies": [
+    "Identity",
+    "Power",
+    "Social",
+    "Relationship",
+    "Exploration",
+    "Mystery & Knowledge",
+    "Survival",
+    "Creation & System",
+    "Political & Intrigue",
+    "Life & Path",
+    "Transformation & Causality"
+  ]
+}

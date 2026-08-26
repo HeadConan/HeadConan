@@ -1,3 +1,16 @@
+export type WorldCategoryType = 
+  | 'Fictional IP'
+  | 'Historical World'
+  | 'Real-World / Life World'
+  | 'Original Archetype';
+
+export type RightsStatusType =
+  | 'public_domain'
+  | 'historical_real_world'
+  | 'original_archetype'
+  | 'licensed_required'
+  | 'unclear';
+
 export type MediumType = 
   | 'Literature'
   | 'Cinema & TV'
@@ -30,6 +43,12 @@ export interface WorldAtlasEntry {
   id: string;
   name: string;
   sourceOrOrigin: string;
+  worldCategory?: WorldCategoryType;
+  rightsStatus?: RightsStatusType;
+  isGoldenWorld?: boolean;
+  isBenchmarkWorld?: boolean;
+  benchmarkType?: 'SOCIAL' | 'POLITICAL' | 'EXPLORATION' | 'MYSTERY';
+  productHypothesis?: string;
   medium: MediumType;
   genre: string[];
   setting: string;
@@ -3044,9 +3063,13 @@ export const WORLD_ATLAS_ENTRIES: WorldAtlasEntry[] = [
 
 export interface AtlasFilters {
   searchQuery: string;
+  category?: WorldCategoryType | 'ALL';
+  rightsStatus?: RightsStatusType | 'ALL';
   medium: MediumType | 'ALL';
   primaryFantasy: PrimaryFantasyType | 'ALL';
   audienceScale: AudienceScaleType | 'ALL';
+  goldenOnly?: boolean;
+  benchmarkOnly?: boolean;
   minCulturalFamiliarity: number;
   sortBy: 'familiarity' | 'overallScore' | 'name' | 'agency' | 'simulationDepth';
 }
@@ -3067,6 +3090,41 @@ export function filterWorldAtlas(
       if (!matchName && !matchSource && !matchSetting && !matchGenre && !matchRole) {
         return false;
       }
+    }
+
+    // Category
+    if (filters.category && filters.category !== 'ALL') {
+      const entryCategory = entry.worldCategory || (
+        entry.medium === 'Historical & Real-World' ? 'Historical World' :
+        entry.medium === 'Philosophical & Concept' ? 'Original Archetype' : 'Fictional IP'
+      );
+      if (entryCategory !== filters.category) return false;
+    }
+
+    // Rights Status
+    if (filters.rightsStatus && filters.rightsStatus !== 'ALL') {
+      const entryRights = entry.rightsStatus || (
+        entry.medium === 'Historical & Real-World' ? 'historical_real_world' :
+        entry.medium === 'Philosophical & Concept' ? 'original_archetype' : 'licensed_required'
+      );
+      if (entryRights !== filters.rightsStatus) return false;
+    }
+
+    // Golden Only
+    if (filters.goldenOnly && !entry.isGoldenWorld) {
+      // Check if it's one of the 12 golden world IDs
+      const goldenIds = [
+        'atlas-spy-family', 'atlas-hogwarts', 'atlas-sherlock', 'atlas-got',
+        'atlas-cyberpunk-edge', 'atlas-outer-wilds', 'atlas-ancient-rome',
+        'atlas-heian-kyoto', 'atlas-elite-university', 'atlas-silicon-valley-1999',
+        'atlas-disco-elysium', 'atlas-papers-please'
+      ];
+      if (!goldenIds.includes(entry.id)) return false;
+    }
+
+    // Benchmark Only
+    if (filters.benchmarkOnly && !entry.isBenchmarkWorld && !['atlas-spy-family', 'atlas-got', 'atlas-outer-wilds', 'atlas-sherlock'].includes(entry.id)) {
+      return false;
     }
 
     // Medium
