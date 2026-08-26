@@ -1,0 +1,6 @@
+{
+  "name": "HeadConan",
+  "description": "An experimental AI-powered interface for externalizing and exploring imagination through generative UI, narrative, and visual world spaces.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
