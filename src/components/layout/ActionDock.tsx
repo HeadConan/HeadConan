@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
-import { Send, Sparkles, CornerDownLeft, Loader2, Zap, Brain, Cpu, Server } from 'lucide-react';
+import { Send, Sparkles, CornerDownLeft, Loader2, Wand2, Shield, Eye } from 'lucide-react';
 import { AIProviderId, AI_PROVIDERS } from '../../ai/client';
+import { WorldStyle } from '../../style/worldStyle';
+import { RoleSlot } from '../../roles/model';
 
 interface ActionDockProps {
   suggestedActions: string[];
   onSubmitAction: (action: string) => void;
   isProcessing: boolean;
   selectedEngine?: AIProviderId;
+  worldStyle?: WorldStyle;
+  activeRole?: RoleSlot;
 }
 
 export const ActionDock: React.FC<ActionDockProps> = ({
@@ -14,6 +18,8 @@ export const ActionDock: React.FC<ActionDockProps> = ({
   onSubmitAction,
   isProcessing,
   selectedEngine = 'auto',
+  worldStyle,
+  activeRole,
 }) => {
   const [inputAction, setInputAction] = useState('');
 
@@ -30,16 +36,30 @@ export const ActionDock: React.FC<ActionDockProps> = ({
   };
 
   const currentConfig = AI_PROVIDERS.find((p) => p.id === selectedEngine) || AI_PROVIDERS[0];
+  const isDirector = activeRole?.type === 'DIRECTOR' || activeRole?.type === 'ARCHITECT';
+  const isObserver = activeRole?.type === 'OBSERVER';
+
+  const defaultPlaceholder = isDirector
+    ? "Direct the world (e.g. 'Spawn sudden crisis', 'Invert faction stance', 'Plant incriminating letter')..."
+    : isObserver
+    ? "Ask the world simulation a question or request an omniscient retrospective..."
+    : worldStyle?.interactionGrammar?.placeholder || "What do you want to do in this world?";
 
   return (
-    <div className="sticky bottom-0 z-30 bg-[#090b12]/95 backdrop-blur-xl border-t border-white/10 px-4 sm:px-6 py-4">
-      <div className="max-w-6xl mx-auto space-y-3">
+    <div className="sticky bottom-0 z-30 bg-[#090b12]/95 backdrop-blur-xl border-t border-white/10 px-3 sm:px-6 py-3.5">
+      <div className="max-w-6xl mx-auto space-y-2.5">
         {/* Suggested Action Chips */}
         {suggestedActions && suggestedActions.length > 0 && (
           <div className="flex items-center space-x-2 overflow-x-auto pb-1 scrollbar-none">
             <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400 flex items-center space-x-1 shrink-0">
-              <Sparkles className="w-3 h-3 text-indigo-400" />
-              <span>Affordances:</span>
+              {isDirector ? (
+                <Wand2 className="w-3 h-3 text-purple-400" />
+              ) : isObserver ? (
+                <Eye className="w-3 h-3 text-emerald-400" />
+              ) : (
+                <Sparkles className="w-3 h-3 text-indigo-400" />
+              )}
+              <span>{worldStyle?.interactionGrammar?.actionTypeLabel || 'Affordances'}:</span>
             </span>
             {suggestedActions.map((suggestion, idx) => (
               <button
@@ -47,7 +67,11 @@ export const ActionDock: React.FC<ActionDockProps> = ({
                 id={`chip-suggestion-${idx}`}
                 disabled={isProcessing}
                 onClick={() => handleChipClick(suggestion)}
-                className="text-xs px-3 py-1.5 rounded-lg bg-white/[0.03] hover:bg-indigo-600/20 text-slate-300 hover:text-indigo-200 border border-white/5 hover:border-indigo-500/30 transition-all shrink-0 font-sans disabled:opacity-50"
+                className={`text-xs px-3 py-1.5 rounded-xl transition-all shrink-0 font-sans disabled:opacity-50 border ${
+                  isDirector
+                    ? 'bg-purple-950/30 hover:bg-purple-900/50 text-purple-200 border-purple-500/20 hover:border-purple-400/40'
+                    : 'bg-white/[0.03] hover:bg-white/[0.08] text-slate-300 hover:text-white border-white/10 hover:border-white/20'
+                }`}
               >
                 {suggestion}
               </button>
@@ -65,10 +89,14 @@ export const ActionDock: React.FC<ActionDockProps> = ({
             disabled={isProcessing}
             placeholder={
               isProcessing
-                ? `${currentConfig.name} is calculating world consequences...`
-                : `What do you want to do? (e.g. Move the army north, or Question the Chancellor)`
+                ? `${currentConfig.name} is resolving causality and mutating world reality...`
+                : defaultPlaceholder
             }
-            className="w-full bg-[#10131e] text-slate-100 text-sm placeholder-slate-500 pl-4 pr-24 py-3 rounded-xl border border-white/15 focus:border-indigo-400/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all font-sans shadow-lg disabled:opacity-60"
+            className={`w-full text-sm pl-4 pr-28 py-3 rounded-xl border focus:outline-none transition-all font-sans shadow-lg disabled:opacity-60 ${
+              isDirector
+                ? 'bg-[#140e22] text-purple-100 placeholder-purple-400/40 border-purple-500/30 focus:border-purple-400 focus:ring-2 focus:ring-purple-500/20'
+                : 'bg-[#10131e] text-slate-100 placeholder-slate-500 border-white/15 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20'
+            }`}
           />
 
           <div className="absolute right-2 flex items-center space-x-1">
@@ -76,7 +104,11 @@ export const ActionDock: React.FC<ActionDockProps> = ({
               id="btn-dispatch-action"
               type="submit"
               disabled={!inputAction.trim() || isProcessing}
-              className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-white/5 text-white disabled:text-slate-500 rounded-lg text-xs font-medium transition-colors flex items-center space-x-1.5"
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center space-x-1.5 disabled:opacity-40 text-white ${
+                isDirector
+                  ? 'bg-purple-600 hover:bg-purple-500'
+                  : 'bg-indigo-600 hover:bg-indigo-500'
+              }`}
             >
               {isProcessing ? (
                 <>
@@ -85,7 +117,7 @@ export const ActionDock: React.FC<ActionDockProps> = ({
                 </>
               ) : (
                 <>
-                  <span>Dispatch</span>
+                  <span>{isDirector ? 'Cast' : 'Dispatch'}</span>
                   <CornerDownLeft className="w-3.5 h-3.5" />
                 </>
               )}

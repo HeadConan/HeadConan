@@ -1,41 +1,37 @@
-# Research Experiment Log — HeadConan
+# HEADCONAN EXPERIMENTS & DEMO WORLDS
 
-This document records the foundational hypotheses and observations discovered during prototyping.
-
----
-
-### Experiment 001: One-Sentence World Genesis
-- **Hypothesis**: A single creative sentence (e.g. *"I want to rule a fracturing cyber-dystopian state"*) can bootstrap a rich, coherent world state and an immediate customized UI.
-- **Setup**: Test single-sentence prompt against the Gemini 3.7 Flash structured generator and rule engine.
-- **Observation**: Yields strong initial coherence with 4-5 key figures, 3 primary tension points, and relevant UI block allocations.
-- **Result**: **Validated**. Minimum prompt overhead drastically lowers user friction compared to lengthy character creation sheets.
-- **Next Question**: How do we prevent AI hallucinations across multi-step mutations?
+Iteration 2 provides three fully fleshed-out demo worlds showcasing distinct interface languages and role slots.
 
 ---
 
-### Experiment 002: Dynamic UI Evolution after User Action
-- **Hypothesis**: Applying a state change (e.g. *"Dismiss the Defense Minister"*) should trigger meaningful UI composition changes (e.g., replacement of Minister dossier with Emergency Decree block and Military hostility surge).
-- **Setup**: Trigger specific high-consequence natural language commands and observe block re-rendering.
-- **Observation**: When UI blocks dynamically update their visual states and priority tiers, users report a tangible sense of world agency.
-- **Result**: **Validated**.
-- **Next Question**: Can user notes directly serve as memory context for future simulations?
+## 1. The Sovereign Imperium of Valen
+* **Genre**: Political Simulation & Authoritarian Intrigue
+* **Visual Language**: Institutional Bureaucracy (Obsidian marble, Deep Indigo, Serif headings).
+* **Primary Surface**: Strategic Garrison Theater & Territorial Map.
+* **Roles**:
+  - `Supreme Archon Alexander` (Player — First-person executive decrees)
+  - `Imperial Shadow Overseer` (Director — Spawning mutinies & leaking memos)
+  - `Cosmic Statecraft Architect` (Architect — Rewriting communication axioms)
+  - `Grand Imperial Chronicler` (Observer)
 
 ---
 
-### Experiment 003: UI Modality Differentiation
-- **Hypothesis**: The system can differentiate when a scenario calls for a tactical map vs. a social schedule vs. an evidence board without explicit template selection by the user.
-- **Setup**: Compare prompt intent mapping against UI Block Registry metadata.
-- **Result**: **Validated**. Semantic tags allow the AI planner to orchestrate appropriate blocks autonomously.
+## 2. St. Jude's Autumn Semester
+* **Genre**: Collegiate Life & Social Sphere
+* **Visual Language**: Modern Academic (Warm emerald & amber accents, clean sans typography).
+* **Primary Surface**: Social Network & Lab Partner Collaboration.
+* **Roles**:
+  - `Alex Morgan` (Player — Senior honors scholar balancing thesis & friendships)
+  - `Campus Proctor & DM` (Director — Spawning surprise pop-quizzes & protests)
+  - `The Campus Chronicler` (Observer)
 
 ---
 
-### Experiment 004: Minimum Sufficient Reality vs. Maximal Over-generation
-- **Hypothesis**: Generating 4 carefully balanced characters and 3 key tensions creates far more engagement than generating 50 boilerplate background entities.
-- **Observation**: Over-generation causes cognitive overload. Restrained semantic anchors invite human curiosity.
-- **Result**: **Confirmed**.
-
----
-
-### Experiment 005: Cross-Genre World Model Coherence
-- **Hypothesis**: The exact same underlying domain types (`WorldState`, `Character`, `Faction`, `Timeline`, `Event`, `Document`) can model an empire simulation, campus drama, or survival mystery without code modifications.
-- **Result**: **Validated**. The universal entity-state model supports radically different narratives.
+## 3. The Blackwood Manor Poisoning
+* **Genre**: 1928 Murder Mystery & Detective Noir
+* **Visual Language**: Archival Corkboard & Sepia Noir (Pushpins, evidence exhibits, red yarn links).
+* **Primary Surface**: Interactive Case Evidence & Deduction Corkboard.
+* **Roles**:
+  - `Inspector Arthur Finch` (Player — Scotland Yard forensic investigation)
+  - `The Shadow Novelist` (Director — Planting forged notes & triggering storms)
+  - `Coroner's Silent Inquest` (Observer)

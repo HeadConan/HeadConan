@@ -1,57 +1,62 @@
-# System Architecture — HeadConan
+# HEADCONAN ARCHITECTURE (ITERATION 2)
 
-## 1. Architectural Philosophy: Decoupled World & UI
+HeadConan is a runtime for inhabiting, directing, and transforming imagined worlds.
 
-A core principle of HeadConan is the strict separation between:
-1. **World State**: The underlying simulation truth (Characters, Locations, Factions, Timelines, Documents, Tensions).
-2. **UI Representation**: The dynamic projection of that state onto interactive UI blocks.
+---
+
+## 1. System Overview
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                         USER INPUT                          │
-│         "Move the northern garrison to the capital"         │
-└──────────────────────────────┬──────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│                     AI SIMULATION ENGINE                     │
-│    Intent Interpretation → State Mutation → UI Planning     │
-└──────────────────────────────┬──────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│                         WORLD STATE                         │
-│   • Factions (Influence & Loyalty shifts)                   │
-│   • Characters (Reactions & Status)                         │
-│   • Timeline & Events (New emergent reports)                │
-│   • Intelligence Documents & User Notes                     │
-└──────────────────────────────┬──────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    UI PLANNING & REGISTRY                   │
-│  Selects semantic UI Blocks (Map, Dossier, Gauge, Timeline) │
-└──────────────────────────────┬──────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  DETERMINISTIC UI RENDERER                  │
-│       React Components render structured JSON blocks         │
-└─────────────────────────────────────────────────────────────┘
+ ┌─────────────────────────────────────────────────────────────┐
+ │                 WORLD RUNTIME & STATE                      │
+ │   - Characters, Factions, Locations, Events, Clues, Rules   │
+ │   - Causality Resolution Engine (DeepSeek / Gemini)         │
+ └──────────────────────────────┬──────────────────────────────┘
+                                │
+                                ▼
+ ┌─────────────────────────────────────────────────────────────┐
+ │                      UI DIRECTOR                            │
+ │   - Inputs: WorldState + Active RoleSlot + WorldStyle       │
+ │   - Attention Budget Allocator (Caps cognitive load)        │
+ │   - Composes active layers for the World Canvas             │
+ └──────────────────────────────┬──────────────────────────────┘
+                                │
+                                ▼
+ ┌─────────────────────────────────────────────────────────────┐
+ │                      WORLD CANVAS                           │
+ │   Layer 0: World Frame (Header, Role Slot Selector, Chrono) │
+ │   Layer 1: Primary Surface (Map / Evidence Board / Roster)  │
+ │   Layer 2: Context Surfaces (Docs, Timeline, Stats, Alerts) │
+ │   Layer 3: Interaction Surface (Context-Aware Action Dock)  │
+ └─────────────────────────────────────────────────────────────┘
 ```
 
-## 2. Minimum Sufficient Reality
+---
 
-HeadConan does not overwhelm the user with thousands of procedurally generated boilerplate entities. It generates **only enough structure** to ground the experience and provide meaningful affordances, leaving the rest for the user's imagination.
+## 2. Core Subsystems
 
-## 3. Controlled Generative UI
+### 1. Multi-Model AI Gateway (`server.ts` & `src/ai/client.ts`)
+* Provides intelligent model routing across:
+  - **DeepSeek-V3** (`deepseek-chat`): Fast, rich simulation and world synthesis.
+  - **DeepSeek-R1** (`deepseek-reasoner`): Deep chain-of-thought causality analysis.
+  - **Gemini 2.5 / Flash**: High-speed multimodal intelligence.
+  - **Procedural Engine**: Sub-millisecond deterministic fallback.
 
-The AI does **not** generate arbitrary HTML or unstable React code on the fly. 
-- The **AI decides what should exist** (the semantic entity and block type).
-- The **Frontend decides how that thing is rendered** (the deterministic, accessible React component).
+### 2. Role Slot Engine (`src/roles/model.ts`)
+* Defines inhabitant identity, agency (character-level vs. world-level vs. system-level), perspective, knowledge fog-of-war, and permissions.
+* Enables instant, seamless agency shifting without page reloads.
 
-## 4. State Synchronization & Mutability
+### 3. UI Director & Attention Budget (`src/interface/director.ts`)
+* Analyzes the active world state, current role, and world style grammar.
+* Allocates visual real estate dynamically to prevent interface bloat.
 
-- **State Store (`src/world/state.ts`)**: Manages the in-memory active world, history snapshots, and user-authored notes.
-- **Mutation Engine (`src/world/mutations.ts`)**: Applies incremental diffs (delta stats, loyalty updates, new log items).
-- **Persistence (`localStorage`)**: Saves session state locally without mandatory remote DB lock-in during prototype research.
+### 4. World Canvas & UI Capabilities (`src/ui/` & `src/components/blocks/`)
+* Modular surface blocks including:
+  - `EvidenceBoardBlock`: Interactive detective corkboard with pins and red yarn links.
+  - `DirectorConsoleBlock`: Directorial intervention matrix and world axiom modifier.
+  - `MapBlock`: Interactive SVG spatial and territorial map.
+  - `CharacterBlock`: Dossiers with loyalty and suspicion gauges.
+  - `StatsBlock`: System vitals and equilibrium meters.
+  - `DocumentBlock`: In-universe classified memos and autopsy records.
+  - `TimelineBlock`: Chronological schedules and crime timelines.
+  - `EventBlock`: Urgent crisis and alert dispatches.

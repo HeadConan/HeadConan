@@ -1,32 +1,29 @@
-# UI System & Semantic Component Registry — HeadConan
+# HEADCONAN UI SYSTEM & WORLD CANVAS
 
-## 1. UI Block Schema
+The UI in HeadConan is organized into four distinct structural layers:
 
-Each UI block rendered on the World Canvas follows a standardized schema:
+---
 
-```typescript
-export interface UIBlock {
-  id: string;
-  type: UIBlockType;
-  title: string;
-  priority: 'primary' | 'secondary' | 'ephemeral';
-  colSpan?: 1 | 2 | 3;
-  dataRef?: string;
-  customData?: any;
-}
-```
+## 1. The Four Levels of UI Hierarchy
 
-## 2. Supported UI Block Modalities
+### Layer 0: World Frame
+* Persistent top atmospheric bar.
+* Displays world identity, genre, active turn/chronometer, and the **Role Slot Selector**.
+* Provides instant access to the **Director Overlay**, AI engine switcher, and narrative chronicle.
 
-| Block Type | Semantic Purpose | Typical Scenarios |
-|---|---|---|
-| `dashboard` | High-level situational summary & overview | World entry, command central |
-| `map` | Interactive SVG storytelling & spatial positioning | Political realms, campus grounds, wasteland sectors |
-| `character` | Character roster, loyalty meters, interaction dialog | Royal courts, university cliques, suspect lineups |
-| `timeline` | Temporal ticks and upcoming scheduled occurrences | Council meetings, class schedules, ticking threats |
-| `document` | In-universe classified files, letters, memos | Intelligence reports, love letters, scientific logs |
-| `stats` | Vital metrics, systemic equilibrium bars, trend indicators | Stability, Economy, Sanity, GPA, Morale |
-| `relationship`| Inter-entity loyalty, friction, and alliance matrix | Court conspiracies, social networks |
-| `event` | Critical urgent broadcasts and emergency decision points | Rebellions, sudden exams, anomaly outbreaks |
-| `note` | User-authored tactical scratchpad & deductive memory | Player notes, suspicion lists |
-| `chat` | Direct conversation stream with specific characters | Interrogations, private meetings, whispers |
+### Layer 1: Primary Surface (World-Specific Centerpiece)
+* The defining spatial or conceptual anchor of the world:
+  - *Empire*: Strategic Military & Territorial Theater Map.
+  - *University*: Academic & Social Cohort Network.
+  - *Detective*: Interactive Evidence Corkboard with pushpins and connected yarn threads.
+
+### Layer 2: Context Surfaces (Attention-Budgeted Grid)
+* Contextual blocks dynamically selected by the **UI Director**:
+  - Dossiers & Suspects
+  - Documents & Autopsy Reports
+  - Timeline & Murder Night Alibis
+  - Faction Equilibrium Matrix
+  - Emergent Dispatches & Alerts
+
+### Layer 3: Interaction Surface (Action Dock)
+* Sticky bottom dock adapting its verbs, placeholders, and affordance chips to the active world style and inhabitant role.

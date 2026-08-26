@@ -21,7 +21,9 @@ export function applyWorldMutations(
   // 2. Stats Updates
   if (changes.updatedStats && changes.updatedStats.length > 0) {
     for (const statUpdate of changes.updatedStats) {
-      const match = nextWorld.stats.find(s => s.id === statUpdate.id || s.label.toLowerCase() === statUpdate.id.toLowerCase());
+      const match = nextWorld.stats.find(
+        s => s.id === statUpdate.id || s.label.toLowerCase().includes(statUpdate.id.toLowerCase())
+      );
       if (match) {
         if (typeof statUpdate.newValue === 'number') {
           match.value = Math.max(0, Math.min(match.max || 100, statUpdate.newValue));
@@ -39,12 +41,17 @@ export function applyWorldMutations(
   // 3. Character Updates
   if (changes.updatedCharacters && changes.updatedCharacters.length > 0) {
     for (const charUpdate of changes.updatedCharacters) {
-      const match = nextWorld.characters.find(c => c.id === charUpdate.id || c.name.toLowerCase() === charUpdate.id.toLowerCase());
+      const match = nextWorld.characters.find(
+        c => c.id === charUpdate.id || c.name.toLowerCase().includes(charUpdate.id.toLowerCase())
+      );
       if (match) {
         if (typeof charUpdate.newLoyalty === 'number') {
           match.loyalty = Math.max(0, Math.min(100, charUpdate.newLoyalty));
         } else if (typeof charUpdate.loyaltyDelta === 'number') {
           match.loyalty = Math.max(0, Math.min(100, match.loyalty + charUpdate.loyaltyDelta));
+        }
+        if (typeof charUpdate.suspicionDelta === 'number' && typeof match.suspicionLevel === 'number') {
+          match.suspicionLevel = Math.max(0, Math.min(100, match.suspicionLevel + charUpdate.suspicionDelta));
         }
         if (charUpdate.status) match.status = charUpdate.status;
       }
@@ -54,7 +61,9 @@ export function applyWorldMutations(
   // 4. Faction Updates
   if (changes.updatedFactions && changes.updatedFactions.length > 0) {
     for (const facUpdate of changes.updatedFactions) {
-      const match = nextWorld.factions.find(f => f.id === facUpdate.id || f.name.toLowerCase() === facUpdate.id.toLowerCase());
+      const match = nextWorld.factions.find(
+        f => f.id === facUpdate.id || f.name.toLowerCase().includes(facUpdate.id.toLowerCase())
+      );
       if (match) {
         if (typeof facUpdate.newInfluence === 'number') {
           match.influence = Math.max(0, Math.min(100, facUpdate.newInfluence));
@@ -69,17 +78,27 @@ export function applyWorldMutations(
 
   // 5. New Events
   if (changes.newEvents && changes.newEvents.length > 0) {
-    nextWorld.events = [...changes.newEvents, ...nextWorld.events].slice(0, 10);
+    nextWorld.events = [...changes.newEvents, ...nextWorld.events].slice(0, 15);
   }
 
   // 6. New Timeline Items
   if (changes.newTimelineItems && changes.newTimelineItems.length > 0) {
-    nextWorld.timeline = [...changes.newTimelineItems, ...nextWorld.timeline].slice(0, 10);
+    nextWorld.timeline = [...changes.newTimelineItems, ...nextWorld.timeline].slice(0, 15);
   }
 
   // 7. New Documents
   if (changes.newDocuments && changes.newDocuments.length > 0) {
     nextWorld.documents = [...changes.newDocuments, ...nextWorld.documents];
+  }
+
+  // 8. New Clues
+  if (changes.newClues && changes.newClues.length > 0) {
+    nextWorld.clues = [...(nextWorld.clues || []), ...changes.newClues];
+  }
+
+  // 9. New Rules / Axioms
+  if (changes.newRules && changes.newRules.length > 0) {
+    nextWorld.rules = [...(nextWorld.rules || []), ...changes.newRules];
   }
 
   return nextWorld;

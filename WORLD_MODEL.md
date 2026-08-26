@@ -1,16 +1,51 @@
-# World Model Domain Ontology — HeadConan
+# HEADCONAN WORLD MODEL
 
-## 1. Domain Types Overview
+The world model in HeadConan represents the persistent, objective state of an imagined universe, completely decoupled from visual representation.
 
-The internal world representation is strictly typed in TypeScript (`src/world/types.ts`):
+---
 
-- **`WorldState`**: Root entity containing world metadata, premise, atmosphere, and constituent collections.
-- **`UserRole`**: Player identity, authority rank, active objectives, and personal capabilities.
-- **`Character`**: Individuals with loyalty scores, faction alignment, status, portraits, and secret motives.
-- **`Location`**: Spatial landmarks with coordinates, tactical significance, and alert status.
-- **`Faction`**: Societal powers with influence ratings (0-100), diplomatic stance, and hidden agendas.
-- **`Event`**: Active incidents, crisis alerts, reports, and whispers sorted by urgency.
-- **`TimelineEvent`**: Sequential progression ticks providing a sense of persistent, moving time.
-- **`StatMetric`**: Quantitative meters (e.g. Treasury, Stability, Morale, Stress) with trends.
-- **`WorldDocument`**: Intelligence memos, classified files, diaries, letters, and intercepted broadcasts.
-- **`UserNote`**: User-authored reflections, suspicions, and observations stored directly into the world memory.
+## 1. Domain Schema
+
+```typescript
+export interface WorldState {
+  id: string;
+  name: string;
+  genre: string;
+  premise: string;
+  atmosphere: string;
+  currentSituation: string;
+
+  // Roles System
+  roles: RoleSlot[];
+  activeRoleId: string;
+
+  // Domain Entities
+  characters: Character[];
+  locations: WorldLocation[];
+  factions: Faction[];
+  events: WorldEvent[];
+  timeline: TimelineEvent[];
+  stats: StatMetric[];
+  documents: WorldDocument[];
+  relationships?: Relationship[];
+  clues?: ClueItem[];
+  rules?: RuleAxiom[];
+  notes: UserNote[];
+
+  // World Interface Grammar Constitution
+  style: WorldStyle;
+
+  createdAt: string;
+  turnCount: number;
+}
+```
+
+---
+
+## 2. Key Entities
+
+1. **RoleSlot**: Defines the lenses through which the user interacts with the world (Player, Director, Architect, Observer).
+2. **ClueItem**: Forensic or investigative leads with categories (`physical`, `testimony`, `documentary`, `environmental`), status (`unsolved`, `connected`, `refuted`), and relational thread linkages.
+3. **RuleAxiom**: Ontological constraints governing physics, communication latency, and social law.
+4. **Faction**: Political, military, or social blocs with influence meters and stance indicators (`hostile`, `suspicious`, `neutral`, `supportive`, `allied`).
+5. **Character**: Agents with loyalty, secret agendas, and alibis.

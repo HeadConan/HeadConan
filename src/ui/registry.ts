@@ -8,8 +8,28 @@ import { EventBlock } from '../components/blocks/EventBlock';
 import { NoteBlock } from '../components/blocks/NoteBlock';
 import { RelationshipBlock } from '../components/blocks/RelationshipBlock';
 import { DashboardBlock } from '../components/blocks/DashboardBlock';
+import { EvidenceBoardBlock } from '../components/blocks/EvidenceBoardBlock';
+import { DirectorConsoleBlock } from '../components/blocks/DirectorConsoleBlock';
 
 export const UI_CAPABILITY_REGISTRY: Record<string, UIBlockDescriptor> = {
+  'evidence-board': {
+    type: 'evidence-board',
+    name: 'Investigation & Evidence Corkboard',
+    description: 'Interactive evidence corkboard with pinned forensic clues, suspect ties, and thread analysis.',
+    whatItRepresents: 'Forensic reality, criminal deductions, and investigative progress.',
+    whenUsed: 'When mystery, crime scene forensics, or detective work is the primary focus.',
+    requiredData: ['clues', 'characters'],
+    component: EvidenceBoardBlock
+  },
+  'director-console': {
+    type: 'director-console',
+    name: 'World Director & Ontological Console',
+    description: 'Directorial interface for spawning emergent crises, altering faction stances, and modifying world axioms.',
+    whatItRepresents: 'Directorial and system-level agency over world simulation.',
+    whenUsed: 'When user assumes Host, Director, or Architect agency.',
+    requiredData: ['factions'],
+    component: DirectorConsoleBlock
+  },
   map: {
     type: 'map',
     name: 'Tactical & Spatial Map',
