@@ -20,13 +20,23 @@ Instead of responding with a static text wall, HeadConan constructs a living cog
 
 ---
 
+## ⚡ Multi-Model Intelligence System (DeepSeek & Gemini)
+
+HeadConan supports multi-model AI routing with dedicated support for:
+- 🔷 **DeepSeek-V3 (`deepseek-chat`)**: High-speed, 671B MoE model for creative roleplay & structured generative world synthesis.
+- 🧠 **DeepSeek-R1 (`deepseek-reasoner`)**: Deep Chain-of-Thought reasoning for complex geopolitical simulations & multi-branch state matrices.
+- ⚡ **Gemini 3.7 Flash (`gemini-3.7-flash`)**: High-performance multimodal reasoning.
+- ⚙️ **Procedural Simulation Engine**: Zero-dependency deterministic offline simulation.
+
+---
+
 ## 🏛️ Project Architecture
 
 ```
 User Imagination
       │
       ▼
-AI Workflow (Interpretation → World Genesis → UI Planning)
+AI Workflow (DeepSeek V3/R1 | Gemini 3.7 | Local Engine)
       │
       ▼
 World State (Independent Domain Entity Model)
@@ -49,6 +59,10 @@ Interactive Experience & State Mutations (Minimum Sufficient Updates)
 # Install dependencies
 npm install
 
+# Configure API Keys in .env (optional, falls back gracefully to procedural engine)
+# DEEPSEEK_API_KEY=your_deepseek_key
+# GEMINI_API_KEY=your_gemini_key
+
 # Start development server
 npm run dev
 
@@ -61,10 +75,10 @@ npm run build
 ## 📚 Living Documentation
 
 - [`ARCHITECTURE.md`](./ARCHITECTURE.md) — System architecture, decoupling of World State & UI Representation.
+- [`AI_WORKFLOW.md`](./AI_WORKFLOW.md) — Multi-model prompt architecture, DeepSeek & Gemini API workflows.
 - [`PRODUCT.md`](./PRODUCT.md) — Product concept, hypothesis, and interaction loops.
 - [`EXPERIMENTS.md`](./EXPERIMENTS.md) — Experiment logs, hypotheses, observations, and discoveries.
 - [`DESIGN.md`](./DESIGN.md) — Visual principles, typography, cinematic dark mode, and UI standards.
-- [`AI_WORKFLOW.md`](./AI_WORKFLOW.md) — Modular prompt architecture, schema enforcement, and fallback mechanics.
 - [`WORLD_MODEL.md`](./WORLD_MODEL.md) — Domain ontology (`WorldState`, `Character`, `Faction`, `Timeline`, etc.).
 - [`UI_SYSTEM.md`](./UI_SYSTEM.md) — Semantic UI block registry, composition, and rendering logic.
 - [`ROADMAP.md`](./ROADMAP.md) — Research roadmap from prototype to full cognitive environment.

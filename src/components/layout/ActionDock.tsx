@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
-import { Send, Sparkles, CornerDownLeft, Loader2 } from 'lucide-react';
+import { Send, Sparkles, CornerDownLeft, Loader2, Zap, Brain, Cpu, Server } from 'lucide-react';
+import { AIProviderId, AI_PROVIDERS } from '../../ai/client';
 
 interface ActionDockProps {
   suggestedActions: string[];
   onSubmitAction: (action: string) => void;
   isProcessing: boolean;
+  selectedEngine?: AIProviderId;
 }
 
 export const ActionDock: React.FC<ActionDockProps> = ({
   suggestedActions,
   onSubmitAction,
   isProcessing,
+  selectedEngine = 'auto',
 }) => {
   const [inputAction, setInputAction] = useState('');
 
@@ -26,13 +29,15 @@ export const ActionDock: React.FC<ActionDockProps> = ({
     onSubmitAction(suggestion);
   };
 
+  const currentConfig = AI_PROVIDERS.find((p) => p.id === selectedEngine) || AI_PROVIDERS[0];
+
   return (
-    <div className="sticky bottom-0 z-30 bg-[#090b12]/95 backdrop-blur-xl border-t border-white/10 px-6 py-4">
+    <div className="sticky bottom-0 z-30 bg-[#090b12]/95 backdrop-blur-xl border-t border-white/10 px-4 sm:px-6 py-4">
       <div className="max-w-6xl mx-auto space-y-3">
         {/* Suggested Action Chips */}
         {suggestedActions && suggestedActions.length > 0 && (
           <div className="flex items-center space-x-2 overflow-x-auto pb-1 scrollbar-none">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-slate-500 flex items-center space-x-1 shrink-0">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400 flex items-center space-x-1 shrink-0">
               <Sparkles className="w-3 h-3 text-indigo-400" />
               <span>Affordances:</span>
             </span>
@@ -60,8 +65,8 @@ export const ActionDock: React.FC<ActionDockProps> = ({
             disabled={isProcessing}
             placeholder={
               isProcessing
-                ? 'The world is responding to your directive...'
-                : 'What do you want to do? (e.g. Move the army north, or Question the Chancellor)'
+                ? `${currentConfig.name} is calculating world consequences...`
+                : `What do you want to do? (e.g. Move the army north, or Question the Chancellor)`
             }
             className="w-full bg-[#10131e] text-slate-100 text-sm placeholder-slate-500 pl-4 pr-24 py-3 rounded-xl border border-white/15 focus:border-indigo-400/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all font-sans shadow-lg disabled:opacity-60"
           />
@@ -76,7 +81,7 @@ export const ActionDock: React.FC<ActionDockProps> = ({
               {isProcessing ? (
                 <>
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span className="hidden sm:inline">Evolving...</span>
+                  <span className="hidden sm:inline">Simulating...</span>
                 </>
               ) : (
                 <>

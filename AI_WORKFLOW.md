@@ -1,8 +1,39 @@
 # AI Workflow & Modular Prompting — HeadConan
 
-## 1. Modular Prompt Assembly
+## 1. Multi-Model Architecture & Intelligent Gateway
 
-The system prompt is divided into clean, decoupled layers:
+HeadConan features a multi-engine AI architecture supporting both **DeepSeek** and **Google Gemini** alongside a deterministic client-side engine:
+
+```
+┌────────────────────────────────────────────────────────┐
+│               Intelligent AI Gateway                   │
+├──────────────────────────┬─────────────────────────────┤
+│   🔷 DeepSeek Engine     │      ⚡ Google Gemini        │
+│   • deepseek-chat (V3)   │      • gemini-3.7-flash     │
+│   • deepseek-reasoner(R1)│                             │
+├──────────────────────────┴─────────────────────────────┤
+│   ⚙️ Local Procedural Genesis & Simulation Engine      │
+│   (Zero-dependency fallback & deterministic runtime)   │
+└────────────────────────────────────────────────────────┘
+```
+
+### Supported Models:
+1. **DeepSeek-V3 (`deepseek-chat`)**:
+   - 671B Parameter MoE architecture (37B active).
+   - High-throughput generative world synthesis and rich, dynamic roleplay interactions.
+   - Structured JSON mode (`response_format: { type: "json_object" }`).
+2. **DeepSeek-R1 (`deepseek-reasoner`)**:
+   - Chain-of-Thought reasoning for deep political consequences, geopolitical simulation, and multi-turn state mutations.
+3. **Gemini 3.7 Flash (`gemini-3.7-flash`)**:
+   - High-speed multimodal intelligence via Google GenAI SDK.
+4. **Deterministic Procedural Simulator**:
+   - Pure client-side rule engine allowing full offline usage without API keys.
+
+---
+
+## 2. Modular Prompt Assembly
+
+The system prompt is divided into decoupled layers:
 
 ```
 ┌────────────────────────────────────────────────────────┐
@@ -16,14 +47,24 @@ The system prompt is divided into clean, decoupled layers:
 ├────────────────────────────────────────────────────────┤
 │ 5. User Input Intent & Direction                       │
 ├────────────────────────────────────────────────────────┤
-│ 6. Enforced JSON Output Schema                         │
+│ 6. Enforced Strict JSON Output Schema                  │
 └────────────────────────────────────────────────────────┘
 ```
 
-## 2. Failure Handling & Graceful Degradation
+---
 
-If the AI call is unavailable, lacks an API key, or encounters network limits:
-1. The app automatically utilizes its **Built-in Procedural Genesis & Simulation Engine** (`src/world/engine.ts`).
-2. Preserves active state without throwing unhandled exceptions.
-3. Provides visual notification in developer status bar while keeping the user fully immersed.
-4. Seamlessly processes actions deterministically or through real Gemini 3.7 Flash when active.
+## 3. Server Endpoints & Integration
+
+- `GET /api/health` — Returns status of DeepSeek and Gemini connections.
+- `POST /api/generate-world` — Generates a new world and tailored UI blocks. Supports `{ prompt, provider, model }`.
+- `POST /api/interact-world` — Simulates consequence calculation and state mutations. Supports `{ action, currentWorld, userNotes, provider, model }`.
+- `POST /api/deepseek/generate-world` & `POST /api/deepseek/interact-world` — Direct DeepSeek endpoints.
+- `POST /api/gemini/generate-world` & `POST /api/gemini/interact-world` — Direct Gemini endpoints.
+
+---
+
+## 4. Failure Handling & Graceful Degradation
+
+If the selected AI model is unavailable or lacks an API key:
+1. The gateway gracefully cascades (DeepSeek $\rightarrow$ Gemini $\rightarrow$ Procedural Engine).
+2. Prevents runtime exceptions, providing unbroken interactive gameplay and world evolution.

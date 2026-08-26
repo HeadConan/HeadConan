@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
 import { ArrowRight, Sparkles, Compass, Shield, GraduationCap, Building2, History } from 'lucide-react';
 import { DEMO_PRESETS } from '../../data/mockWorlds';
+import { AIProviderId, AI_PROVIDERS } from '../../ai/client';
+import { EngineSelector } from '../layout/EngineSelector';
 
 interface EmptyPromptSpaceProps {
   onSubmitPrompt: (prompt: string) => void;
   onSelectPreset: (presetId: string) => void;
+  selectedEngine: AIProviderId;
+  onSelectEngine: (engine: AIProviderId) => void;
 }
 
 export const EmptyPromptSpace: React.FC<EmptyPromptSpaceProps> = ({
   onSubmitPrompt,
   onSelectPreset,
+  selectedEngine,
+  onSelectEngine,
 }) => {
   const [prompt, setPrompt] = useState('');
 
@@ -19,8 +25,10 @@ export const EmptyPromptSpace: React.FC<EmptyPromptSpaceProps> = ({
     onSubmitPrompt(prompt.trim());
   };
 
+  const currentConfig = AI_PROVIDERS.find((p) => p.id === selectedEngine) || AI_PROVIDERS[0];
+
   return (
-    <div className="min-h-screen bg-[#08090d] text-slate-100 flex flex-col justify-between px-6 py-10 relative overflow-hidden">
+    <div className="min-h-screen bg-[#08090d] text-slate-100 flex flex-col justify-between px-6 py-8 relative overflow-hidden">
       {/* Background ambient lighting */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-indigo-900/10 rounded-full blur-[140px] pointer-events-none" />
       <div className="absolute bottom-10 right-10 w-96 h-96 bg-amber-500/5 rounded-full blur-[120px] pointer-events-none" />
@@ -35,13 +43,22 @@ export const EmptyPromptSpace: React.FC<EmptyPromptSpaceProps> = ({
             HeadConan
           </span>
         </div>
-        <span className="text-[11px] font-mono text-slate-400 border border-white/10 px-2.5 py-1 rounded-full bg-white/[0.02]">
-          Generative World Scaffold // v0.1
-        </span>
+
+        <div className="flex items-center space-x-2.5">
+          <EngineSelector
+            selectedEngine={selectedEngine}
+            onSelectEngine={onSelectEngine}
+          />
+        </div>
       </header>
 
       {/* Central Creative Space */}
-      <main className="max-w-3xl mx-auto w-full my-auto z-10 text-center flex flex-col items-center">
+      <main className="max-w-3xl mx-auto w-full my-auto z-10 text-center flex flex-col items-center py-6">
+        <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/[0.03] border border-white/10 text-[11px] font-mono text-indigo-300 mb-4">
+          <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+          <span>Generative World Synthesis Engine // Powered by {currentConfig.badge}</span>
+        </div>
+
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-medium tracking-tight text-slate-100 mb-4 leading-tight">
           What do you want to experience?
         </h1>
@@ -105,8 +122,9 @@ export const EmptyPromptSpace: React.FC<EmptyPromptSpaceProps> = ({
       </main>
 
       {/* Footer */}
-      <footer className="max-w-4xl mx-auto w-full text-center text-xs text-slate-400 z-10 font-mono">
-        Minimum Sufficient Reality • Decoupled Domain State • Generative UI Modalities
+      <footer className="max-w-4xl mx-auto w-full text-center text-xs text-slate-400 z-10 font-mono flex items-center justify-between">
+        <span>Minimum Sufficient Reality • Decoupled Domain State</span>
+        <span className="text-slate-500">Active Engine: {currentConfig.name}</span>
       </footer>
     </div>
   );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { WorldState, UIPlanning, UIBlock } from '../world/types';
 import { EMPIRE_SEED_WORLD, UNIVERSITY_SEED_WORLD, DEMO_PRESETS } from '../data/mockWorlds';
-import { generateWorldFromAI, interactWorldWithAI } from '../ai/client';
+import { generateWorldFromAI, interactWorldWithAI, AIProviderId } from '../ai/client';
 import { applyWorldMutations } from '../world/mutations';
 import { EmptyPromptSpace } from '../components/world/EmptyPromptSpace';
 import { WorldGenesisAnimation } from '../components/world/WorldGenesisAnimation';
@@ -10,19 +10,30 @@ import { WorldCanvasRenderer } from '../ui/renderer';
 import { ActionDock } from '../components/layout/ActionDock';
 import { ChronicleModal } from '../components/world/ChronicleModal';
 import { NotesDrawer } from '../components/world/NotesDrawer';
-import { Sparkles, AlertCircle, CheckCircle, ArrowRight } from 'lucide-react';
+import { Sparkles, Zap, Brain } from 'lucide-react';
 
 interface ChronicleEntry {
   turn: number;
   action: string;
   narrative: string;
   timestamp: string;
+  provider?: string;
+  model?: string;
 }
 
 export const App: React.FC = () => {
   // App Phase: 'prompt' | 'genesis' | 'workspace'
   const [appPhase, setAppPhase] = useState<'prompt' | 'genesis' | 'workspace'>('prompt');
   const [currentPrompt, setCurrentPrompt] = useState<string>('');
+
+  // Selected AI Engine
+  const [selectedEngine, setSelectedEngine] = useState<AIProviderId>(() => {
+    try {
+      const saved = localStorage.getItem('headconan_selected_engine');
+      if (saved) return saved as AIProviderId;
+    } catch (e) {}
+    return 'auto';
+  });
 
   // World and UI Plan State
   const [world, setWorld] = useState<WorldState | null>(null);
@@ -39,6 +50,14 @@ export const App: React.FC = () => {
 
   // Temporary container while genesis animation runs
   const [pendingWorldData, setPendingWorldData] = useState<{ world: WorldState; uiPlanning: UIPlanning } | null>(null);
+
+  // Persist selected engine
+  const handleSelectEngine = (engine: AIProviderId) => {
+    setSelectedEngine(engine);
+    try {
+      localStorage.setItem('headconan_selected_engine', engine);
+    } catch (e) {}
+  };
 
   // Load initial local storage if present
   useEffect(() => {
@@ -77,8 +96,8 @@ export const App: React.FC = () => {
     setLatestNarrativeOutcome(null);
     setChronicle([]);
 
-    // Start generation immediately in parallel with animation
-    const result = await generateWorldFromAI(prompt);
+    // Start generation immediately in parallel with animation using selectedEngine
+    const result = await generateWorldFromAI(prompt, selectedEngine);
     setPendingWorldData({
       world: result.world,
       uiPlanning: result.uiPlanning,
@@ -123,7 +142,7 @@ export const App: React.FC = () => {
 
     try {
       const userNotes = world.notes?.map(n => n.content) || [];
-      const interactionResult = await interactWorldWithAI(action, world, userNotes);
+      const interactionResult = await interactWorldWithAI(action, world, userNotes, selectedEngine);
 
       // Apply mutations
       const nextWorld = applyWorldMutations(world, interactionResult);
@@ -135,7 +154,9 @@ export const App: React.FC = () => {
         turn: nextWorld.turnCount,
         action,
         narrative: interactionResult.narrativeOutcome,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        provider: (interactionResult as any).provider,
+        model: (interactionResult as any).model,
       };
       setChronicle(prev => [newEntry, ...prev]);
 
@@ -191,6 +212,8 @@ export const App: React.FC = () => {
       <EmptyPromptSpace
         onSubmitPrompt={handleInitiatePrompt}
         onSelectPreset={handleSelectPreset}
+        selectedEngine={selectedEngine}
+        onSelectEngine={handleSelectEngine}
       />
     );
   }
@@ -200,6 +223,7 @@ export const App: React.FC = () => {
       <WorldGenesisAnimation
         prompt={currentPrompt || 'Synthesizing world parameters...'}
         onComplete={handleGenesisComplete}
+        selectedEngine={selectedEngine}
       />
     );
   }
@@ -217,6 +241,8 @@ export const App: React.FC = () => {
         onSelectPreset={handleSelectPreset}
         onOpenFeedModal={() => setShowChronicleModal(true)}
         onOpenNotesModal={() => setShowNotesDrawer(true)}
+        selectedEngine={selectedEngine}
+        onSelectEngine={handleSelectEngine}
       />
 
       {/* Main World Canvas */}
@@ -262,6 +288,7 @@ export const App: React.FC = () => {
         suggestedActions={uiPlan.suggestedInteractions || []}
         onSubmitAction={handleDispatchAction}
         isProcessing={isProcessingAction}
+        selectedEngine={selectedEngine}
       />
 
       {/* Modals */}
