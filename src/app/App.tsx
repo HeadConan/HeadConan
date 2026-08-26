@@ -10,6 +10,7 @@ import { WorldCanvasRenderer } from '../ui/renderer';
 import { ActionDock } from '../components/layout/ActionDock';
 import { ChronicleModal } from '../components/world/ChronicleModal';
 import { NotesDrawer } from '../components/world/NotesDrawer';
+import { WorldAtlasExplorer } from '../components/atlas/WorldAtlasExplorer';
 import { computeUIPlan } from '../interface/director';
 import { RoleSlot } from '../roles/model';
 import { Sparkles, Wand2, Shield, Eye, AlertCircle } from 'lucide-react';
@@ -51,6 +52,7 @@ export const App: React.FC = () => {
   // Modals
   const [showChronicleModal, setShowChronicleModal] = useState(false);
   const [showNotesDrawer, setShowNotesDrawer] = useState(false);
+  const [showAtlasModal, setShowAtlasModal] = useState(false);
 
   // Temporary container while genesis animation runs
   const [pendingWorldData, setPendingWorldData] = useState<{ world: WorldState; uiPlanning?: UIPlanning } | null>(null);
@@ -242,12 +244,24 @@ export const App: React.FC = () => {
   // Render based on Phase
   if (appPhase === 'prompt') {
     return (
-      <EmptyPromptSpace
-        onSubmitPrompt={handleInitiatePrompt}
-        onSelectPreset={handleSelectPreset}
-        selectedEngine={selectedEngine}
-        onSelectEngine={handleSelectEngine}
-      />
+      <>
+        <EmptyPromptSpace
+          onSubmitPrompt={handleInitiatePrompt}
+          onSelectPreset={handleSelectPreset}
+          selectedEngine={selectedEngine}
+          onSelectEngine={handleSelectEngine}
+          onOpenAtlas={() => setShowAtlasModal(true)}
+        />
+        {showAtlasModal && (
+          <WorldAtlasExplorer
+            onSelectPromptForWorld={(prompt) => {
+              setShowAtlasModal(false);
+              handleInitiatePrompt(prompt);
+            }}
+            onClose={() => setShowAtlasModal(false)}
+          />
+        )}
+      </>
     );
   }
 
@@ -276,6 +290,7 @@ export const App: React.FC = () => {
         onSelectPreset={handleSelectPreset}
         onOpenFeedModal={() => setShowChronicleModal(true)}
         onOpenNotesModal={() => setShowNotesDrawer(true)}
+        onOpenAtlas={() => setShowAtlasModal(true)}
         selectedEngine={selectedEngine}
         onSelectEngine={handleSelectEngine}
         activeRole={activeRole}
@@ -369,6 +384,16 @@ export const App: React.FC = () => {
         onAddNote={handleAddNote}
         onActionFromNote={handleDispatchAction}
       />
+
+      {showAtlasModal && (
+        <WorldAtlasExplorer
+          onSelectPromptForWorld={(prompt) => {
+            setShowAtlasModal(false);
+            handleInitiatePrompt(prompt);
+          }}
+          onClose={() => setShowAtlasModal(false)}
+        />
+      )}
     </div>
   );
 };

@@ -9,6 +9,7 @@ interface EmptyPromptSpaceProps {
   onSelectPreset: (presetId: string) => void;
   selectedEngine: AIProviderId;
   onSelectEngine: (engine: AIProviderId) => void;
+  onOpenAtlas?: () => void;
 }
 
 export const EmptyPromptSpace: React.FC<EmptyPromptSpaceProps> = ({
@@ -16,6 +17,7 @@ export const EmptyPromptSpace: React.FC<EmptyPromptSpaceProps> = ({
   onSelectPreset,
   selectedEngine,
   onSelectEngine,
+  onOpenAtlas,
 }) => {
   const [prompt, setPrompt] = useState('');
 
@@ -45,6 +47,16 @@ export const EmptyPromptSpace: React.FC<EmptyPromptSpaceProps> = ({
         </div>
 
         <div className="flex items-center space-x-2.5">
+          {onOpenAtlas && (
+            <button
+              onClick={onOpenAtlas}
+              className="px-3 py-1.5 rounded-xl bg-indigo-950/50 hover:bg-indigo-900/60 border border-indigo-500/30 text-xs font-medium text-indigo-200 transition-colors flex items-center space-x-1.5 shadow-sm"
+              title="Open HeadConan World Atlas & Portfolio Catalog"
+            >
+              <Compass className="w-3.5 h-3.5 text-indigo-400" />
+              <span>World Atlas (60+)</span>
+            </button>
+          )}
           <EngineSelector
             selectedEngine={selectedEngine}
             onSelectEngine={onSelectEngine}
@@ -118,6 +130,31 @@ export const EmptyPromptSpace: React.FC<EmptyPromptSpaceProps> = ({
               </button>
             ))}
           </div>
+
+          {onOpenAtlas && (
+            <button
+              onClick={onOpenAtlas}
+              className="w-full mt-3 p-3 rounded-xl bg-gradient-to-r from-indigo-950/40 via-purple-950/30 to-indigo-950/40 border border-indigo-500/30 hover:border-indigo-400/60 transition-all flex items-center justify-between text-xs group"
+            >
+              <div className="flex items-center space-x-2.5">
+                <div className="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-300">
+                  <Compass className="w-4 h-4" />
+                </div>
+                <div className="text-left">
+                  <span className="font-semibold text-white group-hover:text-indigo-200 block">
+                    Explore Systematic World Atlas & Portfolio
+                  </span>
+                  <span className="text-[11px] text-slate-400">
+                    60+ candidate worlds across Literature, Gaming, Anime, History & Philosophy
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center space-x-1 font-mono text-indigo-300 text-[11px]">
+                <span>Browse Atlas</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </div>
+            </button>
+          )}
         </div>
       </main>
 

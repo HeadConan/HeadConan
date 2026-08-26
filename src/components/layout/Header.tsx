@@ -10,7 +10,8 @@ import {
   Wand2,
   Eye,
   Sliders,
-  Sparkles
+  Sparkles,
+  Compass
 } from 'lucide-react';
 import { DEMO_PRESETS } from '../../data/mockWorlds';
 import { AIProviderId } from '../../ai/client';
@@ -23,6 +24,7 @@ interface HeaderProps {
   onSelectPreset: (presetId: string) => void;
   onOpenFeedModal: () => void;
   onOpenNotesModal: () => void;
+  onOpenAtlas?: () => void;
   selectedEngine: AIProviderId;
   onSelectEngine: (engine: AIProviderId) => void;
   activeRole: RoleSlot;
@@ -37,6 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectPreset,
   onOpenFeedModal,
   onOpenNotesModal,
+  onOpenAtlas,
   selectedEngine,
   onSelectEngine,
   activeRole,
@@ -187,6 +190,19 @@ export const Header: React.FC<HeaderProps> = ({
           <History className="w-3.5 h-3.5 text-indigo-400" />
           <span className="hidden xl:inline">Chronicle</span>
         </button>
+
+        {/* World Atlas Button */}
+        {onOpenAtlas && (
+          <button
+            id="btn-open-atlas"
+            onClick={onOpenAtlas}
+            className="px-2.5 py-1.5 rounded-xl bg-indigo-950/40 hover:bg-indigo-900/50 border border-indigo-500/30 text-xs font-medium text-indigo-200 transition-colors flex items-center space-x-1.5 shadow-sm"
+            title="Browse World Atlas & Portfolio (60+ Archetypes)"
+          >
+            <Compass className="w-3.5 h-3.5 text-indigo-400" />
+            <span className="hidden lg:inline">Atlas</span>
+          </button>
+        )}
 
         {/* Notes quick button */}
         <button
