@@ -1,0 +1,54 @@
+# Deploy the static /site demo to GitHub Pages.
+#
+# The /site folder is a zero-dependency, pre-built static site (HTML/CSS/vanilla JS),
+# so no build step is required — we just publish its contents as-is.
+#
+# NOTE: After pushing, enable Pages in repo Settings:
+#   Settings → Pages → Build and deployment → Source = "GitHub Actions".
+
+name: Deploy site to Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - ".github/workflows/deploy-pages.yml"
+  workflow_dispatch:
+
+# Allow only one concurrent deployment; cancel in-progress runs on new push.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Publish the contents of /site to the site root.
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
