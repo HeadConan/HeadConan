@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 300" role="img" aria-labelledby="t d">
+<title id="t">Anya — stylized poster</title>
+<desc id="d">Neubrutalist poster for Anya Forger (SPY x FAMILY demo). Procedural, no copyright assets.</desc>
+<rect x="12" y="12" width="220" height="280" fill="#16140F"/>
+<rect x="0" y="0" width="220" height="280" fill="#FFFFFF" stroke="#16140F" stroke-width="4"/>
+<rect x="10" y="10" width="200" height="150" fill="#8CFF4D"/>
+<rect x="10" y="10" width="200" height="150" fill="none" stroke="#16140F" stroke-width="3"/>
+<circle cx="110" cy="96" r="44" fill="#16140F"/>
+<circle cx="110" cy="104" r="30" fill="#F4C9A6"/>
+<path d="M80 74 q30 16 60 0 l-4 14 h-52 Z" fill="#D4537E"/>
+<circle cx="98" cy="102" r="5" fill="#16140F"/>
+<circle cx="122" cy="102" r="5" fill="#16140F"/>
+<path d="M104 118 q6 5 12 0" fill="none" stroke="#16140F" stroke-width="3"/>
+<circle cx="110" cy="128" r="3" fill="#16140F"/>
+<rect x="10" y="160" width="200" height="80" fill="#F4EFE6"/>
+<path d="M10 160 h200 v22 q-24 18 -46 16 q-14 0 -26 -8 q-12 10 -28 10 q-30 0 -100 -16 Z" fill="#0F6E56"/>
+<path d="M10 160 h200 v18" fill="none" stroke="#16140F" stroke-width="3"/>
+<rect x="10" y="240" width="200" height="40" fill="#16140F"/>
+<text x="20" y="267" font-family="Impact,'Arial Black',sans-serif" font-size="26" fill="#FFD839">ANYA</text>
+<text x="196" y="262" font-family="ui-monospace,monospace" font-size="9" fill="#F4EFE6" text-anchor="end" letter-spacing="1">TELEPATH</text>
+<text x="196" y="274" font-family="ui-monospace,monospace" font-size="9" fill="#F4EFE6" text-anchor="end" letter-spacing="1">KNOWS EVERYTHING</text>
+<rect x="158" y="182" width="44" height="34" fill="#16140F" stroke="#16140F" stroke-width="4"/>
+<rect x="163" y="187" width="34" height="20" fill="#8CFF4D"/>
+<path d="M168 182 v-10 M186 182 v-10 M171 172 h14" stroke="#16140F" stroke-width="4" fill="none"/>
+<text x="186" y="234" font-family="ui-monospace,monospace" font-size="8" font-weight="700" fill="#16140F">EDEN ACADEMY / STUDENT</text>
+</svg>

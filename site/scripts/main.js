@@ -49,6 +49,16 @@
     });
   });
 
+  /* ================= asset slots: png → svg fallback ================= */
+  // Try the licensed/official .png first; if missing (404), swap to the bundled .svg poster.
+  document.querySelectorAll('img[data-fallback]').forEach(function (img) {
+    img.addEventListener('error', function () {
+      if (img.src.indexOf(img.dataset.fallback) === -1) {
+        img.src = img.dataset.fallback;
+      }
+    });
+  });
+
   /* ================= 02 / GATE (desires) ================= */
 
   var DESIRES = {

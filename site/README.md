@@ -26,6 +26,7 @@ This is the most important section. **Nothing is fake-misrepresented.** Every wo
 | "WHERE WOULD YOU GO?" desire buttons | **Real, deterministic UI** | Clicking reveals the interface needs for that desire. |
 | WORLDS portal cards | **Real, deterministic UI** | Clicking ENTER scrolls to the demo. |
 | SPY × FAMILY interactive demo | **Real, deterministic state machine** | Pure JS in `scripts/demo.js`. No AI, no backend, no API key. See [§5](#5-the-demo-state-machine). |
+| Character posters (Yor / Loid / Anya / Bond) | **Procedural SVG** — bundled and always shown. **Optional licensed `.png`** — drop a file into `site/assets/worlds/spy-family/` and the PNG replaces the SVG automatically. See [§5.1](#51-image-asset-slots). |
 | PLAYER / HOST perspective toggle | **Real, deterministic** | Hardcoded what the player knows vs what the host knows. |
 | CHATBOT / HEADCONAN diagram | **Real, hardcoded** | Static content, not generated. |
 | World-specific UI switch (SCHOOL / INVESTIGATION / EMPIRE) | **Real, deterministic mockup** | Pure CSS + HTML. Labeled "concept demo" so no one mistakes it for a real instance. |
@@ -47,11 +48,39 @@ site/
 ├── styles/
 │   └── main.css        # Neubrutalist design system (no preprocessor)
 ├── scripts/
-│   ├── main.js         # page interactions (door, gate, portals, perspective, notchat, worldui)
+│   ├── main.js         # page interactions (door, gate, portals, perspective, notchat, worldui, asset-slot fallback)
 │   └── demo.js         # SPY × FAMILY state machine
-├── assets/             # currently empty (logo is inline SVG)
+├── assets/
+│   └── worlds/
+│       └── spy-family/
+│           ├── README.txt      # how to place licensed .png files
+│           ├── yor.svg         # procedural poster (bundled fallback)
+│           ├── loid.svg
+│           ├── anya.svg
+│           └── bond.svg
 └── README.md
 ```
+
+### 5.1 Image asset slots
+
+Each character poster in the SPY × FAMILY demo follows a two-step fallback chain:
+
+1. `<name>.png` in `assets/worlds/spy-family/` (optional — place your licensed or commissioned image here).
+2. `<name>.svg` bundled with the site (always present, shows if the PNG isn't there).
+
+The slot is wired in `scripts/main.js`:
+
+```js
+document.querySelectorAll('img[data-fallback]').forEach(function (img) {
+  img.addEventListener('error', function () {
+    if (img.src.indexOf(img.dataset.fallback) === -1) img.src = img.dataset.fallback;
+  });
+});
+```
+
+If you want to swap in licensed official art (you must own the rights to redistribute it), drop the PNG in the right folder — no code changes needed. Recommended aspect ratio for replacements: **4:5 portrait** (e.g. 800×1000). See `assets/worlds/spy-family/README.txt` for the full naming convention and copyright notice.
+
+The bundled SVG posters are **stylized, procedural** — they draw on Neubrutalist visual language (hard borders, offset shadows, single-character accent color blocks) rather than copying any official artwork. They keep the site honest even before any third-party image is added.
 
 ### Neubrutalist design system
 

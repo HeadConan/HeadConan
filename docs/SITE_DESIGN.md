@@ -190,6 +190,10 @@ Five variants (`btn-yellow`, `btn-red`, `btn-blue`, `btn-green`, `btn-white`) + 
 
 All cards use `border: 3px solid var(--ink)` and `box-shadow: 5px 5px 0 var(--ink)`. The shadow is the same on every card surface — this is the system's signature. Cards have no border-radius.
 
+### Character posters
+
+Demo character cards (`Yor`, `Loid`) and the SPY × FAMILY portal (`Anya`, `Bond`) carry a stylized poster at the top. The poster is rendered through the **image asset slot** — a PNG-first / SVG-fallback chain (see `site/README.md` §5.1). The bundled SVG posters are drawn in-house with Neubrigralist geometry (head silhouette + identity color block + bold character name + props glyph + "THORN PRINCESS" / "TWILIGHT" / "TELEPATH" / "FUTURE SIGHT" caption). No external image is loaded; no copyright is borrowed.
+
 ### Top borders
 
 A colored top-border accent (8–12px) identifies section content:

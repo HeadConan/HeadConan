@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 300" role="img" aria-labelledby="t d">
+<title id="t">Yor — stylized poster</title>
+<desc id="d">Neubrutalist poster for Yor Forger (SPY x FAMILY demo). Procedural, no copyright assets.</desc>
+<rect x="12" y="12" width="220" height="280" fill="#16140F"/>
+<rect x="0" y="0" width="220" height="280" fill="#FFFFFF" stroke="#16140F" stroke-width="4"/>
+<rect x="10" y="10" width="200" height="150" fill="#D64550"/>
+<rect x="10" y="10" width="200" height="150" fill="none" stroke="#16140F" stroke-width="3"/>
+<circle cx="110" cy="86" r="40" fill="#16140F"/>
+<circle cx="110" cy="98" r="30" fill="#F4C9A6"/>
+<path d="M82 88 q28 14 56 0" fill="none" stroke="#16140F" stroke-width="5"/>
+<circle cx="100" cy="96" r="4" fill="#16140F"/>
+<circle cx="120" cy="96" r="4" fill="#16140F"/>
+<path d="M104 112 q6 6 12 0" fill="none" stroke="#16140F" stroke-width="3"/>
+<rect x="10" y="160" width="200" height="80" fill="#F4EFE6"/>
+<path d="M10 160 h200 v26 q-28 20 -52 20 q-18 0 -34 -8 q-12 8 -30 8 q-30 0 -84 -20 Z" fill="#16140F"/>
+<path d="M116 186 v-8 h18 v8 q0 8 -18 8 q-18 0 -18 -8 Z" fill="#D64550"/>
+<rect x="10" y="240" width="200" height="40" fill="#16140F"/>
+<text x="20" y="267" font-family="Impact,'Arial Black',sans-serif" font-size="26" fill="#FFD839">YOR</text>
+<text x="196" y="262" font-family="ui-monospace,monospace" font-size="9" fill="#F4EFE6" text-anchor="end" letter-spacing="1">THORN</text>
+<text x="196" y="274" font-family="ui-monospace,monospace" font-size="9" fill="#F4EFE6" text-anchor="end" letter-spacing="1">PRINCESS</text>
+<g stroke="#16140F" stroke-width="4" fill="#FFFFFF">
+<rect x="160" y="180" width="34" height="26"/>
+<path d="M166 180 v-12 a8 8 0 0 1 16 0 v12"/>
+</g>
+<path d="M196 206 l10 14" stroke="#16140F" stroke-width="5" stroke-linecap="round"/>
+<text x="188" y="234" font-family="ui-monospace,monospace" font-size="8" font-weight="700" fill="#16140F">CITY HALL / COVER</text>
+</svg>
