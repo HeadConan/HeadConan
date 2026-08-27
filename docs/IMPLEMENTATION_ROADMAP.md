@@ -1,181 +1,192 @@
-# HeadConan 实施路线图（IMPLEMENTATION_ROADMAP）
+# HeadConan Implementation Roadmap (IMPLEMENTATION_ROADMAP)
 
-> 目标：把「实现变得在智力上直截了当」。先画依赖图，再排阶段。任何阶段若依赖未验证的假设，先回到 [`ARCHITECTURAL_EXPERIMENTS.md`](./ARCHITECTURAL_EXPERIMENTS.md)。
+> Goal: make "implementation" intellectually straightforward. Draw the dependency graph first, then sequence the phases. If any phase depends on an unverified assumption, go back to [`ARCHITECTURAL_EXPERIMENTS.md`](./ARCHITECTURAL_EXPERIMENTS.md) first.
 
 ---
 
-## 1. 依赖图（DAG）
+## 1. Dependency Graph (DAG)
 
 ```
                         ┌─────────────────────────────┐
-                        │ P0 架构验证实验（前置，最小）  │
+                        │ P0 Architecture Validation   │
+                        │ Experiments (prerequisite,   │
+                        │ minimal)                     │
                         └─────────────┬───────────────┘
                                       ▼
                         ┌─────────────────────────────┐
-                        │ P1 运行时接线（表示体系入活） │ ← 无它则一切都是死代码
+                        │ P1 Runtime Wiring (bringing  │
+                        │ the representation system to │
+                        │ life)                       │ ← without it, everything is dead code
                         └─────────────┬───────────────┘
                                       ▼
              ┌────────────────────────┴────────────────────────┐
              ▼                                                 ▼
   ┌──────────────────────┐                       ┌──────────────────────────┐
-  │ P2 事件内核 + 事件日志  │                       │ P8a 持久化（日志+快照）    │
-  │ （唯一写入者）          │                       │ （P2 完成后即可并行）      │
-  └──────────┬───────────┘                       └────────────┬─────────────┘
-             ▼                                                 │
+  │ P2 Event Kernel +     │                       │ P8a Persistence (log +   │
+  │ Event Log             │                       │ snapshot)                │
+  │ (sole writer)         │                       │ (can run in parallel     │
+  └──────────┬───────────┘                       │ once P2 is done)         │
+             ▼                                     └────────────┬─────────────┘
   ┌──────────────────────┐                                     │
-  │ P3 动作解析 + 干预通道  │                                     │
+  │ P3 Action Resolution  │                                     │
+  │ + Intervention Channel │                                     │
   └──────────┬───────────┘                                     │
              ▼                                                 │
   ┌──────────────────────┐                                     │
-  │ P4 代理绑定 + 决策循环  │ ◄──────────────────────────────────┘
-  └──────────┬───────────┘（P4 需要恢复会话 → P8a 是软依赖）
+  │ P4 Agent Binding +    │ ◄──────────────────────────────────┘
+  │ Decision Loop         │ (P4 needs session restore → P8a is a soft dependency)
+  └──────────┬───────────┘
              ▼
   ┌──────────────────────┐
-  │ P5 玩家交互（多模态）  │
+  │ P5 Player Interaction │
+  │ (multimodal)          │
   └──────────┬───────────┘
              ▼
   ┌──────────────────────┐        ┌──────────────────────────┐
-  │ P6 体验服务（显著性）  │ ──────► │ P7 动态布局引擎（5原语）    │
+  │ P6 Experience Service │ ──────► │ P7 Dynamic Layout Engine │
+  │ (salience)            │        │ (5 primitives)           │
   └──────────────────────┘        └──────────┬───────────────┘
                                              ▼
                                   ┌──────────────────────────┐
-                                  │ P8b 完整持久化（分支/会话）  │
+                                  │ P8b Full Persistence      │
+                                  │ (branching / sessions)    │
                                   └──────────┬───────────────┘
                                              ▼
                                   ┌──────────────────────────┐
-                                  │ P9 世界创作（主持人工具）    │
+                                  │ P9 World Authoring        │
+                                  │ (host tools)              │
                                   └──────────────────────────┘
 ```
 
 ---
 
-## 2. 阶段明细
+## 2. Phase Details
 
-### PHASE 0 — 架构验证（最小实验）
-| 项 | 内容 |
+### PHASE 0 — Architecture Validation (minimal experiments)
+| Item | Content |
 | :--- | :--- |
-| 目标 | 杀死最高风险假设（定义/状态分离、级联、认知、布局派生、Host 通道），每个实验 ≤ 1 天 |
-| 产物 | 5 个微型实验（见 ARCHITECTURAL_EXPERIMENTS）+ 决定去留 |
-| 出口标准 | E1–E5 全部有明确结论；任何失败 → 回到本文档修正依赖图 |
-| **阻塞** | 无（纯代码实验，独立于现有 UI） |
+| Goal | Kill the highest-risk assumptions (definition/state separation, cascade, cognition, layout derivation, Host channel); each experiment ≤ 1 day |
+| Output | 5 micro-experiments (see ARCHITECTURAL_EXPERIMENTS) + a keep-or-drop decision |
+| Exit Criteria | E1–E5 all have clear conclusions; any failure → return to this document to revise the dependency graph |
+| **Blocked By** | None (pure code experiments, independent of the existing UI) |
 
-### PHASE 1 — 运行时接线（RUNTIME BINDING）
-| 项 | 内容 |
+### PHASE 1 — Runtime Wiring (RUNTIME BINDING)
+| Item | Content |
 | :--- | :--- |
-| 目标 | `representation/` 从「纯类型」变成「活状态」 |
-| 内容 | ① 用 `WorldStateInstance` + `WorldDefinition` 替换 `App.tsx` 的遗留 `WorldState`；② 定义/状态加载与校验（`validateWorldDefinition`）；③ 投影器接入渲染前（**每帧先投影再渲染**）；④ 四个基准世界可实例化并走 UI |
-| 出口标准 | 切换角色 → 视图内容确实变化（不再是只换控制台）；遗留 `world/types.ts` 从 App 路径移除 |
-| **阻塞** | 无 |
-| 关键风险 | 表示类型与现有 Block 组件的数据契约不匹配 → 需要适配层（短暂） |
+| Goal | Turn `representation/` from "pure types" into "live state" |
+| Content | ① Replace the legacy `WorldState` in `App.tsx` with `WorldStateInstance` + `WorldDefinition`; ② Definition/state loading and validation (`validateWorldDefinition`); ③ Projector hooked in before rendering (**project before rendering every frame**); ④ The four baseline worlds can be instantiated and driven through the UI |
+| Exit Criteria | Switching characters → view content actually changes (not just the console); legacy `world/types.ts` removed from the App path |
+| **Blocked By** | None |
+| Key Risk | Representation types don't match the data contract of existing Block components → an adaptation layer is needed (briefly) |
 
-### PHASE 2 — 事件内核 + 事件日志（EVENT KERNEL）
-| 项 | 内容 |
+### PHASE 2 — Event Kernel + Event Log (EVENT KERNEL)
+| Item | Content |
 | :--- | :--- |
-| 目标 | 建立唯一写入者 |
-| 内容 | ① `applyEvent` 内核（前提/效果/观察派生/后果排队/日志追加）；② 调度队列（延迟/定期事件，含预算上限）；③ 拒绝即事件；④ 用基准世界的动作定义做回归测试（`evaluateWorldAction` 演进为内核） |
-| 出口标准 | 同一日志前缀重放 → 同一状态（单元测试覆盖四个基准世界的代表性事件）；级联后果有界 |
-| **阻塞** | P1（需要活状态） |
-| 并行 | P8a 持久化（日志追加写可独立实现） |
+| Goal | Establish the sole writer |
+| Content | ① `applyEvent` kernel (precondition/effect/observation derivation/consequence queueing/log append); ② Scheduling queue (delayed/periodic events, with budget caps); ③ Rejection is an event; ④ Regression tests using baseline-world action definitions (`evaluateWorldAction` evolves into the kernel) |
+| Exit Criteria | Same log prefix replayed → same state (unit tests covering representative events of all four baseline worlds); cascading consequences are bounded |
+| **Blocked By** | P1 (needs live state) |
+| Parallel | P8a persistence (log-append writes can be implemented independently) |
 
-### PHASE 3 — 动作解析 + 主持人干预通道（ACTION RESOLUTION）
-| 项 | 内容 |
+### PHASE 3 — Action Resolution + Host Intervention Channel (ACTION RESOLUTION)
+| Item | Content |
 | :--- | :--- |
-| 目标 | 玩家文本/点选 → 结构化候选事件；主持人干预成为合法事件 |
-| 内容 | ① 意图解析器（LLM 辅助：文本→verb/target/payload + 确定性实体解析与校正）；② 动作类别与角色权限校验；③ `directorial_intervention` 事件（溯源 `player_directive`，权限检查）；④ 删除 `[DIRECTOR INTERVENTION]` 前缀机制 |
-| 出口标准 | 「公开指控大臣」走查全链路（见 WORLD_RUNTIME 4.3）；干预与玩家动作走同一内核 |
-| **阻塞** | P2 |
-| 关键风险 | LLM 解析歧义（目标指代不清）→ 需要澄清反馈通道（P5 处理） |
+| Goal | Player text/click → structured candidate events; host intervention becomes a legitimate event |
+| Content | ① Intent parser (LLM-assisted: text → verb/target/payload + deterministic entity resolution and correction); ② Action category and character-permission validation; ③ `directorial_intervention` event (traces `player_directive`, permission check); ④ Remove the `[DIRECTOR INTERVENTION]` prefix mechanism |
+| Exit Criteria | "Publicly accuse the minister" walks the full chain (see WORLD_RUNTIME 4.3); intervention and player actions go through the same kernel |
+| **Blocked By** | P2 |
+| Key Risk | LLM parsing ambiguity (unclear target reference) → a clarification feedback channel is needed (handled by P5) |
 
-### PHASE 4 — 代理绑定 + 决策循环（AGENT LOOP）
-| 项 | 内容 |
+### PHASE 4 — Agent Binding + Decision Loop (AGENT LOOP)
+| Item | Content |
 | :--- | :--- |
-| 目标 | NPC 成为真正的代理；NPC 与玩家共享动作/观察接口 |
-| 内容 | ① `AgentBinding`（controller: player/ai/script/none）；② 感知→决策→候选事件的循环（LLM 决策 + 确定性记账）；③ 世界 tick（调度器触发 + 主动性阈值）；④ NPC 上下文 = 该代理的投影视图（防泄漏） |
-| 出口标准 | 「Loid 与 Yor 对话而互不知秘密」可运行：两人的 LLM 上下文各自缺失对方秘密；SPY×FAMILY 基准测试通过 |
-| **阻塞** | P2（P3 弱依赖——代理动作可不经玩家解析器） |
-| 并行 | P8a（会话恢复） |
+| Goal | NPCs become true agents; NPCs and players share the action/observation interface |
+| Content | ① `AgentBinding` (controller: player/ai/script/none); ② Perception → decision → candidate-event loop (LLM decision + deterministic bookkeeping); ③ World tick (triggered by scheduler + initiative threshold); ④ NPC context = that agent's projected view (leak prevention) |
+| Exit Criteria | "Loid and Yor converse without knowing each other's secrets" runs: each one's LLM context independently lacks the other's secret; SPY×FAMILY baseline test passes |
+| **Blocked By** | P2 (weak dependency on P3 — agent actions need not go through the player parser) |
+| Parallel | P8a (session restore) |
 
-### PHASE 5 — 玩家交互（PLAYER INTERACTION）
-| 项 | 内容 |
+### PHASE 5 — Player Interaction (PLAYER INTERACTION)
+| Item | Content |
 | :--- | :--- |
-| 目标 | 交互从「文本框」升级为「多模态意图」 |
-| 内容 | ① 实体目标化（点选角色→质问、点选地图节点→派遣）；② 对话为一阶（speech_act 事件 + 对话舞台）；③ 澄清反馈流（解析歧义时）；④ 建议词条由呈现计划驱动（替换硬编码列表） |
-| 出口标准 | 大学世界走查：错过课程 → 声誉变化 → 教授邮件（延迟）→ 图书馆偶遇 |
-| **阻塞** | P3（解析）+ P4（NPC 反应） |
-| 并行 | P6 可开始设计（显著性计算不依赖 P5 全部） |
+| Goal | Upgrade interaction from "text box" to "multimodal intent" |
+| Content | ① Entity targeting (click character → interrogate, click map node → dispatch); ② Dialogue as first-class (speech_act event + dialogue stage); ③ Clarification feedback flow (on parsing ambiguity); ④ Suggestion tokens driven by the presentation plan (replacing the hardcoded list) |
+| Exit Criteria | University-world walkthrough: miss a class → reputation change → professor email (delayed) → library encounter |
+| **Blocked By** | P3 (parsing) + P4 (NPC reaction) |
+| Parallel | P6 design can begin (salience computation does not depend on all of P5) |
 
-### PHASE 6 — 体验服务（EXPERIENCE SERVICE）
-| 项 | 内容 |
+### PHASE 6 — Experience Service (EXPERIENCE SERVICE)
+| Item | Content |
 | :--- | :--- |
-| 目标 | 「世界发生了什么」→「用户该看什么」 |
-| 内容 | ① 显著性计算（FocusScore 四因子）；② `ExperienceState`（焦点对象、显著增量、张力指标）；③ `PresentationPlan`（舞台模式/卫星内容/环境指标/词条/基调）；④ 叙事措辞（LLM 由观察者视图生成，非上帝视角） |
-| 出口标准 | 同一状态，玩家视图与主持人视图产生不同呈现计划（E4 的规模化验证） |
-| **阻塞** | P4（需要事件流） |
+| Goal | "What happened in the world" → "What the user should see" |
+| Content | ① Salience computation (FocusScore four factors); ② `ExperienceState` (focus object, salience delta, tension metric); ③ `PresentationPlan` (stage mode / satellite content / ambient metric / tokens / tone); ④ Narrative phrasing (LLM generated from the observer's view, not an omniscient perspective) |
+| Exit Criteria | Same state, player view and host view produce different presentation plans (scaled validation of E4) |
+| **Blocked By** | P4 (needs event stream) |
 
-### PHASE 7 — 动态布局引擎（LAYOUT ENGINE）
-| 项 | 内容 |
+### PHASE 7 — Dynamic Layout Engine (LAYOUT ENGINE)
+| Item | Content |
 | :--- | :--- |
-| 目标 | 5 原语 + 焦点 → 可序列化布局树 → 渲染 |
-| 内容 | ① `Focus` 对象（sticky 锁定）；② 布局引擎（Stage 形态切换 + Satellite 过滤 + Ambient 收缩）；③ FLIP 过渡；④ 替换 3 列网格与 `computeUIPlan` |
-| 出口标准 | 六场景布局矩阵全部可渲染；玩家↔主持人切换 = 平滑布局变形而非换页 |
-| **阻塞** | P6（呈现计划） |
-| 关键风险 | FLIP 在 React 的动画成本 → 可先做无动画版本，后补过渡 |
+| Goal | 5 primitives + focus → serializable layout tree → render |
+| Content | ① `Focus` object (sticky lock); ② Layout engine (Stage form switching + Satellite filtering + Ambient contraction); ③ FLIP transitions; ④ Replace the 3-column grid and `computeUIPlan` |
+| Exit Criteria | All six-scenario layout matrix renders; player↔host switch = smooth layout morph, not a page swap |
+| **Blocked By** | P6 (presentation plan) |
+| Key Risk | FLIP animation cost in React → can ship an animation-free version first, then add transitions later |
 
-### PHASE 8 — 持久化（PERSISTENCE）
-| 项 | 内容 |
+### PHASE 8 — Persistence (PERSISTENCE)
+| Item | Content |
 | :--- | :--- |
-| 目标 | 定义/日志/快照/玩家数据/制品分层落盘 |
-| 内容 | ① P8a：日志追加 + 周期快照 + 会话恢复（可并行于 P2 后）；② P8b：分支（实例复制 + 分歧日志）、导出/导入世界档案 |
-| 出口标准 | 刷新页面恢复会话；分支可回滚；`restore()` 从日志重建状态（E2 验证） |
-| **阻塞** | P8a 阻塞 P4 的会话恢复；P8b 阻塞 P9 |
+| Goal | Layered persistence of definitions / logs / snapshots / player data / artifacts |
+| Content | ① P8a: log append + periodic snapshot + session restore (can run in parallel after P2); ② P8b: branching (instance copy + divergent log), export/import of world archives |
+| Exit Criteria | Refresh page restores session; branches can be rolled back; `restore()` rebuilds state from log (E2 validation) |
+| **Blocked By** | P8a blocks P4's session restore; P8b blocks P9 |
 
-### PHASE 9 — 世界创作（WORLD AUTHORING / HOST TOOLS）
-| 项 | 内容 |
+### PHASE 9 — World Authoring (WORLD AUTHORING / HOST TOOLS)
+| Item | Content |
 | :--- | :--- |
-| 目标 | 主持人/作者通道产品化 |
-| 内容 | ① 定义编辑器（实体/事实/规则/角色/体验信号表单）；② 运行时干预面板（注入事件/改规则，均走 `define_modification` 事件）；③ 图册导入（WorldAtlas 条目 → 定义模板）；④ 定义校验与版本化 |
-| 出口标准 | 主持人不用碰代码即可改世界；干预全部经内核与日志 |
-| **阻塞** | P3（干预通道）+ P8b（定义版本库） |
+| Goal | Productize the host/author channel |
+| Content | ① Definition editor (entity/fact/rule/character/experience-signal forms); ② Runtime intervention panel (inject events / change rules, all via the `define_modification` event); ③ Atlas import (WorldAtlas entries → definition templates); ④ Definition validation and versioning |
+| Exit Criteria | Host can change the world without touching code; all interventions go through the kernel and log |
+| **Blocked By** | P3 (intervention channel) + P8b (definition version store) |
 
 ---
 
-## 3. 阻塞 / 关键路径 / 可并行 / 可推迟
+## 3. Blocked / Critical Path / Parallelizable / Deferrable
 
-| 类别 | 内容 |
+| Category | Content |
 | :--- | :--- |
-| **阻塞链（关键路径）** | P0 → P1 → P2 → P3 → P4 → P5 → P6 → P7（8 步）；P2 与 P3 之间是最大风险窗口（内核正确性） |
-| **最大单一阻塞** | **P2 事件内核**——一切正确性的汇聚点；宁可慢，不可糊 |
-| **可并行** | P8a（P2 后即可启动）；P6 设计可提前；WorldAtlas 清洗与基准扩展（P1 前即可做） |
-| **可推迟（DEFERRED）** | 语义记忆/长文摘要（见 DO_NOT_BUILD_YET）；多端同步；多用户；VR/native 渲染栈；插件系统 |
-| **每一阶段出口** | 都必须有「用户可验证的效果」（见 §4） |
+| **Blocked chain (critical path)** | P0 → P1 → P2 → P3 → P4 → P5 → P6 → P7 (8 steps); the gap between P2 and P3 is the highest-risk window (kernel correctness) |
+| **Single largest blocker** | **P2 Event Kernel** — the convergence point of all correctness; prefer slow over sloppy |
+| **Parallelizable** | P8a (can start after P2); P6 design can begin early; WorldAtlas cleanup and baseline expansion (can be done before P1) |
+| **Deferrable (DEFERRED)** | Semantic memory / long-text summarization (see DO_NOT_BUILD_YET); multi-device sync; multi-user; VR/native render stack; plugin system |
+| **Every phase exit** | must have a "user-verifiable effect" (see §4) |
 
 ---
 
-## 4. 每阶段「用户视角效果」验证表
+## 4. Per-Phase "User-Perspective Effect" Validation Table
 
-> 按用户工作偏好：每个改动必须可被用户侧验证，无验证不做。
+> Per user working preference: every change must be verifiable on the user side; no verification, no build.
 
-| 阶段 | 用户看到/感受到什么 | 用户如何验证 |
+| Phase | What the user sees / feels | How the user verifies |
 | :--- | :--- | :--- |
-| P1 | 切换角色后，界面内容（而非仅工具）随之改变 | 以玩家视角看不到「大臣的秘密议程」，切主持人能看到 |
-| P2 | 行动后果开始「符合逻辑」且可回滚 | 做一次公开指控：议员在场者知道、缺席者不知道 |
-| P3 | 点选目标比打字更精准；主持人干预不再显示「[DIRECTOR]」前缀 | 点选角色发起质问；干预前后世界自洽 |
-| P4 | NPC 会主动推进剧情、离线世界仍演化 | 大学世界：不操作，隔段时间看日程/消息有变化 |
-| P5 | 对话有潜台词/读心层；歧义时系统会反问澄清 | 质问嫌疑人时能追问；说「去找他」系统确认指谁 |
-| P6 | 界面只突出「此刻重要的事」，不堆卡片 | 审讯时地图消失，对话与档案占据主舞台 |
-| P7 | 布局随活动流畅变形，无闪跳 | 玩家↔主持人切换时同一世界平滑过渡 |
-| P8 | 刷新不丢进度；可回到旧分歧点 | 刷新浏览器继续；从第 3 回合分支重玩 |
-| P9 | 主持人可改规则/注入事件，无需代码 | 表单改一条公理 → 世界行为随之变化 |
+| P1 | After switching characters, the interface content (not just the tools) changes accordingly | From the player view you cannot see "the minister's secret agenda"; switching to host you can |
+| P2 | Action consequences start to be "logical" and rollbackable | Do a public accusation: those present know, those absent don't |
+| P3 | Clicking targets is more precise than typing; host intervention no longer shows the "[DIRECTOR]" prefix | Click a character to launch an interrogation; the world stays self-consistent before and after intervention |
+| P4 | NPCs proactively advance the plot; the offline world still evolves | University world: take no action, then after a while see schedule/messages change |
+| P5 | Dialogue has subtext / mind-reading layers; the system asks back to clarify on ambiguity | Can press a suspect for more during interrogation; say "go find him" and the system confirms who you mean |
+| P6 | The interface highlights only "what matters right now," not piling up cards | During interrogation the map disappears, dialogue and dossier take the main stage |
+| P7 | Layout morphs fluidly with activity, no flicker | Smooth transition of the same world when switching player↔host |
+| P8 | Refresh doesn't lose progress; can return to an old divergence point | Refresh the browser to continue; branch-replay from turn 3 |
+| P9 | Host can change rules / inject events without code | Change one axiom via a form → world behavior changes accordingly |
 
 ---
 
-## 5. 阶段顺序的备选方案（为何采用当前顺序）
+## 5. Alternative Phase Orderings (Why the Current Order)
 
-| 备选 | 理由否决 |
+| Alternative | Reason rejected |
 | :--- | :--- |
-| 先做布局引擎（P7 提前） | 没有事件流与显著性，布局引擎没有输入；且现有 3 列网格「能用」，不构成阻塞 |
-| 先做持久化（P8 提前） | 没有事件日志的内核，持久化不知道存什么；存「旧世界 JSON」等于把错误固化 |
-| 先做代理社会（P4 提前） | 没有内核与解析，代理动作无处安放；「NPC 自主」是锦上添花，内核是地基 |
-| 先做作者工具（P9 提前） | 没有定义驱动的运行时，作者工具产出无法被验证 |
+| Build the layout engine first (P7 early) | Without an event stream and salience, the layout engine has no input; and the existing 3-column grid "works," so it isn't a blocker |
+| Build persistence first (P8 early) | Without the event-log kernel, persistence doesn't know what to store; storing "old-world JSON" equals freezing the error in place |
+| Build the agent society first (P4 early) | Without the kernel and parser, agent actions have nowhere to live; "NPC autonomy" is icing on the cake, the kernel is the foundation |
+| Build author tools first (P9 early) | Without a definition-driven runtime, author-tool output cannot be verified |
 
-> 总原则：**先让「世界如何变化」正确，再让「世界如何被看到」聪明，最后让「世界如何被创作」顺手。**
+> Guiding principle: **First make "how the world changes" correct, then make "how the world is seen" smart, and finally make "how the world is authored" convenient.**

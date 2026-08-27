@@ -1,135 +1,135 @@
-# HeadConan 架构评估报告（Architectural Assessment）
+# HeadConan Architectural Assessment
 
-> 阶段：实现前规划（Phase 0）。
-> 目的：在写出任何生产代码之前，先确定 HeadConan **实际上是什么**、原型**实际上做了什么**、哪些是**假装实现的**，以及哪些抽象值得保留、哪些必须抛弃。
-> 依据：对仓库全部源码与文档的通读（`src/**`、`server.ts`、根级 15 份文档、`docs/**` 21 份文档、`docs/layout/*`、`docs/world-atlas/*`）。
-
----
-
-## 1. HeadConan 目前是什么
-
-从代码与文档的交叉验证来看，HeadConan 当前是一个**「生成式界面 + 文本交互」的研究原型**，而非一个世界运行时：
-
-- **界面层（真实的）**：React 19 + Tailwind 的精致暗色 UI，11 种语义 UI Block（地图、证据板、档案、时间线、事件、关系、统计、文档、导演控制台等），由一个规则式 `computeUIPlan` 编排进一个固定 3 列 CSS 网格。
-- **状态层（部分真实的）**：`src/world/types.ts` 中扁平的 `WorldState`（角色/地点/派系/事件/统计/文档的数组），由 `App.tsx` 的 `useState` 持有，并写入 `localStorage`。
-- **AI 层（真实但被误用）**：`server.ts` 是稳健的 Express 代理（Gemini + DeepSeek + 图片生成 + 过程式回退）。但提示词迫使 LLM 在一轮内输出「完整世界状态 + UI 布局计划」的巨型 JSON。
-- **世界表示层（真实但未接线）**：`src/world/representation/*` 是一套正式的类型化表示体系（Definition/State/Dynamics/Presentation 四层分离、认知投影器、校验器、动作求值器、四个基准世界），但**完全未接入** `App.tsx` 的实时循环。
-
-一句话概括：**原型是一个「看起来像世界模拟器的生成式仪表盘」；真正意义上的世界运行时尚未存在，只有它的建筑材料（表示体系）和它的展示皮囊（UI 块）。**
+> Phase: Pre-implementation planning (Phase 0).
+> Purpose: Before writing any production code, determine what HeadConan *actually is*, what the prototype *actually does*, what is *pretended*, and which abstractions are worth keeping versus which must be discarded.
+> Basis: A full read-through of all repository source and documentation (`src/**`, `server.ts`, 15 root-level docs, 21 docs in `docs/**`, `docs/layout/*`, `docs/world-atlas/*`).
 
 ---
 
-## 2. 原型实现了什么（REAL）
+## 1. What HeadConan Is Right Now
 
-| 子系统 | 位置 | 真实性 | 说明 |
+Cross-validating the code and documentation, HeadConan is currently a **research prototype for "generative interface + text interaction"**, not a world runtime:
+
+- **Interface layer (real)**: A refined dark-mode UI in React 19 + Tailwind, with 11 semantic UI Blocks (map, evidence board, dossier, timeline, events, relationships, stats, document, director console, etc.), orchestrated by a rule-based `computeUIPlan` into a fixed 3-column CSS grid.
+- **State layer (partly real)**: The flat `WorldState` in `src/world/types.ts` (arrays of characters/locations/factions/events/stats/documents), held by `App.tsx` via `useState` and written to `localStorage`.
+- **AI layer (real but misused)**: `server.ts` is a robust Express proxy (Gemini + DeepSeek + image generation + procedural fallback). But the prompts force the LLM to emit, in a single turn, a giant JSON of "complete world state + UI layout plan".
+- **World representation layer (real but unwired)**: `src/world/representation/*` is a formal typed representation system (Definition/State/Dynamics/Presentation four-layer separation, cognition projector, validators, action evaluator, four baseline worlds), but it is **entirely disconnected** from `App.tsx`'s real-time loop.
+
+In one sentence: **the prototype is a "generative dashboard that looks like a world simulator"; a genuine world runtime does not yet exist — only its building material (the representation system) and its display skin (the UI blocks).**
+
+---
+
+## 2. What the Prototype Implements (REAL)
+
+| Subsystem | Location | Authenticity | Notes |
 | :--- | :--- | :--- | :--- |
-| 世界表示基础 | `src/world/representation/*` | **REAL** | Definition/State/Dynamics/Presentation 四层分离、Fact/Belief/Secret/Rumor 认知模型、关系与权力向量、`projectEpistemicPerspective`、`validateWorldDefinition`、`evaluateWorldAction`、四个基准世界。通过类型检查。 |
-| AI 网关代理 | `server.ts` | **REAL** | Gemini 3.7 Flash、DeepSeek V3/R1、图片生成、JSON 提取与回退链。 |
-| 世界图册 | `src/data/worldAtlas.ts` + `WorldAtlasExplorer` | **REAL** | 400+ 世界分类库、50 个金标准世界、雷达图与筛选。 |
-| 交互外壳 | `ActionDock`、`Header`、`EngineSelector` | **REAL** | 建议词条、引擎切换、角色切换。 |
-| 纯视觉组件 | `StatsBlock`、`TimelineBlock`、`DocumentBlock` 等 | **REAL（仅视觉）** | 对现有数据渲染良好，但无交互深度。 |
-| 布局研究 | `docs/LAYOUT_*`、`docs/layout/*`、`docs/PRESENTATION_MODEL.md` | **REAL（设计资产）** | 5 空间原语、注意力打分、FLIP 过渡、6 个场景布局分析——这是最有价值的设计资产之一。 |
+| World representation foundation | `src/world/representation/*` | **REAL** | Definition/State/Dynamics/Presentation four-layer separation; Fact/Belief/Secret/Rumor cognition model; relationships and power vectors; `projectEpistemicPerspective`, `validateWorldDefinition`, `evaluateWorldAction`; four baseline worlds. Passes type checking. |
+| AI gateway proxy | `server.ts` | **REAL** | Gemini 3.7 Flash, DeepSeek V3/R1, image generation, JSON extraction and fallback chain. |
+| World atlas | `src/data/worldAtlas.ts` + `WorldAtlasExplorer` | **REAL** | 400+ world classification library, 50 gold-standard worlds, radar charts and filtering. |
+| Interaction shell | `ActionDock`, `Header`, `EngineSelector` | **REAL** | Suggested terms, engine switching, character switching. |
+| Pure visual components | `StatsBlock`, `TimelineBlock`, `DocumentBlock`, etc. | **REAL (visual only)** | Renders existing data well, but no interactive depth. |
+| Layout research | `docs/LAYOUT_*`, `docs/layout/*`, `docs/PRESENTATION_MODEL.md` | **REAL (design assets)** | 5 spatial primitives, attention scoring, FLIP transitions, 6 scenario layout analyses — among the most valuable design assets. |
 
 ---
 
-## 3. 原型假装实现了什么（FAKE / MOCKED）
+## 3. What the Prototype Pretends to Implement (FAKE / MOCKED)
 
-| 假装实现 | 证据 | 真相 |
+| Pretended implementation | Evidence | Truth |
 | :--- | :--- | :--- |
-| **世界生成** | `src/world/engine.ts` 用 `prompt.includes('mystery')` 等关键词匹配返回静态种子 | 模板匹配，不是合成。任何不在种子库里的提示词都会落到通用模板。 |
-| **因果模拟** | `simulateWorldInteraction` 按 `includes('attack')/includes('talk')` 等字符串猜测情感倾向 | 关键词启发式 + 硬编码数值漂移，不验证任何前提条件，不产生真正的级联后果。 |
-| **导演/上帝干预** | `DirectorConsoleBlock` 提交时给文本加 `[DIRECTOR INTERVENTION]` 前缀 | 用文本前缀伪装权限，绕过了任何权限/规则系统。 |
-| **信息不对称** | `Header` 切换角色只改 `activeRoleId` 并重算 UI 计划 | 世界状态**不经过**认知过滤就到达 UI；`representation` 的投影器被闲置。 |
-| **UI 自适应** | `computeUIPlan` 按 `style.primarySurfaceType` 返回固定 Block 数组 | 规则树，无注意力模型、无焦点对象、无空间持久性。 |
-| **持久化** | `localStorage` 保存世界 JSON + 编年史 | 同一浏览器可跨刷新恢复，但无事件日志、无分支、无快照版本、无多端。 |
-| **证据板/地图交互** | 硬编码 SVG 坐标与连线 | 用户不能拖拽、连线、推理；纯展示。 |
+| **World generation** | `src/world/engine.ts` returns a static seed via keyword matching such as `prompt.includes('mystery')` | Template matching, not synthesis. Any prompt not in the seed library falls back to a generic template. |
+| **Causal simulation** | `simulateWorldInteraction` guesses sentiment by string checks like `includes('attack')/includes('talk')` | Keyword heuristics + hardcoded numeric drift; validates no preconditions and produces no genuine cascading consequences. |
+| **Director / god intervention** | `DirectorConsoleBlock` prefixes submitted text with `[DIRECTOR INTERVENTION]` | Uses a text prefix to fake authority, bypassing any permission/rule system. |
+| **Information asymmetry** | `Header` switching characters only changes `activeRoleId` and recomputes the UI plan | World state reaches the UI **without** epistemic filtering; the `representation` projector sits idle. |
+| **Adaptive UI** | `computeUIPlan` returns a fixed Block array based on `style.primarySurfaceType` | A rules tree — no attention model, no focus object, no spatial persistence. |
+| **Persistence** | `localStorage` saves world JSON + chronicle | Recoverable across refreshes in the same browser, but no event log, no branching, no snapshot versioning, no multi-device support. |
+| **Evidence board / map interaction** | Hardcoded SVG coordinates and connectors | Users cannot drag, connect, or reason; purely presentational. |
 
 ---
 
-## 4. 已存在的主要抽象（值得审视并保留/演进）
+## 4. Existing Major Abstractions (worth reviewing and keeping / evolving)
 
-按「架构重要性」排序：
+Ordered by "architectural importance":
 
-1. **Definition / State / Dynamics / Presentation 四层分离**（`representation/`）—— 方向正确，是本项目最重要的既有资产。
-2. **认知模型**：`Fact`（可见域 6 级）、`Belief`（置信度+真伪）、`SecretItem`（持有者/目标/暴露阈值）、`RumorItem`、`projectEpistemicPerspective` 投影器 —— 解决了信息不对称的最小可行建模。
-3. **一阶关系与多维权力**：`RelationshipDefinition`（affinity/trust/powerBalance/visibility/coverStory）、`PowerRelation`（政治/经济/军事/信息/社会/超自然/法证 7 域向量）。
-4. **玩家可能性空间**：`InhabitedRoleSlot`（inhabitationMode 5 种、agencyLevel 4 级、epistemicFogOfWar 3 级）—— 玩家≠NPC 的关键抽象。
-5. **场景与分支的类型骨架**：`ScenarioSeed`、`TimelineBranch`（仅有类型，无运行时语义）。
-6. **体验信号**：`ExperienceProfile`（主导幻想原型、张力梯度、信息密度、`recommendedModalities`）—— 世界驱动 UI 而不硬编码组件的正确接口。
-7. **动作声明模型**：`WorldActionDefinition`（preconditions/directEffects/potentialConsequences）+ `evaluateWorldAction` 求值器 —— 已存在但未接入玩家输入路径。
-8. **布局语法**：5 空间原语（Anchor/Stage/Satellite/Ambient/Dock）+ `PresentationPlan` 类型草案。
-9. **命名空间 ID 与溯源**：`entity:spy_family:loid_forger`、`ProvenanceMeta`（authored/derived/observed/inferred/simulated/temporary）—— 区分正典与幻觉的关键。
-10. **校验器**：`validateWorldDefinition`（悬空引用、重复 ID、角色绑定）。
+1. **Definition / State / Dynamics / Presentation four-layer separation** (`representation/`) — the direction is correct; the most important existing asset of the project.
+2. **Cognition model**: `Fact` (6-level visibility domain), `Belief` (confidence + truth value), `SecretItem` (holder/target/exposure threshold), `RumorItem`, `projectEpistemicPerspective` projector — solves the minimal viable modeling of information asymmetry.
+3. **First-order relationships and multi-dimensional power**: `RelationshipDefinition` (affinity/trust/powerBalance/visibility/coverStory), `PowerRelation` (7-domain vector: political/economic/military/informational/social/supernatural/forensic).
+4. **Player possibility space**: `InhabitedRoleSlot` (5 inhabitation modes, 4 agency levels, 3 epistemic fog-of-war levels) — the key abstraction that player ≠ NPC.
+5. **Type skeleton for scenarios and branches**: `ScenarioSeed`, `TimelineBranch` (types only, no runtime semantics).
+6. **Experience signals**: `ExperienceProfile` (dominant fantasy archetype, tension gradient, information density, `recommendedModalities`) — the correct interface where the world drives the UI without hardcoding components.
+7. **Action declaration model**: `WorldActionDefinition` (preconditions/directEffects/potentialConsequences) + `evaluateWorldAction` evaluator — already exists but is not wired into the player input path.
+8. **Layout syntax**: 5 spatial primitives (Anchor/Stage/Satellite/Ambient/Dock) + draft `PresentationPlan` type.
+9. **Namespaced IDs and provenance**: `entity:spy_family:loid_forger`, `ProvenanceMeta` (authored/derived/observed/inferred/simulated/temporary) — key to distinguishing canon from hallucination.
+10. **Validator**: `validateWorldDefinition` (dangling references, duplicate IDs, character bindings).
 
 ---
 
-## 5. 缺失的抽象（MISSING）
+## 5. Missing Abstractions (MISSING)
 
-| 缺失抽象 | 为什么必需 | 现状 |
+| Missing abstraction | Why it is necessary | Current state |
 | :--- | :--- | :--- |
-| **事件内核（唯一写入者）** | 所有状态变更必须经过单一、可重放、可校验的纯函数；否则无法保证确定性、回滚与分支 | 无；状态被 `mutations.ts` 和 LLM 直接改 |
-| **动作解析层** | 用户自由文本 → 结构化候选事件 → 前提校验 → 事件 | 无；文本直接进 LLM 或关键词匹配 |
-| **认知更新的副作用化** | 观察必须作为事件的效果写回 `knownFacts`/`beliefs`，才能保证不泄漏 | `projector` 是纯读函数（正确），但没有「观察→知识」的写入通道 |
-| **焦点/显著性计算** | 决定「此刻什么重要」——体验层的入口 | 无；`computeUIPlan` 只是规则树 |
-| **代理绑定模型** | 一个角色由谁控制（玩家/AI/脚本）应是运行时绑定而非实体属性 | 仅有 `AgentBehavior` 类型壳，无绑定与决策循环 |
-| **调度器（时间/待办事件队列）** | 级联后果、「明日大臣反应」、校园日程都需要延迟执行 | 无；事件立即全量应用 |
-| **持久化分层** | 定义/实例/状态/事件日志/玩家数据各有归属 | 只有 localStorage 单对象 |
-| **对话为一阶对象** | 谎言、潜台词、读心都需要话语（utterance）记录而非叙事文本 | 无 |
-| **布局引擎** | 5 原语的实现：焦点→舞台模式→卫星/环境/坞编排 | 只有文档 |
-| **创作者/主持人工具的真实通道** | 干预应成为带溯源的事件，经同一内核 | 文本前缀冒充 |
+| **Event kernel (single writer)** | All state changes must pass through a single, replayable, verifiable pure function; otherwise determinism, rollback, and branching cannot be guaranteed | None; state is directly mutated by `mutations.ts` and the LLM |
+| **Action resolution layer** | Free-form user text → structured candidate events → precondition validation → event | None; text goes straight to the LLM or keyword matching |
+| **Side-effecting of cognition updates** | Observations must be written back to `knownFacts`/`beliefs` as an effect of an event, to guarantee no leakage | The `projector` is a pure read function (correct), but there is no "observation → knowledge" write channel |
+| **Focus / salience computation** | Decides "what matters right now" — the entry point of the experience layer | None; `computeUIPlan` is just a rules tree |
+| **Agent binding model** | Who controls a character (player/AI/script) should be a runtime binding, not an entity attribute | Only an `AgentBehavior` type shell, no binding or decision loop |
+| **Scheduler (time / pending event queue)** | Cascading consequences, "the minister's reaction tomorrow", campus schedules all need deferred execution | None; events are applied fully and immediately |
+| **Persistence layering** | Definitions/instances/state/event logs/player data each have their own home | Only a single localStorage object |
+| **Dialogue as a first-class object** | Lies, subtext, and mind-reading all require utterance records rather than narrative text | None |
+| **Layout engine** | Implementation of the 5 primitives: focus → stage mode → satellite/ambient/dock orchestration | Documentation only |
+| **Real channel for creator / director tools** | Interventions should become events with provenance, through the same kernel | Faked with text prefixes |
 
 ---
 
-## 6. 危险假设（DANGEROUS ASSUMPTIONS）
+## 6. Dangerous Assumptions (DANGEROUS ASSUMPTIONS)
 
-1. **「LLM 能在单轮输出完整且一致的世界状态 JSON」** —— 已多次出现 schema 漂移与幻觉；状态越大越不可靠；token 成本随轮次线性爆炸。这是当前架构最危险的假设。
-2. **「LLM 应该设计 UI」** —— 提示词要求 LLM 返回 `uiPlanning.blocks`。这与「世界独立于界面」的根本主张自相矛盾。
-3. **「所有世界都适配同一个仪表盘网格」** —— 3 列网格把政治模拟、谋杀谜案、间谍家庭、校园生活压成同一形态。
-4. **「信念属于定义而非状态」** —— `CharacterEntity.beliefs` 是静态数组；但信念随时间变化（怀疑、误解、幻灭）。静态信念会与模拟冲突。
-5. **`knownFactIds` 双源** —— 定义上的 `char.knownFactIds` 与状态上的 `epistemics.entityKnownFacts` 并存，谁为准？运行时必须单一源。
-6. **「表示体系是纯数学，可以慢慢接线」** —— 若接不上实时循环，`representation/` 将成为「漂亮但没用」的死代码。风险在于其正确性永远不被真实路径验证。
-7. **「回合=用户动作」** —— 没有时间语义：校园世界需要日历压力，悬疑世界需要倒计时，而 `inUniverseTime` 只是字符串。
-8. **「角色切换不改状态」** —— 当前切到导演只是多显示一个控制台；真正的导演视角应改变「可见内容」，而不是「拥有的工具」。
-9. **`currentSituationNarrative` 字符串 blob** —— 作为状态唯一叙事锚点，无结构、无法计算显著性。
+1. **"The LLM can output complete and consistent world-state JSON in a single turn"** — schema drift and hallucination have already occurred repeatedly; the larger the state, the less reliable; token cost explodes linearly with rounds. This is the most dangerous assumption in the current architecture.
+2. **"The LLM should design the UI"** — the prompt asks the LLM to return `uiPlanning.blocks`. This contradicts the fundamental claim that "the world is independent of the interface".
+3. **"All worlds fit the same dashboard grid"** — the 3-column grid compresses political simulation, murder mystery, spy family, and campus life into the same shape.
+4. **"Beliefs belong to the definition rather than the state"** — `CharacterEntity.beliefs` is a static array; but beliefs change over time (suspicion, misunderstanding, disillusionment). Static beliefs will conflict with the simulation.
+5. **`knownFactIds` dual source** — `char.knownFactIds` on the definition and `epistemics.entityKnownFacts` on the state coexist. Which is authoritative? There must be a single source at runtime.
+6. **"The representation system is pure math and can be wired up slowly"** — if it cannot be connected to the real-time loop, `representation/` becomes "pretty but useless" dead code. The risk is that its correctness is never validated by a real path.
+7. **"A turn = a user action"** — no temporal semantics: a campus world needs calendar pressure, a suspense world needs a countdown, yet `inUniverseTime` is just a string.
+8. **"Switching characters does not change state"** — currently switching to the director just shows an extra console; a true director perspective should change "what is visible", not "what tools are owned".
+9. **`currentSituationNarrative` string blob** — as the sole narrative anchor of state, it is unstructured and cannot compute salience.
 
 ---
 
-## 7. 应保留（PRESERVE）
+## 7. Keep (PRESERVE)
 
-| 保留项 | 理由 |
+| Keep | Reason |
 | :--- | :--- |
-| `src/world/representation/*` 整体 | 四层分离、认知模型、关系/权力、角色空间、场景/分支骨架、校验器、四个基准世界 —— 这是未来内核的数据契约基础 |
-| `server.ts` 代理架构 | 多提供商路由、回退链、图片生成端点，仅需替换提示词与请求/响应契约 |
-| `src/data/worldAtlas.ts` | 高价值基准目录；注意其 `rightsStatus` 字段为版权风险提供了入口 |
-| 布局研究文档（`docs/LAYOUT_*`、`docs/layout/*`、`PRESENTATION_MODEL.md`） | 5 原语与 14 问研究是布局引擎的规格书 |
-| `ActionDock` 交互外壳与建议词条机制 | 唯一成熟的人机通道 |
-| 纯视觉组件（Stats/Timeline/Document/Event） | 在数据契约明确后可廉价复用 |
-| `ProvenanceMeta` 与命名空间 ID | 溯源是区分正典/幻觉/干预的基石 |
-| `evaluateWorldAction` 的 reducer 精神 | `(State, Action) → NextState` 是正确方向，只是求值太浅、未接线 |
+| `src/world/representation/*` as a whole | Four-layer separation, cognition model, relationship/power, role space, scenario/branch skeleton, validator, four baseline worlds — the foundation of the future kernel's data contract |
+| `server.ts` proxy architecture | Multi-provider routing, fallback chain, image generation endpoints; only the prompts and request/response contracts need replacement |
+| `src/data/worldAtlas.ts` | High-value baseline catalog; note that its `rightsStatus` field provides an entry point for copyright risk |
+| Layout research docs (`docs/LAYOUT_*`, `docs/layout/*`, `PRESENTATION_MODEL.md`) | The 5 primitives and the 14-question research are the specification for the layout engine |
+| `ActionDock` interaction shell and suggested-terms mechanism | The only mature human-machine channel |
+| Pure visual components (Stats/Timeline/Document/Event) | Cheaply reusable once the data contract is clarified |
+| `ProvenanceMeta` and namespaced IDs | Provenance is the cornerstone of distinguishing canon/hallucination/intervention |
+| The reducer spirit of `evaluateWorldAction` | `(State, Action) → NextState` is the right direction, only the evaluation is too shallow and unwired |
 
 ---
 
-## 8. 应抛弃（DISCARD）
+## 8. Discard (DISCARD)
 
-| 抛弃项 | 理由 |
+| Discard | Reason |
 | :--- | :--- |
-| `src/world/types.ts`（遗留 `WorldState`） | 扁平的 lore+UI 混杂物（`colSpan` 在领域类型里）。由 `representation/` 迁移替代 |
-| `src/world/engine.ts` 关键词匹配 | 伪合成。替换为：真实世界合成（LLM 产出**定义** JSON + 确定性实例化）+ 确定性回退 |
-| `src/world/mutations.ts` 标量钳制 | 无前提、无规则、无级联。替换为事件内核 |
-| `src/ai/prompts.ts` 与 `server.ts` 中的单轮巨型 JSON 提示 | 违反一切分离原则。替换为：结构化工具调用/小步状态增量 |
-| `src/interface/director.ts` 规则树 | 替换为注意力/显著性驱动的 `PresentationPlanner` |
-| `src/ui/renderer.tsx` 3 列网格 | 替换为 5 原语布局引擎 |
-| `[DIRECTOR INTERVENTION]` 文本前缀机制 | 替换为带溯源的干预事件，经同一内核与权限校验 |
-| 硬编码在 Block 上的布局属性（`colSpan`） | 布局属于体验层，不属于领域数据 |
-| 静态种子世界的 UI 计划（`mockWorlds` 中的 `uiPlanning`） | 世界不应携带 UI 计划 |
+| `src/world/types.ts` (legacy `WorldState`) | A flat lore+UI mixture (`colSpan` inside domain types). Superseded by migration to `representation/` |
+| `src/world/engine.ts` keyword matching | Pseudo-synthesis. Replace with: genuine world synthesis (LLM produces **definition** JSON + deterministic instantiation) + deterministic fallback |
+| `src/world/mutations.ts` scalar clamping | No preconditions, no rules, no cascade. Replace with the event kernel |
+| `src/ai/prompts.ts` and the single-turn giant JSON prompt in `server.ts` | Violates every separation principle. Replace with: structured tool calls / small-step state increments |
+| `src/interface/director.ts` rules tree | Replace with an attention/salience-driven `PresentationPlanner` |
+| `src/ui/renderer.tsx` 3-column grid | Replace with the 5-primitive layout engine |
+| The `[DIRECTOR INTERVENTION]` text-prefix mechanism | Replace with provenance-bearing intervention events, through the same kernel with permission validation |
+| Layout attributes hardcoded onto Blocks (`colSpan`) | Layout belongs to the experience layer, not domain data |
+| Static seed worlds' UI plans (`uiPlanning` in `mockWorlds`) | Worlds should not carry UI plans |
 
 ---
 
-## 9. 结论
+## 9. Conclusion
 
-原型在**两个方向上各走了一半**：表示体系（正确的数学/认知契约）与展示层（精致的视觉外壳）都已存在，但中间的心脏——**事件驱动的世界转移内核、动作解析、认知副作用、显著性计算、代理绑定**——完全缺失。下一阶段不是「继续堆 UI」，而是把表示体系接线为运行时，并在两者之间建立唯一写入通道。
+The prototype is **halfway down two directions**: the representation system (correct mathematical/cognitive contract) and the presentation layer (a refined visual shell) both already exist, but the heart in between — the **event-driven world transition kernel, action resolution, cognitive side effects, salience computation, and agent binding** — is entirely missing. The next phase is not "keep piling on UI", but wiring the representation system into a runtime, and establishing the single write channel between the two.
 
-相关文档：
-- 内核定义 → [`HEADCONAN_KERNEL.md`](./HEADCONAN_KERNEL.md)
-- 系统边界 → [`SYSTEM_ARCHITECTURE.md`](./SYSTEM_ARCHITECTURE.md)
-- 运行时细节 → [`WORLD_RUNTIME.md`](./WORLD_RUNTIME.md)
+Related documents:
+- Kernel definition → [`HEADCONAN_KERNEL.md`](./HEADCONAN_KERNEL.md)
+- System boundaries → [`SYSTEM_ARCHITECTURE.md`](./SYSTEM_ARCHITECTURE.md)
+- Runtime details → [`WORLD_RUNTIME.md`](./WORLD_RUNTIME.md)

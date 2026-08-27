@@ -1,79 +1,79 @@
-# HeadConan 架构实验（ARCHITECTURAL_EXPERIMENTS）
+# HeadConan Architectural Experiments
 
-> 目标：**用最小的实验杀死最危险的假设**。每个实验 ≤ 1 天，纯代码（可完全脱离现有 UI），结论要么「假设成立」，要么「假设被证伪 → 回到 ARCHITECTURAL_DECISIONS 修正」。
-> 前置条件：`src/world/representation/*` 已可用（四个基准世界 + 投影器 + 求值器）。
-
----
-
-## E1 — 单一世界表示能否同时支撑「正典」与「平行场景」？
-
-- **假设（ADR-1/内核 §5）**：`WorldDefinition + ScenarioSeed → WorldInstance`，多个实例互不污染。
-- **设置**：用 GAME OF THRONES 定义，构造三个种子：`canon`（正典开局）、`voldemort_wins`（「如果奈德拒绝南下」）、`player_minister`（玩家成为魔法部长/领主）。各 `instantiate()` 后各跑 3 个事件。
-- **判据（KILL CRITERIA）**：
-  - ✅ 成立：三个实例的状态互不影响；同一事件在不同实例产生不同结果（因初始状态不同）。
-  - ❌ 证伪：任何实例间引用泄漏（共享数组/引用）；或种子无法表达「分歧」。
-- **产出**：`instantiate(world, scenario) → WorldInstance` 的正式接口签名。
+> Goal: **Kill the most dangerous assumptions with the smallest possible experiments.** Each experiment ≤ 1 day, pure code (fully decoupled from the existing UI); the conclusion is either "assumption holds" or "assumption falsified → go back to ARCHITECTURAL_DECISIONS to revise".
+> Precondition: `src/world/representation/*` is usable (four baseline worlds + projector + evaluator).
 
 ---
 
-## E2 — 单个动作能否产生有界的级联后果？
+## E1 — Can a single world representation support both "canon" and "parallel scenarios" simultaneously?
 
-- **假设（ADR-2/ADR-3）**：「公开指控大臣」→ 效果 + 观察（议员知情）+ 排队后果（大臣回应、派系表态）。
-- **设置**：SPY×FAMILY 或 GoT 定义，为 `public_accusation` 写规则（direct effects + 2 个延迟 consequence）；跑 `applyEvent` 后手动触发调度队列 3 轮。
-- **判据**：
-  - ✅ 成立：级联深度 ≤ 预算上限；每个后果都源自明确的规则；日志可按序重放出相同轨迹。
-  - ❌ 证伪：级联无法终止（需硬编码深度）；或后果彼此矛盾（A 派表态后又因 B 事件翻转）。
-- **产出**：调度队列 + 排水预算的规格；规则「后果」字段是否需要 `delayInTurns` / `afterInUniverseTime` 的证据。
-
----
-
-## E3 — 两个角色对同一事实拥有不同认知，且不会泄漏？
-
-- **假设（ADR-4）**：`Fact(loid_is_twilight)` 对 Loid 可见、对 Yor 不可见；投影器输出不同视图；LLM 上下文只含各自投影。
-- **设置**：用 SPY×FAMILY 定义；分别投影 Loid / Yor / Anya / 上帝视角；比较四个视图；再注入一个 `observation` 事件（Anya 读心）并重新投影。
-- **判据**：
-  - ✅ 成立：四视图各自正确（Anya 视图含 Loid+Yor 的秘密，Loid 视图不含 Yor 的秘密）；观察事件后认知精确更新且不波及其他。
-  - ❌ 证伪：任何「直接读全量状态」的路径被 UI/LLM 意外使用；或观察副作用把秘密泄露给了不在场者。
-- **产出**：投影器的性能基线（每次投影成本）；「观察副作用」写入通道的正式定义。
+- **Assumption (ADR-1 / Kernel §5)**: `WorldDefinition + ScenarioSeed → WorldInstance`, with multiple instances not polluting each other.
+- **Setup**: Using the GAME OF THRONES definition, construct three seeds: `canon` (canonical opening), `voldemort_wins` ("what if Ned refused to go south"), `player_minister` (the player becomes the magic minister / lord). After each `instantiate()`, run 3 events per instance.
+- **Kill Criteria**:
+  - ✅ Holds: The three instances' states do not affect each other; the same event produces different results in different instances (due to different initial states).
+  - ❌ Falsified: Any reference leakage between instances (shared array/reference); or the seed cannot express "divergence".
+- **Output**: The formal interface signature of `instantiate(world, scenario) → WorldInstance`.
 
 ---
 
-## E4 — 同一世界状态能否产生不同的 UI 布局？
+## E2 — Can a single action produce bounded cascading consequences?
 
-- **假设（ADR-7/ADR-8）**：布局是状态 + 角色透镜 + 焦点的派生；玩家与主持人看同一世界得到不同呈现计划。
-- **设置**：构造一个中等复杂度状态（含一次公开指控事件）；同一输入喂给「玩家透镜」与「主持人透镜」的显著性+呈现规划；比较两个 `PresentationPlan`。
-- **判据**：
-  - ✅ 成立：两份计划在舞台模式/焦点/可见内容上显著不同，且两者都「合理」（玩家：对话+怀疑；主持人：全图+干预控件）。
-  - ❌ 证伪：两份计划几乎相同（透镜没有影响）→ 说明认知投影未接入显著性，或显著性公式退化为静态规则。
-- **产出**：`significance(state, perspective, profile) → ExperienceState` 的可实现版本；FocusScore 四因子的初始权重。
-
----
-
-## E5 — 主持人能否不绕过运行时地修改世界？
-
-- **假设（ADR-6）**：干预 = 带溯源的普通事件，经同一内核；改规则 = `define_modification` 版本化事件。
-- **设置**：在 E1 的实例上，主持人执行：① 注入危机事件；② 把某角色对另一角色的关系 affinity 改为 -50；③ 修改一条公理（如「通信延迟翻倍」）；全部走 `applyEvent`，随后验证日志完整、规则生效、玩家视图在投影后自然变化。
-- **判据**：
-  - ✅ 成立：三次干预全部入日志；无需任何旁路 API；撤销 = 回滚到干预前快照。
-  - ❌ 证伪：干预必须绕过前提校验才能生效（说明权限模型错）；或定义修改后既有状态失效（版本不兼容）。
-- **产出**：权限校验器（谁能提交什么事件）+ 定义版本化 diff 的规格。
+- **Assumption (ADR-2 / ADR-3)**: "Publicly accuse the minister" → effects + observation (council members learn) + queued consequences (minister responds, faction takes a stance).
+- **Setup**: SPY×FAMILY or GoT definition; write rules for `public_accusation` (direct effects + 2 delayed consequences); after `applyEvent`, manually trigger the scheduler queue for 3 rounds.
+- **Kill Criteria**:
+  - ✅ Holds: Cascade depth ≤ budget cap; every consequence originates from an explicit rule; the log can replay the same trajectory in order.
+  - ❌ Falsified: The cascade cannot terminate (needs hardcoded depth); or consequences contradict each other (faction A takes a stance, then flips due to event B).
+- **Output**: The specification of the scheduler queue + drain budget; evidence for whether the rule "consequence" field needs `delayInTurns` / `afterInUniverseTime`.
 
 ---
 
-## E6（补充）— 动作失败本身是否是有意义的事件？
+## E3 — Can two characters hold different cognition of the same fact, without leakage?
 
-- **假设**：「尝试但失败」应进入日志并可被呈现（「你试图潜入，被卫兵看见」）。
-- **设置**：在 GoT 定义中，让玩家对无权限对象执行动作（如平民命令国王）。
-- **判据**：
-  - ✅ 成立：拒绝记录入日志；若有在场者，观察副作用照常发生（卫兵注意到了）；体验层可呈现「失败也是一种结果」。
-  - ❌ 证伪：拒绝必须静默消失（无叙事价值）。
-- **产出**：`rejected` 事件的日志/观察/呈现规范。
+- **Assumption (ADR-4)**: `Fact(loid_is_twilight)` is visible to Loid but not to Yor; the projector outputs different views; the LLM context contains only each one's own projection.
+- **Setup**: Using the SPY×FAMILY definition; project Loid / Yor / Anya / god perspective separately; compare the four views; then inject an `observation` event (Anya reads minds) and re-project.
+- **Kill Criteria**:
+  - ✅ Holds: All four views are each correct (Anya's view contains Loid+Yor's secrets, Loid's view does not contain Yor's secret); the cognitive record updates precisely after the observation event and does not ripple to others.
+  - ❌ Falsified: Any path that "directly reads the full state" is accidentally used by the UI/LLM; or the observation side effect leaks a secret to someone not present.
+- **Output**: A performance baseline for the projector (cost per projection); the formal definition of the "observation side effect" write channel.
 
 ---
 
-## 实验执行规则
+## E4 — Can the same world state produce different UI layouts?
 
-1. **每个实验独立可跑**（不依赖其他实验的代码），但共享 `representation/` 基础。
-2. **全部判据写成断言**（哪怕是临时脚本）：结论由测试决定，不由印象决定。
-3. **失败的实验是成果**：记录「假设为何错、修正哪个 ADR」，然后继续——这正是架构可证伪性的意义。
-4. 完成后汇总到 `docs/EXPERIMENTS.md`（既有实验日志的延续）。
+- **Assumption (ADR-7 / ADR-8)**: Layout is derived from state + character lens + focus; the player and the host see the same world and get different presentation plans.
+- **Setup**: Construct a medium-complexity state (containing one public accusation event); feed the same input to the "player lens" and "host lens" significance + presentation planning; compare the two `PresentationPlan`s.
+- **Kill Criteria**:
+  - ✅ Holds: The two plans differ significantly in stage mode / focus / visible content, and both are "reasonable" (player: dialogue + suspicion; host: full map + intervention controls).
+  - ❌ Falsified: The two plans are nearly identical (the lens had no effect) → indicates the cognitive projection is not wired into salience, or the salience formula degraded into static rules.
+- **Output**: An implementable version of `significance(state, perspective, profile) → ExperienceState`; initial weights for the FocusScore four factors.
+
+---
+
+## E5 — Can the host modify the world without bypassing the runtime?
+
+- **Assumption (ADR-6)**: Intervention = an ordinary event with provenance, through the same kernel; changing rules = a `define_modification` versioned event.
+- **Setup**: On the instance from E1, the host performs: ① inject a crisis event; ② change one character's relationship affinity toward another character to -50; ③ modify an axiom (e.g., "communication delay doubled"); all through `applyEvent`, then verify the log is complete, the rules take effect, and the player view changes naturally after projection.
+- **Kill Criteria**:
+  - ✅ Holds: All three interventions enter the log; no bypass API needed; undo = rollback to the pre-intervention snapshot.
+  - ❌ Falsified: The intervention must bypass precondition validation to take effect (indicates the permission model is wrong); or existing state becomes invalid after the definition change (version incompatibility).
+- **Output**: The permission validator (who can submit what event) + the specification of the definition versioned diff.
+
+---
+
+## E6 (supplementary) — Is a failed action itself a meaningful event?
+
+- **Assumption**: "Attempted but failed" should enter the log and be presentable ("You tried to sneak in, spotted by the guard").
+- **Setup**: In the GoT definition, have the player perform an action on an unauthorized object (e.g., a commoner commanding the king).
+- **Kill Criteria**:
+  - ✅ Holds: The rejection is logged; if there is a witness, the observation side effect occurs normally (the guard noticed); the experience layer can present "failure is also a result".
+  - ❌ Falsified: The rejection must silently disappear (no narrative value).
+- **Output**: The logging / observation / presentation specification for `rejected` events.
+
+---
+
+## Experiment Execution Rules
+
+1. **Each experiment is independently runnable** (not dependent on other experiments' code), but shares the `representation/` foundation.
+2. **All kill criteria are written as assertions** (even if in a temporary script): the conclusion is decided by tests, not by impressions.
+3. **A failed experiment is a result**: record "why the assumption was wrong, which ADR to revise", then continue — this is precisely the meaning of architectural falsifiability.
+4. After completion, summarize into `docs/EXPERIMENTS.md` (a continuation of the existing experiment log).

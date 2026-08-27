@@ -1,298 +1,298 @@
-# HeadConan 世界运行时（WORLD RUNTIME）
+# HeadConan World Runtime (WORLD RUNTIME)
 
-> 本文件是内核（[`HEADCONAN_KERNEL.md`](./HEADCONAN_KERNEL.md)）的实现规格：定义结构、实例语义、状态真理源、转移抽象、事件模型、信息不对称、代理/玩家/主持人模型、记忆与持久化的归属。
+> This file is the implementation specification of the kernel ([`HEADCONAN_KERNEL.md`](./HEADCONAN_KERNEL.md)): it defines structure, instance semantics, the source of truth for state, the transition abstraction, the event model, information asymmetry, the agent/player/host model, and the ownership of memory and persistence.
 
 ---
 
-## 1. WorldDefinition（世界定义）—— 组合结构
+## 1. WorldDefinition — Compositional Structure
 
-**原则**：不是每个类别一个类。定义由「几个最小组合体」构成。现有 `representation/` 的类型已接近正确，本文件做三点修正（见 1.2）。
+**Principle**: not one class per category. A definition is composed of "a few minimal compositions." The existing types in `representation/` are already close to correct; this file makes three corrections (see 1.2).
 
-### 1.1 组合结构
+### 1.1 Compositional Structure
 
 ```
 WorldDefinition
-├── 身份与版本（id, name, tagline, premise, version）
-├── Axioms（公理：不变法则）            —— 物理/社会契约/机构规范
-├── Ontology（本体）                    —— CapabilityDefinition + PropertyDefinition
-├── Baseline（正典基底）                —— entities（char/org/loc/object/resource）+ relationships + groundTruthFacts
-├── Dynamics（动力学）                  —— WorldActionDefinition[]（前提/效果/后果）
-├── PossibilitySpace（可能性空间）       —— InhabitedRoleSlot[]（模式/代理级/认知雾/禁忌）
-└── ExperienceProfile（体验信号）        —— 幻想原型/张力梯度/密度/推荐模态
+├── Identity & version (id, name, tagline, premise, version)
+├── Axioms (invariants: immutable laws)   —— physical/social contract/institutional norms
+├── Ontology                              —— CapabilityDefinition + PropertyDefinition
+├── Baseline (canonical base)             —— entities (char/org/loc/object/resource) + relationships + groundTruthFacts
+├── Dynamics                              —— WorldActionDefinition[] (precondition/effects/consequences)
+├── PossibilitySpace                      —— InhabitedRoleSlot[] (mode/agent level/cognitive fog/taboos)
+└── ExperienceProfile (experience signals)—— fantasy archetype/tension gradient/density/recommended modalities
 ```
 
-**文化/机构/地理不需要专属类**：
-- 机构 = `OrganizationEntity`（doctrine/cohesion/prestige）+ 挂在组织上的规范（`SocialNorm`）。
-- 文化 = 公理 + 规范 + 体验信号（`dominantTone` 等）的涌现，不单独建模。
-- 地理 = `LocationEntity`（accessibility/spatialAffordances）+ 位置间关系（如 `adjacency` 可用 Relationship 或自定义属性表达）。
+**Culture / institution / geography need no dedicated class**:
+- Institution = `OrganizationEntity` (doctrine/cohesion/prestige) + norms attached to the organization (`SocialNorm`).
+- Culture = an emergence of axioms + norms + experience signals (e.g. `dominantTone`), not modeled separately.
+- Geography = `LocationEntity` (accessibility/spatialAffordances) + relationships between locations (e.g. `adjacency` can be expressed via Relationship or a custom attribute).
 
-### 1.2 对现有类型的修正
+### 1.2 Corrections to Existing Types
 
-| # | 修正 | 原因 |
+| # | Correction | Reason |
 | :--- | :--- | :--- |
-| 1 | **信念从定义迁到状态**：删除 `CharacterEntity.beliefs` 静态数组，改为运行时 `BeliefRecord[]`（随状态演化） | 信念随时间变化；静态信念与模拟冲突（危险假设 #4） |
-| 2 | **`knownFactIds` 单一源**：运行时认知记录以 `epistemics.entityKnownFacts` 为准；定义中保留的 `knownFactIds` 仅作**初始认知**（种子） | 双源必然漂移（危险假设 #5） |
-| 3 | **动作定义补三类专门化**：`speech_act` 类别、延迟后果（`spawnEvent.delayInTurns`/`afterInUniverseTime`）、组织级效果（`targetDomain: organization`） | 四世界压力测试的吃紧点（见内核 3.5） |
-| 4 | **`currentSituationNarrative` 从状态移除**：改为事件日志的最新摘要（派生） | 字符串 blob 无法计算显著性（危险假设 #9） |
+| 1 | **Beliefs move from definition to state**: remove the static `CharacterEntity.beliefs` array, replace with runtime `BeliefRecord[]` (evolves with state) | Beliefs change over time; static beliefs conflict with simulation (dangerous assumption #4) |
+| 2 | **Single source for `knownFactIds`**: runtime cognition records use `epistemics.entityKnownFacts` as authoritative; the `knownFactIds` retained in the definition serves only as **initial cognition** (seed) | Dual sources inevitably drift (dangerous assumption #5) |
+| 3 | **Three action-definition specializations added**: `speech_act` category, delayed consequences (`spawnEvent.delayInTurns`/`afterInUniverseTime`), organization-level effects (`targetDomain: organization`) | Pressure points from the four-world stress test (see kernel 3.5) |
+| 4 | **Remove `currentSituationNarrative` from state**: replace with the latest summary of the event log (derived) | String blob cannot be used to compute salience (dangerous assumption #9) |
 
-### 1.3 定义不变式（校验器必须强制）
+### 1.3 Definition Invariants (must be enforced by the validator)
 
-1. 所有引用（角色/组织/地点/事实/动作/关系）必须存在（已有 `validateWorldDefinition` 覆盖大部分）。
-2. 每个角色必须能解析出：角色 ↔ 实体绑定、认知雾级别、可用动作类别（已有）。
-3. 定义不得包含任何运行时值（回合数、当前时间、当前状态、UI 计划）。
-4. `groundTruthFacts` 中同一条事实不得有两条可见域矛盾的记录（新增校验）。
+1. All references (character/organization/location/fact/action/relationship) must exist (already largely covered by `validateWorldDefinition`).
+2. Every character must resolve to: character ↔ entity binding, cognitive fog level, available action categories (already present).
+3. The definition must not contain any runtime value (turn count, current time, current state, UI plan).
+4. `groundTruthFacts` must not contain two records of the same fact that contradict each other in a visible domain (new validation).
 
 ---
 
-## 2. 世界实例 / 场景 / 时间线 / 分支
+## 2. World Instance / Scenario / Timeline / Branch
 
-| 概念 | 定义 | 存储形式 |
+| Concept | Definition | Storage Form |
 | :--- | :--- | :--- |
-| **WorldInstance** | 一次具体运行：`definitionId + scenarioId + 当前状态 + 事件日志 + 时钟 + 代理绑定` | 状态快照（周期性）+ 追加日志 |
-| **ScenarioSeed** | 起始配置：初始情境 + 初始状态突变（`StateEffect[]`）+ 推荐角色 | 定义侧数据（种子库） |
-| **Timeline** | 事件日志按时间排序的投影 | 不存储（派生视图） |
-| **TimelineBranch** | 在日志某点派生出的新实例（`parentTimelineId + forkedAtTurn + divergenceReason`） | 分支即「复制实例 + 从分歧点继续」 |
+| **WorldInstance** | A concrete run: `definitionId + scenarioId + current state + event log + clock + agent bindings` | State snapshot (periodic) + append-only log |
+| **ScenarioSeed** | Starting configuration: initial situation + initial state mutations (`StateEffect[]`) + recommended characters | Definition-side data (seed library) |
+| **Timeline** | A chronological projection of the event log | Not stored (derived view) |
+| **TimelineBranch** | A new instance forked at some point in the log (`parentTimelineId + forkedAtTurn + divergenceReason`) | A branch is "copy the instance + continue from the divergence point" |
 
-**实例化流程**（确定性）：
-1. `instantiate(definition, scenario)` → 深拷贝定义基线 → 应用 `initialStateMutations` → 初始化认知记录（角色初始 `knownFactIds` 来自定义）→ 时钟归零 → 日志空。
-2. 任何时刻 `restore(instanceId, snapshotOrLog)` 可重建。
+**Instantiation flow** (deterministic):
+1. `instantiate(definition, scenario)` → deep-copy the definition baseline → apply `initialStateMutations` → initialize cognition records (a character's initial `knownFactIds` comes from the definition) → zero the clock → empty log.
+2. At any time `restore(instanceId, snapshotOrLog)` can rebuild it.
 
-> 分支的操作成本 = 一次实例复制 + 之后只写新日志。禁止为分支建独立数据库（过度工程）。
-
----
-
-## 3. 世界状态 —— 真理源与派生分离
-
-### 3.1 真理源（SOURCE OF TRUTH，必须持久化）
-
-| 数据 | 说明 |
-| :--- | :--- |
-| 实体状态 | `entityStates[id] = { currentLocationId, currentActivity, emotionalState, reputationScore, physicalStatus, dynamicAttributes, inventory }` |
-| 关系状态 | `relationshipStates[id] = { affinity, trust, powerBalance, recentInteractions, brokenPromises }` |
-| 时钟 | `turnNumber + inUniverseTime + elapsedSimulatedSeconds` |
-| 认知记录 | `epistemics = { entityKnownFacts, beliefs, activeSecrets, activeRumors, publicExposedFactIds }` |
-| 资源池 | `resourcePools[id] = number` |
-| 事件日志 | 全部 `SimulationEvent`（追加写） |
-| 调度队列 | 待执行的排队事件（含触发时间） |
-| 代理绑定 | `agentBindings[entityId] = { controller: player|ai|script|none, policy?, playerId? }` |
-
-### 3.2 派生（DERIVED，永不存储为真理）
-
-| 派生物 | 来源 |
-| :--- | :--- |
-| 观察者视图 | `projectEpistemicPerspective(state, observer)` |
-| 信念真伪标记 | 信念 vs 事实的对比（比对时计算） |
-| 显著性/注意力 | Experience Service |
-| 呈现计划 | Experience Service |
-| 声誉聚合/关系摘要 | 由状态值推导 |
-| 叙事散文 | 事件 → LLM 措辞（呈现层缓存，非真理） |
-| 时间线/分支图 | 事件日志投影 |
-
-**纪律**：任何字段若能由日志+规则重建，就不进状态快照（快照仅做性能缓存）。
+> The operational cost of a branch = one instance copy + afterwards only writing the new log. Do not build a separate database for branches (over-engineering).
 
 ---
 
-## 4. 世界转移（TRANSITIONS）
+## 3. World State — Separation of Source of Truth from Derived
 
-### 4.1 抽象
+### 3.1 Source of Truth (MUST be persisted)
+
+| Data | Description |
+| :--- | :--- |
+| Entity state | `entityStates[id] = { currentLocationId, currentActivity, emotionalState, reputationScore, physicalStatus, dynamicAttributes, inventory }` |
+| Relationship state | `relationshipStates[id] = { affinity, trust, powerBalance, recentInteractions, brokenPromises }` |
+| Clock | `turnNumber + inUniverseTime + elapsedSimulatedSeconds` |
+| Cognition records | `epistemics = { entityKnownFacts, beliefs, activeSecrets, activeRumors, publicExposedFactIds }` |
+| Resource pools | `resourcePools[id] = number` |
+| Event log | All `SimulationEvent` (append-only writes) |
+| Scheduling queue | Queued events pending execution (including trigger time) |
+| Agent bindings | `agentBindings[entityId] = { controller: player|ai|script|none, policy?, playerId? }` |
+
+### 3.2 Derived (NEVER stored as truth)
+
+| Derived | Source |
+| :--- | :--- |
+| Observer view | `projectEpistemicPerspective(state, observer)` |
+| Belief truth/false marker | Belief vs. fact comparison (computed at comparison time) |
+| Salience/attention | Experience Service |
+| Presentation plan | Experience Service |
+| Reputation aggregation / relationship summary | Derived from state values |
+| Narrative prose | Event → LLM wording (cached by presentation layer, not truth) |
+| Timeline / branch graph | Event log projection |
+
+**Discipline**: any field that can be rebuilt from log + rules must not enter the state snapshot (snapshots serve only as a performance cache).
+
+---
+
+## 4. World Transitions (TRANSITIONS)
+
+### 4.1 Abstraction
 
 ```
 ACTOR_INTENT + STATE + RULES
-        │  解析与校验
+        │  resolution & validation
         ▼
-  CANDIDATE EVENT（候选事件）
-        │  内核应用
+  CANDIDATE EVENT
+        │  kernel application
         ▼
   NEW STATE + SPAWNED EVENTS + OBSERVATIONS + (REJECTED?)
 ```
 
-**核心签名**：
+**Core signature**:
 
 ```
 applyEvent(state, definition, event)
   → { nextState, spawnedEvents[], observations[], rejected? , reason? }
 ```
 
-### 4.2 转移流水线（内核内部）
+### 4.2 Transition Pipeline (inside the kernel)
 
-1. **前提校验**（确定性）：位置共现、能力、知识、资源、权限、信任阈值、主持人权限（干预事件需 `player_directive` 溯源 + 角色权限）。
-2. **效果应用**（确定性）：原子突变（set/increment/decrement/reveal_fact/create_entity/modify_status），支持 `$actor`/`$target` 占位符解析。
-3. **观察派生**：事件携带「谁在场/谁可见」→ 对每个观察者生成观察记录 → 更新其 `knownFacts`/`beliefs`/`rumors`。**这是信息不对称的写入通道。**
-4. **后果排队**：满足触发条件的 `EmergentConsequence` → 立即效果 + 延迟/定期事件进入调度队列。
-5. **日志追加**：事件 + 观察 + 拒绝记录全部入日志（拒绝也是日志项，支持「尝试过」叙事）。
+1. **Precondition validation** (deterministic): co-presence, capability, knowledge, resources, permissions, trust threshold, host permission (intervention events require `player_directive` provenance + character permission).
+2. **Effect application** (deterministic): atomic mutations (set/increment/decrement/reveal_fact/create_entity/modify_status), supports `$actor`/`$target` placeholder resolution.
+3. **Observation derivation**: an event carries "who was present / who could see" → generate an observation record for each observer → update their `knownFacts`/`beliefs`/`rumors`. **This is the write channel for information asymmetry.**
+4. **Consequence queueing**: `EmergentConsequence` whose trigger conditions are met → immediate effects + delayed/periodic events enter the scheduling queue.
+5. **Log append**: the event + observations + rejection records all enter the log (rejections are also log entries, supporting "attempted" narrative).
 
-### 4.3 「公开指控大臣」示例走查
+### 4.3 "Publicly Accuse the Minister" Walkthrough
 
-| 步骤 | 内容 |
+| Step | Content |
 | :--- | :--- |
-| 意图 | 玩家：「我公开指控大臣。」 |
-| 解析 | `intent(accuse, target=minister, claim=fact_ref)` → 候选事件 `public_accusation` |
-| 前提 | ① 玩家在场（议会大厅）；② 有说话能力；③ 该指控对象在场；④ 主持人/角色权限允许 |
-| 效果 | 大臣 reputation-15；玩家与大臣 relationship(hostility)；议会 faction 立场浮动 |
-| 观察 | 在场议员 12 人 → 每人 `knownFacts += 指控内容(作为 rumor/belief)`；媒体事件排队 |
-| 后果 | `scheduled_event(大臣回应, +1 回合)`；`scheduled_event(派系 A 表态, +2 回合)` |
-| 显著性 | 这是高戏剧性事件 → 体验层提升为焦点 |
+| Intent | Player: "I publicly accuse the minister." |
+| Resolution | `intent(accuse, target=minister, claim=fact_ref)` → candidate event `public_accusation` |
+| Precondition | ① Player is present (council hall); ② has the ability to speak; ③ the accusation target is present; ④ host/character permission permits |
+| Effect | Minister reputation −15; player↔minister relationship (hostility); council faction stance shifts |
+| Observation | 12 council members present → each gets `knownFacts += accusation content (as rumor/belief)`; media event queued |
+| Consequence | `scheduled_event(minister response, +1 turn)`; `scheduled_event(faction A statement, +2 turns)` |
+| Salience | This is a high-drama event → experience layer promotes it to focus |
 
 ---
 
-## 5. 事件模型（EVENT MODEL）
+## 5. Event Model (EVENT MODEL)
 
-### 5.1 五概念不合并，但只有一层存储
+### 5.1 Five concepts are not merged, but there is only one layer of storage
 
-| 概念 | 定义 | 存储 |
+| Concept | Definition | Storage |
 | :--- | :--- | :--- |
-| **Action（动作）** | 意图：`{ actor, verb, target, payload, context }` | 不存储（输入） |
-| **Event（事件）** | 发生的事实：`{ id, type, turn, time, actor, targets, content, publicKnowledgeLevel }` | **日志（唯一存储）** |
-| **StateChange（状态变化）** | 事件的效果集 | 由事件+规则派生（可物化为快照） |
-| **Observation（观察）** | 谁感知到了什么 | 事件携带的观察副作用 → 写入认知记录 |
-| **Consequence（后果）** | 后续事件（立即或延迟） | 调度队列 / 日志 |
+| **Action** | Intent: `{ actor, verb, target, payload, context }` | Not stored (input) |
+| **Event** | A fact that occurred: `{ id, type, turn, time, actor, targets, content, publicKnowledgeLevel }` | **Log (the only storage)** |
+| **StateChange** | The set of effects of an event | Derived from event + rules (can be materialized as a snapshot) |
+| **Observation** | What someone perceived | The observation side-effect carried by an event → written to cognition records |
+| **Consequence** | Subsequent event (immediate or delayed) | Scheduling queue / log |
 
-> 结论：**事件日志是唯一脊柱**。动作是其输入，状态变化与观察是其投影，后果是排队事件。五概念语义不同但物理上不重复存储——这既满足「不自动合并」的要求，也避免冗余。
+> Conclusion: **the event log is the only spine.** Actions are its input, state changes and observations are its projections, consequences are queued events. The five concepts differ semantically but are not physically stored twice — this satisfies the "do not auto-merge" requirement while avoiding redundancy.
 
-### 5.2 事件类型（初始集合，随世界扩展）
+### 5.2 Event Types (initial set, extended per world)
 
-| 类型 | 示例 | 说明 |
+| Type | Example | Description |
 | :--- | :--- | :--- |
-| `speech_act` | 对话/质问/谎言/坦白 | 含 `utterance`、`subtext?`、`intentTag`；供读心/推演/潜台词 |
-| `physical_action` | 攻击/移动/搜查 | 前提多为位置/能力 |
-| `political_action` | 结盟/宣战/颁布法令 | 触发组织级效果与延迟后果 |
-| `forensic_action` | 检验/发现证据/审讯 | 触发 `reveal_fact` 认知写入 |
-| `institutional_action` | 课程/任命/处分 | 触发日程与例行 |
-| `directorial_intervention` | 主持人注入事件 | 溯源 `player_directive`，仍需前提校验（权限） |
-| `scheduled_trigger` | 定时后果/截止 | 由调度器自动提交 |
-| `world_tick` | 日常例行/环境变化 | 自主世界推进的最小步 |
+| `speech_act` | dialogue/interrogation/lie/confession | Includes `utterance`, `subtext?`, `intentTag`; feeds mind-reading/deduction/subtext |
+| `physical_action` | attack/move/search | Preconditions mostly location/capability |
+| `political_action` | ally/declare war/promulgate decree | Triggers organization-level effects and delayed consequences |
+| `forensic_action` | examine/discover evidence/interrogate | Triggers `reveal_fact` cognition write |
+| `institutional_action` | coursework/appointment/discipline | Triggers schedule and routines |
+| `directorial_intervention` | host-injected event | Provenance `player_directive`, still requires precondition validation (permission) |
+| `scheduled_trigger` | timed consequence/deadline | Auto-submitted by the scheduler |
+| `world_tick` | daily routine/environment change | Minimal step of autonomous world advancement |
 
-### 5.3 事件纪律
+### 5.3 Event Discipline
 
-1. 事件不可变（追加写）。修正 = 新事件（`retraction` 类型），不是原地编辑。
-2. 事件必须可序列化（纯数据）。叙事散文不是事件的一部分。
-3. 事件必须有 `publicKnowledgeLevel`（universal / witnesses_only / covert），观察派生依赖它。
+1. Events are immutable (append-only writes). Correction = a new event (`retraction` type), not in-place editing.
+2. Events must be serializable (pure data). Narrative prose is not part of an event.
+3. Events must have a `publicKnowledgeLevel` (universal / witnesses_only / covert); observation derivation depends on it.
 
 ---
 
-## 6. 信息不对称（INFORMATION ASYMMETRY）
+## 6. Information Asymmetry (INFORMATION ASYMMETRY)
 
-### 6.1 最小可行架构（非完整认知逻辑）
+### 6.1 Minimal Viable Architecture (not a full cognition logic)
 
 ```
-WORLD TRUTH（事实层，带可见域 + 溯源）
-        │ 观察副作用（事件的投影，唯一写入通道）
+WORLD TRUTH (fact layer, with visibility domain + provenance)
+        │ observation side-effect (projection of the event, the only write channel)
         ▼
-KNOWLEDGE（认知记录：entityKnownFacts[实体]=[事实ID]；beliefs：含置信度/真伪）
-        │ 投影（纯读函数）
+KNOWLEDGE (cognition records: entityKnownFacts[entity]=[factID]; beliefs: with confidence/true-false)
+        │ projection (pure read function)
         ▼
-PERCEPTION（projectEpistemicPerspective(observer) → 观察者视图）
+PERCEPTION (projectEpistemicPerspective(observer) → observer view)
 ```
 
-### 6.2 三原则
+### 6.2 Three Principles
 
-1. **真相与认知分存**：事实在定义/状态的事实层；认知记录只存「已知哪些事实 ID + 主观信念」。真伪标记是比对时计算的派生值。
-2. **认知只经事件改变**：`reveal_fact` / `observation` 效果是唯一写入通道。任何角色/玩家/呈现层都**不可能**直接读到未授权的真相——因为读的永远是投影结果。
-3. **投影在呈现时执行**：每次用户回合结束，按角色（含 `epistemicFogOfWar`）投影。投影结果不回流状态。
+1. **Truth and cognition stored separately**: facts live in the fact layer of definition/state; cognition records only store "which fact IDs are known + subjective beliefs". The true/false marker is a derived value computed at comparison time.
+2. **Cognition changes only via events**: the `reveal_fact` / `observation` effect is the only write channel. No character/player/presentation layer can possibly read unauthorized truth directly — because what is read is always the projection result.
+3. **Projection executed at presentation time**: after each user turn ends, project by character (including `epistemicFogOfWar`). The projection result does not flow back into state.
 
-### 6.3 秘密与戏剧反讽
+### 6.3 Secrets and Dramatic Irony
 
-- `SecretItem`：`{ factId, holdingEntityIds, targetEntityIds, consequencesIfExposed, exposureThreshold }`。
-- 暴露触发：阈值被事件推高（如证据被发现）→ 触发暴露事件（后果进入调度队列）。
-- 反讽检测：`compareEpistemicAsymmetry(world, state, A, B, factId)`（已有）——供体验层提示「观众知道而角色不知道」的时刻。
+- `SecretItem`: `{ factId, holdingEntityIds, targetEntityIds, consequencesIfExposed, exposureThreshold }`.
+- Exposure trigger: the threshold is pushed up by events (e.g. evidence is discovered) → triggers an exposure event (consequence enters the scheduling queue).
+- Irony detection: `compareEpistemicAsymmetry(world, state, A, B, factId)` (already exists) — feeds the experience layer hints about moments "the audience knows but the character doesn't".
 
-### 6.4 泄漏防护清单
+### 6.4 Leak Protection Checklist
 
-| 场景 | 防护 |
+| Scenario | Protection |
 | :--- | :--- |
-| 玩家切角色/切主持人 | 每次渲染前重新投影（主持人 = 全知投影，玩家 = 严格一视点投影） |
-| LLM 代理上下文注入 | 给代理的上下文 = 该代理的投影视图，**不是**全量状态 |
-| 事件内容包含秘密 | 事件 `publicKnowledgeLevel` 决定观察派生范围；covert 事件默认无观察者 |
-| 叙事散文泄漏 | 叙事措辞由「该观察者的视图」生成，而非上帝视角 |
+| Player switches character / switches to host | Re-project before each render (host = omniscient projection, player = strict single-viewpoint projection) |
+| LLM agent context injection | Context given to the agent = that agent's projected view, **not** the full state |
+| Event content contains a secret | Event `publicKnowledgeLevel` determines the observation derivation scope; covert events have no observers by default |
+| Narrative prose leak | Narrative wording is generated from "that observer's view", not from a god's-eye perspective |
 
 ---
 
-## 7. 角色 / 代理 / 玩家 / 主持人模型
+## 7. Character / Agent / Player / Host Model
 
-### 7.1 概念分离（不是类继承，是绑定）
+### 7.1 Conceptual Separation (not class inheritance, but binding)
 
 ```
-Entity（基底：一切事物）
-  └─ Character = Entity + 心智（人格/目标/需求/能力/认知记录）
-        └─ Agent = Character（或任意实体）+ 决策绑定（谁来驱动）
-              绑定 controller: 'player' | 'ai' | 'script' | 'none'
-Player    = 一种 视角 + 代理权 + 控制绑定 + 认知边界（可控制 0..n 个角色）
-Host      = 一种 角色/权限 + 全知认知透镜 + 干预权限（可同时是 Player）
+Entity (base: everything)
+  └─ Character = Entity + mind (personality/goals/needs/capability/cognition records)
+        └─ Agent = Character (or any entity) + decision binding (who drives it)
+               binding controller: 'player' | 'ai' | 'script' | 'none'
+Player    = a kind of viewpoint + agency + control binding + cognitive boundary (may control 0..n characters)
+Host      = a kind of role/permission + omniscient cognition lens + intervention permission (may simultaneously be a Player)
 ```
 
-| 概念 | 本质 | 实现 |
+| Concept | Essence | Implementation |
 | :--- | :--- | :--- |
-| Entity | 存在之物 | `CoreEntityKind`（含 character/agent/organization/location/object/resource/concept） |
-| Character | 有心智的实体 | `CharacterEntity`（心智字段 + 初始认知种子） |
-| Agent | 实体 + 决策过程 | 运行时 `AgentBinding`（controller + policy 引用） |
-| NPC | 由 AI/脚本驱动的 Agent | `controller: 'ai' | 'script'` |
-| Player | 视角+代理权+绑定+认知边界 | `InhabitedRoleSlot`（已有）+ `PlayerSession`（用户侧） |
-| Host | 角色+权限+全知透镜 | `InhabitedRoleSlot(host)` + 干预事件通道 |
+| Entity | What exists | `CoreEntityKind` (including character/agent/organization/location/object/resource/concept) |
+| Character | Entity with a mind | `CharacterEntity` (mind fields + initial cognition seed) |
+| Agent | Entity + decision process | Runtime `AgentBinding` (controller + policy reference) |
+| NPC | Agent driven by AI/script | `controller: 'ai' | 'script'` |
+| Player | Viewpoint + agency + binding + cognitive boundary | `InhabitedRoleSlot` (already exists) + `PlayerSession` (user side) |
+| Host | Role + permission + omniscient lens | `InhabitedRoleSlot(host)` + intervention event channel |
 
-### 7.2 统一动作/观察接口（关键）
+### 7.2 Unified Action/Observation Interface (key)
 
-所有「控制者」——玩家、AI 代理、脚本、主持人——通过**同一个接口**与世界交互：
+All "controllers" — player, AI agent, script, host — interact with the world through **the same interface**:
 
 ```
 interface Controller {
-  perceive(view: EpistemicPerspective): void;      // 只看投影
-  decide(context): CandidateEvent[];               // 产出候选事件
+  perceive(view: EpistemicPerspective): void;      // sees only the projection
+  decide(context): CandidateEvent[];               // produces candidate events
 }
-applyEvent(state, def, candidate) → result         // 唯一写入路径
+applyEvent(state, def, candidate) → result         // the only write path
 ```
 
-这使 NPC 代理、玩家代理、主持人代理共享全部基础设施：前提校验、观察副作用、日志、显著性。**「玩家是被人类控制的 NPC」被彻底否决**——玩家是绑定的一个实例。
+This lets NPC agents, player agents, and host agents share all infrastructure: precondition validation, observation side-effects, logging, salience. **The idea "the player is an NPC controlled by a human" is firmly rejected** — the player is one instance of a binding.
 
-### 7.3 主持人（Host）设计
+### 7.3 Host Design
 
-| 问题 | 决策 |
+| Question | Decision |
 | :--- | :--- |
-| 是角色、权限、模式还是视角？ | **四者的组合**：角色（Host 角色槽）+ 权限（干预/审查/改规则）+ 模式（UI 上的编辑面）+ 视角（全知投影） |
-| 是否有独立引擎？ | **否**。干预 = `directorial_intervention` 事件（溯源 `player_directive`），走同一内核与校验。区别仅在：来源允许、权限检查放宽、观察默认 covert |
-| 能看隐藏信息？ | 能——主持人投影 = 全知投影（`observerEntityId` 为空），这是**视角**，不改变状态 |
-| 能改定义/规则？ | 能——`define_modification` 事件（版本化 diff），同样入日志、可回滚。运行时不为此开旁路 |
+| Is it a role, a permission, a mode, or a viewpoint? | **A combination of all four**: role (Host role slot) + permission (intervention/review/rule-change) + mode (editing surface in the UI) + viewpoint (omniscient projection) |
+| Does it have a separate engine? | **No.** Intervention = a `directorial_intervention` event (provenance `player_directive`), going through the same kernel and validation. The only differences: source is permitted, permission checks are relaxed, observations default to covert |
+| Can it see hidden information? | Yes — the host projection = omniscient projection (`observerEntityId` empty); this is a **viewpoint**, it does not change state |
+| Can it change definition/rules? | Yes — a `define_modification` event (versioned diff), also enters the log and is rollback-able. The runtime does not open a bypass for this |
 
 ---
 
-## 8. 记忆与持久化的归属
+## 8. Ownership of Memory and Persistence
 
-### 8.1 五类记忆的定位
+### 8.1 Placement of the Five Kinds of Memory
 
-| 记忆 | 是什么 | 住在哪 | 真理性 |
+| Memory | What it is | Where it lives | Truth status |
 | :--- | :--- | :--- | :--- |
-| **世界记忆** | 事件日志 + 状态（全部发生过的） | 运行时（日志是真理） | 真理 |
-| **角色记忆** | 该实体 `knownFacts` + 信念 + 交互摘要 | 状态认知记录（结构化）+ 派生摘要（语义） | 事实 ID 是真理；摘要非真理 |
-| **玩家记忆** | 用户笔记 + 玩家已感知内容（由角色+日志派生） | 用户数据 | 用户笔记是用户资产 |
-| **事件历史** | 日志本身 | 运行时 | 真理 |
-| **派生知识** | 长文摘要/检索索引（语义记忆） | 异步构建的派生层 | **非真理**——永远以日志为准，摘要只作上下文 |
+| **World memory** | Event log + state (everything that has happened) | Runtime (log is truth) | Truth |
+| **Character memory** | That entity's `knownFacts` + beliefs + interaction summary | State cognition records (structured) + derived summary (semantic) | Fact IDs are truth; summary is not truth |
+| **Player memory** | User notes + content the player has perceived (derived from character + log) | User data | User notes are user assets |
+| **Event history** | The log itself | Runtime | Truth |
+| **Derived knowledge** | Long-text summaries / retrieval index (semantic memory) | Asynchronously built derived layer | **Not truth** — always defer to the log; summary is context only |
 
-### 8.2 记忆在热循环之外
+### 8.2 Memory Outside the Hot Loop
 
-- **热循环只用结构化数据**：状态、认知记录、事件（小而确定）。
-- **长文记忆异步派生**：摘要/索引由日志构建，供代理上下文与呈现层使用；任何 LLM 拿到的「记忆」都标注来源（`ProvenanceMeta`），不得覆盖事实层。
-- **防污染规则**：LLM 可以生成新事件（观察/推理），但**不能改写既有事实**；修正 = 新事件。
+- **Hot loop uses only structured data**: state, cognition records, events (small and deterministic).
+- **Long-text memory derived asynchronously**: summaries/indexes built from the log, used for agent context and the presentation layer; any "memory" an LLM receives is annotated with its source (`ProvenanceMeta`) and must not override the fact layer.
+- **Anti-contamination rule**: an LLM may generate new events (observation/reasoning), but **cannot rewrite existing facts**; correction = a new event.
 
-### 8.3 持久化分层
+### 8.3 Persistence Layering
 
-| 层 | 内容 | 所有者 | 存储形态 |
+| Layer | Content | Owner | Storage form |
 | :--- | :--- | :--- | :--- |
-| 定义 | WorldDefinition + 版本 | 作者 | 版本化文档 |
-| 实例 | 快照 + 事件日志 + 分支 | 运行时 | 追加日志 + 周期快照 |
-| 玩家 | 笔记/绑定/偏好 | 用户 | 用户数据 |
-| 制品 | 图片/文档（内容寻址） | 运行时+用户 | 内容寻址存储，事件引用 |
+| Definition | WorldDefinition + version | Author | Versioned document |
+| Instance | Snapshot + event log + branch | Runtime | Append-only log + periodic snapshot |
+| Player | Notes/bindings/preferences | User | User data |
+| Artifact | Images/documents (content-addressed) | Runtime + user | Content-addressed storage, referenced by events |
 
 ---
 
-## 9. 与世界定义的体验信号对接
+## 9. Connecting to the Definition's Experience Signals
 
 ```
 WorldDefinition.ExperienceProfile
   ├─ primaryFantasy / dominantTone / tensionGradient
   ├─ socialDensity / informationAsymmetry / consequenceLethality / investigativeDepth
-  └─ recommendedModalities（dialogue_focused / forensic_evidence_board / territorial_tactical_map / relationship_web_graph / academic_schedule_timeline / dossier_matrix）
+  └─ recommendedModalities (dialogue_focused / forensic_evidence_board / territorial_tactical_map / relationship_web_graph / academic_schedule_timeline / dossier_matrix)
         │
-        ▼（体验服务解读信号，世界无关）
-ExperienceState + PresentationPlan（见 LAYOUT_ARCHITECTURE.md）
+        ▼ (experience service interprets signals, world-agnostic)
+ExperienceState + PresentationPlan (see LAYOUT_ARCHITECTURE.md)
 ```
 
-**纪律**：世界声明「什么模态重要」，体验服务决定「现在用什么模态」，呈现层决定「怎么摆」。三层都不得硬编码「SPY×FAMILY 界面」这类世界专属 UI。
+**Discipline**: the world declares "which modalities matter", the experience service decides "which modality to use now", the presentation layer decides "how to lay it out". None of the three layers may hard-code world-specific UI like a "SPY×FAMILY interface".

@@ -1,100 +1,100 @@
-# HeadConan 开放问题（OPEN_QUESTIONS）
+# HeadConan Open Questions (OPEN_QUESTIONS)
 
-> 这些是**需要实验而非臆断**的问题。它们不阻塞 P0/P1，但会在对应阶段成为「必须回答」的问题。每个问题标注：所属阶段、当前倾向、需要什么证据。
-
----
-
-## Q1 — 回合与时间的语义（阻塞 P4/P6 的调度设计）
-
-- **问题**：用户一次动作推进多少世界时间？时钟推进是「动作后 +1 回合」还是「按事件类型推进」（对话 +15 分钟，行军 +1 日）？倒计时世界（谋杀时钟）与日程世界（校园周历）如何统一？
-- **当前倾向**：时钟推进由**事件类型 + 世界定义的 timeScale 配置**决定；回合数只是用户交互计数，与世界时钟解耦。
-- **所需证据**：E2 的延迟后果实验（`delayInTurns` vs `afterInUniverseTime` 哪个更自然）。
-- **阻塞阶段**：P4（调度器）、P6（显著性中的时间压力）。
+> These are questions that **require experiments, not assumptions**. They do not block P0/P1, but become "must-answer" questions at their respective phases. Each question is tagged with: owning phase, current lean, and what evidence is needed.
 
 ---
 
-## Q2 — 自主性的程度（阻塞 P4 的 tick 设计）
+## Q1 — Semantics of Turns and Time (blocks P4/P6 scheduling design)
 
-- **问题**：NPC 何时自主行动？「日常校园」需要后台例行模拟（NPC 上课/发消息），而「谋杀谜案」可能只需要反应式 NPC。主动性阈值应由世界定义声明还是运行时调节？
-- **当前倾向**：定义侧声明 `reactivityThreshold`（已有 `AgentBehavior` 类型壳），运行时按世界类型给 tick 预算；先做「调度触发 + 高优先级代理」，不做全量常驻模拟。
-- **所需证据**：大学世界走查（P5 出口标准）中「不操作时世界是否依然可信」。
-- **阻塞阶段**：P4。
-
----
-
-## Q3 — 话语（speech_act）的粒度（阻塞 P5 的对话体验）
-
-- **问题**：对话记录到何种结构？最小是 `{ speaker, addressee, utterance, turn }`；要支持潜台词/谎言/读心，可能需要 `{ intentTag, subtext?, truthValue?, knownLie? }`。过度结构化会让 LLM 生成负担过重。
-- **当前倾向**：v1 只加 `intentTag`（质问/坦白/撒谎/寒暄）+ 可选的 `subtext` 文本；读心/推演作为派生（观察者能力决定能否看到 subtext 层，见 docs/layout/conversation.md）。
-- **所需证据**：SPY×FAMILY 对话走查中，LLM 能否稳定产出意图标签；投影器能否按能力过滤 subtext。
-- **阻塞阶段**：P5。
+- **Question**: How much world time does one user action advance? Is clock advancement "after action +1 turn" or "by event type" (dialogue +15 min, march +1 day)? How do a countdown world (murder clock) and a schedule world (campus weekly calendar) unify?
+- **Current lean**: Clock advancement is determined by **event type + the world's defined timeScale config**; the turn count is merely a user-interaction counter, decoupled from the world clock.
+- **Evidence needed**: E2's delayed-consequence experiment (`delayInTurns` vs `afterInUniverseTime` — which is more natural).
+- **Blocked phase**: P4 (scheduler), P6 (time pressure in salience).
 
 ---
 
-## Q4 — 信念演化规则（阻塞 P3/P4 的认知写入）
+## Q2 — Degree of Autonomy (blocks P4 tick design)
 
-- **问题**：观察如何改变信念置信度？需要显式规则（「一致观察 +10% 置信度」）还是由 LLM 决策时自然携带（代理输出新信念）？
-- **当前倾向**：结构化规则处理**事实类**认知（knownFacts 增删），LLM 处理**主观类**认知（信念内容与置信度变化），两者都作为事件效果写回。
-- **所需证据**：E3 扩展——连续观察后置信度是否单调合理。
-- **阻塞阶段**：P3（认知写入通道）、P4（代理决策）。
-
----
-
-## Q5 — LLM 与确定性的分界（贯穿 P2–P6）
-
-- **问题**：哪些判定必须确定性（前提/权限/记账/校验），哪些交给 LLM（代理决策/意图解析/叙事措辞）？分界的经验证据是什么？
-- **当前倾向**：按 ADR-12：记账全确定性，决策全 LLM；意图解析为「LLM 提议 + 确定性校验」混合。
-- **所需证据**：意图解析的歧义率（E 系实验的副产品）；代理决策的一致性（同一情境两次决策差异是否可接受）。
-- **阻塞阶段**：P2（确定性部分先建）、P3（混合部分）。
+- **Question**: When do NPCs act autonomously? "Everyday campus" needs background routine simulation (NPCs attend class / send messages), while "murder mystery" may only need reactive NPCs. Should the initiative threshold be declared by the world definition or adjusted at runtime?
+- **Current lean**: Declare `reactivityThreshold` on the definition side (the `AgentBehavior` type shell already exists), and give tick budget by world type at runtime; first do "scheduler-triggered + high-priority agents," not full always-on simulation.
+- **Evidence needed**: In the university-world walkthrough (P5 exit criteria), whether "the world still feels believable when the user does nothing."
+- **Blocked phase**: P4.
 
 ---
 
-## Q6 — 记忆的规模拐点（阻塞「要不要建语义记忆」）
+## Q3 — Granularity of Speech (speech_act) (blocks P5 dialogue experience)
 
-- **问题**：结构化认知记录在多大的世界/多长的会话后失效？何时必须引入摘要/语义检索？
-- **当前倾向**：先不建（DO_NOT_BUILD_YET #1）；用日志 + 认知记录硬扛到 ~50 回合，观察失败模式。
-- **所需证据**：长会话压力测试（P8 后）：「角色忘了早期约定」「上下文爆掉」出现的回合数。
-- **阻塞阶段**：P8b 之后。
-
----
-
-## Q7 — 分支的用户体验（阻塞 P8b）
-
-- **问题**：平行时间线如何在 UI 上呈现而不造成困惑？活跃分支如何标记？回滚体验（回到第 3 回合重玩）与「当前进展」如何共存？
-- **当前倾向**：先做「分支 = 新实例」的数据模型（ADR/内核 §5），UI 只呈现**单一活跃分支 + 分支列表**，不做时间线瀑布图。
-- **所需证据**：真实用户回滚/分支的使用频率（可能很低——也许「重开一个实例」就够了）。
-- **阻塞阶段**：P8b。
+- **Question**: To what structure is dialogue recorded? The minimum is `{ speaker, addressee, utterance, turn }`; to support subtext / lies / mind-reading, it may need `{ intentTag, subtext?, truthValue?, knownLie? }`. Over-structuring overloads the LLM generation burden.
+- **Current lean**: v1 adds only `intentTag` (interrogate / confess / lie / smalltalk) + optional `subtext` text; mind-reading / deduction are treated as derived (the observer's capability determines whether the subtext layer is visible, see docs/layout/conversation.md).
+- **Evidence needed**: In the SPY×FAMILY dialogue walkthrough, whether the LLM can stably produce intent tags; whether the projector can filter subtext by capability.
+- **Blocked phase**: P5.
 
 ---
 
-## Q8 — 显著性计算的可解释性与标定（阻塞 P6）
+## Q4 — Belief Evolution Rules (blocks P3/P4 cognition writes)
 
-- **问题**：FocusScore 四因子权重如何标定？「什么值得看」在四个基准世界上能否一致成立？自动焦点切换何时是助力、何时是眩晕？
-- **当前倾向**：权重由 ExperienceProfile 参数化 + 人工调优；提供「为什么是这个焦点」的可解释输出；sticky 锁定兜底（LAYOUT_ARCHITECTURE §3.2）。
-- **所需证据**：六场景布局矩阵的用户测试（哪个自动切换最反直觉）。
-- **阻塞阶段**：P6/P7。
-
----
-
-## Q9 — 版权与发布约束（产品层，非技术层）
-
-- **问题**：图册中 50 个金标准世界含受版权 IP（SPY×FAMILY、GoT、哈利波特等）。正式产品以「原创世界 + 公开领域」为主，还是需要 IP 授权流程？基准测试世界（4 个表示基准）能否公开分发？
-- **当前倾向**：技术架构中立（IP 世界的定义可作为内部基准）；产品层以原创/公开领域为发布范围；图册 `rightsStatus` 字段作为筛选入口。
-- **所需证据**：产品定位讨论（非实验可答）。
-- **阻塞阶段**：无（架构不受影响）。
+- **Question**: How do observations change belief confidence? Need explicit rules ("consistent observation +10% confidence") or let the LLM naturally carry it during decision-making (agent outputs new beliefs)?
+- **Current lean**: Structured rules handle **fact-class** cognition (knownFacts add/remove), the LLM handles **subjective-class** cognition (belief content and confidence change); both are written back as event effects.
+- **Evidence needed**: E3 extension — after consecutive observations, is the confidence change monotonic and reasonable.
+- **Blocked phase**: P3 (cognition write channel), P4 (agent decision).
 
 ---
 
-## Q10 — 延迟预算（贯穿 P4–P7 的体验目标）
+## Q5 — Boundary Between LLM and Determinism (spans P2–P6)
 
-- **问题**：多代理并行决策 + 显著性 + 呈现规划的端到端延迟目标？「等待世界反应」的割裂感能否用流式输出/部分呈现缓解？
-- **当前倾向**：先建立「每回合一次 LLM 调用 + 确定性记账」的基线；流式叙事与代理并行留到 P4 后优化。
-- **所需证据**：P4 基线的实测延迟；用户对 3 秒/5 秒/10 秒延迟的容忍度（快速实验）。
-- **阻塞阶段**：P4（基线）、优化阶段（P7 后）。
+- **Question**: Which judgments must be deterministic (precondition / permission / bookkeeping / validation), and which are handed to the LLM (agent decision / intent parsing / narrative phrasing)? What is the empirical evidence for the boundary?
+- **Current lean**: Per ADR-12: bookkeeping fully deterministic, decisions fully LLM; intent parsing is a "LLM proposes + deterministic validation" hybrid.
+- **Evidence needed**: Ambiguity rate of intent parsing (byproduct of the E-series experiments); consistency of agent decisions (whether a two-time decision difference in the same situation is acceptable).
+- **Blocked phase**: P2 (deterministic parts built first), P3 (hybrid parts).
 
 ---
 
-## 使用方式
+## Q6 — Scale Inflection Point of Memory (blocks "whether to build semantic memory")
 
-- 本文件是**活的**：实验/走查给出答案后，将结论移入 [`ARCHITECTURAL_DECISIONS.md`](./ARCHITECTURAL_DECISIONS.md)（修订或新增 ADR）。
-- 一个问题若久悬不决，说明对应的实验缺失——回到 [`ARCHITECTURAL_EXPERIMENTS.md`](./ARCHITECTURAL_EXPERIMENTS.md) 补实验，不要靠讨论拖延。
+- **Question**: At what world size / session length does structured cognition recording fail? When must summarization / semantic retrieval be introduced?
+- **Current lean**: Don't build it yet (DO_NOT_BUILD_YET #1); hard-carry with log + cognition records up to ~50 turns, and observe the failure modes.
+- **Evidence needed**: Long-session stress test (after P8): the turn at which "character forgot an early agreement" / "context blew up" appears.
+- **Blocked phase**: After P8b.
+
+---
+
+## Q7 — Branching User Experience (blocks P8b)
+
+- **Question**: How are parallel timelines presented in the UI without causing confusion? How is the active branch marked? How do the rollback experience (return to turn 3 to replay) and "current progress" coexist?
+- **Current lean**: First do the data model of "branch = new instance" (ADR/kernel §5); the UI only presents **a single active branch + a branch list**, not a timeline waterfall diagram.
+- **Evidence needed**: Real-user frequency of rollback/branch usage (may be very low — perhaps "start a new instance" is enough).
+- **Blocked phase**: P8b.
+
+---
+
+## Q8 — Interpretability and Calibration of Salience Computation (blocks P6)
+
+- **Question**: How are the four FocusScore factor weights calibrated? Can "what's worth seeing" hold consistently across the four baseline worlds? When is automatic focus switching a help, and when is it disorienting?
+- **Current lean**: Weights are parameterized by ExperienceProfile + hand-tuned; provide interpretable output of "why this focus"; sticky lock as a fallback (LAYOUT_ARCHITECTURE §3.2).
+- **Evidence needed**: User testing of the six-scenario layout matrix (which automatic switch is most counterintuitive).
+- **Blocked phase**: P6/P7.
+
+---
+
+## Q9 — Copyright and Release Constraints (product layer, not technical layer)
+
+- **Question**: The 50 gold-standard worlds in the atlas contain copyrighted IP (SPY×FAMILY, GoT, Harry Potter, etc.). Should the official product lean on "original worlds + public domain," or does it need an IP licensing process? Can the baseline test worlds (4 representation baselines) be publicly distributed?
+- **Current lean**: Architecture is neutral (IP-world definitions can serve as internal baselines); the product layer releases within original / public-domain scope; the atlas `rightsStatus` field serves as a filter entry point.
+- **Evidence needed**: Product positioning discussion (not answerable by experiment).
+- **Blocked phase**: None (architecture unaffected).
+
+---
+
+## Q10 — Latency Budget (experience goal spanning P4–P7)
+
+- **Question**: End-to-end latency target for parallel multi-agent decisions + salience + presentation planning? Can the sense of "waiting for the world to react" be eased with streaming output / partial presentation?
+- **Current lean**: First establish a baseline of "one LLM call per turn + deterministic bookkeeping"; streamed narrative and parallel agents deferred to post-P4 optimization.
+- **Evidence needed**: Measured latency of the P4 baseline; user tolerance for 3s / 5s / 10s latency (quick experiment).
+- **Blocked phase**: P4 (baseline), optimization phase (post-P7).
+
+---
+
+## How to Use This File
+
+- This file is **alive**: once an experiment / walkthrough yields an answer, move the conclusion into [`ARCHITECTURAL_DECISIONS.md`](./ARCHITECTURAL_DECISIONS.md) (revise or add an ADR).
+- If a question lingers unresolved, it means a corresponding experiment is missing — go back to [`ARCHITECTURAL_EXPERIMENTS.md`](./ARCHITECTURAL_EXPERIMENTS.md) to add the experiment; don't stall with discussion.

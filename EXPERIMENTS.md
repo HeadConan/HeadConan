@@ -38,19 +38,19 @@ Iteration 2 provides three fully fleshed-out demo worlds showcasing distinct int
 
 ---
 
-# ARCHITECTURAL EXPERIMENT LOG（2026-08-27 起）
+# ARCHITECTURAL EXPERIMENT LOG (from 2026-08-27)
 
-> 实验规程：判据写成断言（vitest）；结论由测试决定；证伪即记录「修正哪个 ADR」。
-> 用例位置：`src/world/runtime/instantiate.test.ts`（E1）。运行：`npm test`。
+> Experiment protocol: criteria written as assertions (vitest); conclusions decided by tests; on falsification, record "which ADR to revise".
+> Test location: `src/world/runtime/instantiate.test.ts` (E1). Run: `npm test`.
 
-## E1 — 单一世界表示能否同时支撑「正典」与「平行场景」？
+## E1 — Can a single world representation simultaneously support "canon" and "parallel scenes"?
 
-- **假设**（ADR-1 / HEADCONAN_KERNEL §5）：`WorldDefinition + ScenarioSeed → WorldInstance`，多实例互不污染；种子能表达分歧。
-- **结果**：✅ **CONFIRMED**（9/9 断言通过）
-- **证据**：
-  1. `instantiate()` 两条路径均可用：合成路径（从定义合成初始状态）与基态路径（深拷贝手写 `*_INITIAL_STATE`）。
-  2. 三实例（正典 / 瑟曦抢先摊牌 / 财政大臣视角）独立 ID、零共享引用（实体/关系/认知数组/资源池），突变 A 不波及 B/C、不污染定义。
-  3. 种子可表达四类分歧：位置、关系亲和、资源、声誉。
-  4. 同动作在不同实例产生不同结果：正典实例「摊牌」被拒（非共现），分歧实例通过并触发「劳勃驾崩」级联事件入日志；同效果（声誉 -10）在不同初始值下得到不同绝对结果（82 vs 40）。
-- **关键发现（P2 必做）**：现有 `evaluateWorldAction` 仅实现 7 类前提中的 2 类（`requires_co_presence` / `requires_capability`）；`requires_knowledge` 被静默忽略——「不知情的奈德也能向瑟曦摊牌」构成认知泄漏。P2 事件内核必须实现全部前提类型，否则信息不对称架构失效。
-- **交付物**：`src/world/runtime/instantiate.ts`（`instantiate` / `synthesizeInitialState` / `applyStateEffect`）；`vitest.config.ts` + `npm test` 脚本；ADR 无变更。
+- **Hypothesis** (ADR-1 / HEADCONAN_KERNEL §5): `WorldDefinition + ScenarioSeed → WorldInstance`, multiple instances do not cross-contaminate; the seed can express divergence.
+- **Result**: ✅ **CONFIRMED** (9/9 assertions passed)
+- **Evidence**:
+  1. Both paths of `instantiate()` are usable: the synthetic path (synthesize initial state from the definition) and the base-state path (deep-copy the hand-written `*_INITIAL_STATE`).
+  2. Three instances (canon / Cersei confronts first / Master of Coin perspective) have independent IDs, zero shared references (entity / relationship / cognition arrays / resource pool); mutating A does not affect B/C and does not contaminate the definition.
+  3. The seed can express four kinds of divergence: location, relationship affinity, resource, reputation.
+  4. The same action produces different results in different instances: in the canon instance "confront" is rejected (no co-presence), while in the divergent instance it passes and triggers the "Robert's death" cascade event into the log; the same effect (reputation -10) yields different absolute results under different initial values (82 vs 40).
+- **Key finding (P2 must-do)**: the existing `evaluateWorldAction` implements only 2 of the 7 precondition types (`requires_co_presence` / `requires_capability`); `requires_knowledge` is silently ignored — "the unaware Ned can also confront Cersei" constitutes a cognition leak. The P2 event kernel must implement all precondition types, otherwise the information-asymmetry architecture fails.
+- **Deliverables**: `src/world/runtime/instantiate.ts` (`instantiate` / `synthesizeInitialState` / `applyStateEffect`); `vitest.config.ts` + `npm test` script; no ADR change.

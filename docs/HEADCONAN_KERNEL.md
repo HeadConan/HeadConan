@@ -1,260 +1,260 @@
-# HeadConan 内核（HEADCONAN KERNEL）
+# HeadConan Kernel
 
-> 本文回答三个问题：**HeadConan 在计算上解决什么问题？最小原语是什么？内核（重心）是什么？**
-> 结论先行：HeadConan 的内核是一个**事件驱动的世界转移内核**（reducer core），其上叠加认知投影（派生）与呈现规划（派生）。它不是聊天机器人、不是状态机 UI、不是知识图谱——它是一个**模拟内核**。
-
----
-
-## 1. 核心问题（计算化表述）
-
-### 1.1 一阶问题
-
-> **给定一个世界定义 D 与一个初始场景 S，持续计算：当实体 E（玩家控制的或自主的）发出动作 A 时，世界的下一个状态是什么，谁感知到了什么，以及用户应看到什么——使得世界状态独立于任何界面而存在。**
-
-### 1.2 循环（初始假设及其修正）
-
-提示中的循环方向基本正确，但有三处必须修正：
-
-```
-（修正前）USER INTENT → 解释 → ACTION → 转移 → 新状态 → 后果 → 呈现 → 感知 → 新意图
-```
-
-修正 1：**动作必须成为事件才能进入世界。**「用户意图」不是世界的输入；「被解析并校验的候选事件」才是。失败的动作也是事件（「试图行窃被抓」）。
-
-修正 2：**后果是排队的事件，不是即时副作用。**「大臣明日回应」必须由调度器延迟触发；否则一切因果都是瞬时的。
-
-修正 3：**呈现之前必须有「显著性」层。**世界发生了 100 件事，用户只能看到 5 件。选择哪 5 件是体验层的职责，不属于世界内核。
-
-修正后的完整循环见 [`RUNTIME_LOOP.md`](./RUNTIME_LOOP.md)。
-
-### 1.3 问题域的本质
-
-HeadConan 的问题域是 **「在不确定性、信息不对称与时间压力下，让一个结构化世界以自洽方式演化」**。它同时具备三种计算性质：
-
-| 性质 | 含义 | 后果 |
-| :--- | :--- | :--- |
-| **确定性** | 给定状态+事件+规则，转移结果唯一 | 可重放、可回滚、可分支 |
-| **非确定性** | 代理的决策由 LLM/策略产生 | 决策层与记账层必须分离 |
-| **投影性** | 同一真相在不同观察者眼中不同 | 认知必须派生，不能与真相混存 |
+> This document answers three questions: **What problem does HeadConan solve computationally? What are the minimal primitives? What is the kernel (the center of gravity)?**
+> Conclusion up front: HeadConan's kernel is an **event-driven world transition kernel** (a reducer core), on top of which cognitive projection (derived) and presentation planning (derived) are layered. It is not a chatbot, not a state-machine UI, not a knowledge graph — it is a **simulation kernel**.
 
 ---
 
-## 2. 最小原语（MINIMAL PRIMITIVES）
+## 1. The Core Problem (Computational Formulation)
 
-**不要**从 `World / Character / Quest / Inventory` 开始。下面是推导过程与结论。
+### 1.1 First-order Problem
 
-### 2.1 推导：什么不可再分？
+> **Given a world definition D and an initial scenario S, continuously compute: when an entity E (player-controlled or autonomous) issues an action A, what is the world's next state, who perceived what, and what the user should see — such that the world state exists independently of any interface.**
 
-| 候选 | 是否原语 | 理由 |
+### 1.2 The Loop (Initial Assumption and Its Revisions)
+
+The direction of the loop in the prompt is basically correct, but three points must be revised:
+
+```
+(pre-revision) USER INTENT → interpret → ACTION → transition → new state → consequence → present → perceive → new intent
+```
+
+Revision 1: **An action must become an event to enter the world.** "User intent" is not the world's input; "the parsed and validated candidate event" is. A failed action is also an event ("tried to steal, got caught").
+
+Revision 2: **Consequences are queued events, not immediate side effects.** "The minister responds tomorrow" must be deferredly triggered by the scheduler; otherwise all causality is instantaneous.
+
+Revision 3: **A "salience" layer must exist before presentation.** The world had 100 things happen; the user can only see 5. Choosing which 5 is the responsibility of the experience layer, not the world kernel.
+
+The fully revised loop is in [`RUNTIME_LOOP.md`](./RUNTIME_LOOP.md).
+
+### 1.3 The Nature of the Problem Domain
+
+HeadConan's problem domain is **"letting a structured world evolve in a self-consistent way under uncertainty, information asymmetry, and time pressure"**. It simultaneously has three computational properties:
+
+| Property | Meaning | Consequence |
 | :--- | :--- | :--- |
-| **Entity（实体）** | ✅ | 一切可持久化事物的基底：身份 + 可变属性。无实体则无世界。 |
-| **Fact（事实）** | ✅ | 最小的真值单元：「Yor 是刺客」。事实挂在实体上（subject/related），带可见域与溯源。 |
-| **Relationship（关系）** | ✅ | 实体之间的有向、带状态边（affinity/trust/power）。不是实体的字符串属性——它是独立对象，因为它的状态变化频率与实体不同。 |
-| **Event（事件）** | ✅ | 唯一的写入者。一切状态变化都是某个事件的效果。事件是编年史的最小单元。 |
-| **Rule（规则）** | ✅ | 生成机制：前提校验 + 效果应用 + 后果派生。无规则则事件只是噪音。 |
-| **Time（时间）** | ✅ | 排序原则：事件序列 + 时钟。分支/因果/倒计时都依赖它。 |
-| State（状态） | ❌ 派生 | 实体属性值 + 关系值在时刻 T 的聚合快照。不单独存储「状态类」。 |
-| Knowledge（知识） | ❌ 派生 | 每个观察者对事实子集的投影 + 主观信念。由事件观察副作用写回，但**真值**永远派生自事实。 |
-| Action（动作） | ❌ 组合 | 意图 + 前提校验，解析为候选事件（或失败事件）。 |
-| Goal（目标） | ❌ 组合 | 挂在代理上的谓词（对状态的完成条件）。是动态属性，不是独立类。 |
-| Agent（代理） | ❌ 组合 | 实体 + 决策过程（绑定）。 |
+| **Determinism** | Given state + event + rules, the transition result is unique | Replayable, rollbackable, branchable |
+| **Non-determinism** | Agent decisions are produced by LLM/strategy | Decision layer and bookkeeping layer must be separated |
+| **Projection** | The same truth looks different in different observers' eyes | Cognition must be derived, not mixed with truth |
 
-### 2.2 结论：六个原语
+---
+
+## 2. Minimal Primitives
+
+**Do not** start from `World / Character / Quest / Inventory`. Below is the derivation and conclusion.
+
+### 2.1 Derivation: What is indivisible?
+
+| Candidate | Primitive? | Reason |
+| :--- | :--- | :--- |
+| **Entity** | ✅ | The base of everything persistable: identity + mutable attributes. No entity, no world. |
+| **Fact** | ✅ | The smallest unit of truth: "Yor is an assassin". Facts attach to entities (subject/related), with a visibility domain and provenance. |
+| **Relationship** | ✅ | A directed, state-bearing edge between entities (affinity/trust/power). Not a string attribute of an entity — it is an independent object, because its state changes at a different frequency than the entity. |
+| **Event** | ✅ | The single writer. All state changes are the effect of some event. The event is the smallest unit of the chronicle. |
+| **Rule** | ✅ | The generation mechanism: precondition validation + effect application + consequence derivation. Without rules, events are just noise. |
+| **Time** | ✅ | The ordering principle: event sequence + clock. Branching/causality/countdown all depend on it. |
+| State | ❌ Derived | An aggregate snapshot of entity attribute values + relationship values at time T. Do not store a "state class" separately. |
+| Knowledge | ❌ Derived | Each observer's projection of a subset of facts + subjective beliefs. Written back via the observation side effect of events, but the **truth** is always derived from facts. |
+| Action | ❌ Composite | Intent + precondition validation, resolved into a candidate event (or a failure event). |
+| Goal | ❌ Composite | A predicate attached to an agent (completion condition on state). A dynamic attribute, not a separate class. |
+| Agent | ❌ Composite | Entity + decision process (binding). |
+
+### 2.2 Conclusion: Six Primitives
 
 > **ENTITY · FACT · RELATIONSHIP · EVENT · RULE · TIME**
 
-其余一切（状态、知识、目标、动作、场景、世界、分支）都是这六者的**组合或派生**。验证：请检查下文的四世界压力测试——如果六个原语能表达全部四个世界而不新增原语，则假设成立。
+Everything else (state, knowledge, goal, action, scenario, world, branch) is a **composition or derivation** of these six. Verification: see the four-world stress test below — if the six primitives can express all four worlds without adding a new primitive, the assumption holds.
 
-### 2.3 每个原语的属性表
+### 2.3 Property Table for Each Primitive
 
-| 原语 | 表示什么 | 为什么基本 | 依赖它的是什么 | 持久化？ | 派生？ | 归属 |
+| Primitive | Represents | Why fundamental | What depends on it | Persisted? | Derived? | Belongs to |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| Entity | 可持久化事物的身份与属性 | 世界的基底 | 事实/关系/状态/代理 | ✅ | 否 | 定义(原型)+状态(动态属性) |
-| Fact | 最小真值单元 | 真相与认知的分界 | 知识/秘密/推演 | ✅ | 部分（derived 溯源类型） | 定义(正典事实)+状态(实例事实) |
-| Relationship | 实体间有向带状态边 | 社交/权力/情感的结构载体 | 权力模拟/关系图/对话潜台词 | ✅ | 否（独立演化） | 定义(基线)+状态(动态值) |
-| Event | 唯一的写入者 | 一切变化的记录与可重放性 | 编年史/分支/回滚/知识副作用 | ✅ | 否 | 运行时（事件日志） |
-| Rule | 前提+效果+后果的生成机制 | 让事件成为因果 | 转移内核 | ✅（定义内） | 否 | 定义 |
-| Time | 事件序列与时钟 | 排序/截止/分支 | 调度器/编年史/时间线 | ✅ | 否 | 运行时（时钟+日志序） |
+| Entity | Identity and attributes of persistable things | The base of the world | Fact/Relationship/State/Agent | ✅ | No | Definition (prototype) + State (dynamic attributes) |
+| Fact | Smallest unit of truth | The boundary of truth and cognition | Knowledge/Secret/Inference | ✅ | Partly (derived provenance type) | Definition (canon fact) + State (instance fact) |
+| Relationship | Directed, state-bearing edge between entities | The structural carrier of social/power/emotion | Power simulation / relationship graph / dialogue subtext | ✅ | No (evolves independently) | Definition (baseline) + State (dynamic values) |
+| Event | The single writer | The record and replayability of all change | Chronicle / branch / rollback / knowledge side effect | ✅ | No | Runtime (event log) |
+| Rule | Precondition + effect + consequence generation mechanism | Makes events causal | Transition kernel | ✅ (within definition) | No | Definition |
+| Time | Event sequence and clock | Ordering / deadline / branch | Scheduler / chronicle / timeline | ✅ | No | Runtime (clock + log order) |
 
-### 2.4 关于原语的三个设计纪律
+### 2.4 Three Design Disciplines Regarding Primitives
 
-1. **状态不存储可派生之物。** 显著性、注意力、声誉聚合、关系摘要、UI 形态——一律运行时派生。
-2. **知识不存储真值。** 实体只存「已知哪些事实 ID + 信念（含置信度与真伪标记）」；真值永远在事实层。校对信念真伪是派生操作。
-3. **事件不存储结论。** 事件记录「发生了什么」，状态变化与观察是它的投影——尽管为性能可物化，但不可作为第二真相源。
+1. **State stores nothing derivable.** Salience, attention, reputation aggregation, relationship summaries, UI shape — all derived at runtime.
+2. **Knowledge stores no truth.** An entity stores only "which fact IDs are known + beliefs (with confidence and truth markers)"; truth always lives in the fact layer. Verifying a belief's truth is a derived operation.
+3. **Events store no conclusions.** An event records "what happened"; state change and observation are its projections — though it may be materialized for performance, it must not serve as a second source of truth.
 
 ---
 
-## 3. 四世界压力测试（同一组原语能否表达全部四个世界？）
+## 3. Four-World Stress Test (Can the same set of primitives express all four worlds?)
 
-对每个世界做**代表性交互建模**，检查六个原语是否足够、在哪里吃紧。
+For each world, do **representative interaction modeling**, checking whether the six primitives are sufficient and where they are strained.
 
-### 3.1 SPY × FAMILY — 信息不对称
+### 3.1 SPY × FAMILY — Information Asymmetry
 
-> Loid 与 Yor 互动，双方都不知道对方秘密。
+> Loid and Yor interact, neither knowing the other's secret.
 
-- **建模**：`Fact(loid_is_twilight)`（可见域 singular_secret，持有者 Loid）；`Fact(yor_is_assassin)`（持有者 Yor）；`SecretItem`（目标=对方）；Loid 对 Yor 的 `Belief(yor_normal_clerk, confidence 0.9, accurate=false)`；家庭 `Relationship(kinship, visibility=fictitious_cover, coverStory="正常夫妻")`。
-- **事件**：`speech_act(loid→yor, "今天也要努力…")` + 观察副作用（Loid 观察 Yor 的言行 → 更新信念置信度）。
-- **吃紧点**：① **话语（utterance）必须是一阶事件类型**——潜台词、谎言、读心都需要把「说了什么」记录为结构化内容而非叙事散文；② 信念的**置信度演化**需要规则支持（观察→置信度漂移）。**不需要新原语**：话语=一种事件（speech_act），信念=实体属性。
+- **Modeling**: `Fact(loid_is_twilight)` (visibility domain singular_secret, holder Loid); `Fact(yor_is_assassin)` (holder Yor); `SecretItem` (target = the other); Loid's `Belief(yor_normal_clerk, confidence 0.9, accurate=false)` toward Yor; the family `Relationship(kinship, visibility=fictitious_cover, coverStory="normal couple")`.
+- **Event**: `speech_act(loid→yor, "Today we must work hard too…")` + observation side effect (Loid observes Yor's words and actions → updates belief confidence).
+- **Strain points**: ① **Utterance must be a first-class event type** — subtext, lies, and mind-reading all need "what was said" recorded as structured content rather than narrative prose; ② the **confidence evolution** of beliefs needs rule support (observation → confidence drift). **No new primitive needed**: utterance = an event type (speech_act), belief = an entity attribute.
 
-### 3.2 GAME OF THRONES — 政治联盟与级联后果
+### 3.2 GAME OF THRONES — Political Alliances and Cascading Consequences
 
-> 一位领主缔结政治联盟，改变派系关系。
+> A lord forges a political alliance, changing faction relationships.
 
-- **建模**：`Relationship(fealty/alliance, powerBalance)`；`Organization(house)` + `PowerRelation`（经济债务/军事/政治域）；`Fact(cersei_children_bastards)`（singular_secret）。
-- **事件**：`alliance_formed(houseA, houseB)` → 规则派生效用（多对 relationship 状态变化 + 派系声誉）→ **排队** `scheduled_event(国王反应, +2 日)`、`scheduled_event(敌对家族报复, +5 日)`。
-- **吃紧点**：① **延迟调度**（大臣明日回应）——需要带时钟的待办事件队列；② 派系/组织聚合状态（声誉、凝聚力）如何由成员与事件推导——需要「组织级规则」（org-level effects）。**不需要新原语**：调度=规则产出的排队事件；组织=实体。
+- **Modeling**: `Relationship(fealty/alliance, powerBalance)`; `Organization(house)` + `PowerRelation` (economic debt / military / political domains); `Fact(cersei_children_bastards)` (singular_secret).
+- **Event**: `alliance_formed(houseA, houseB)` → rules derive effects (multiple relationship state changes + faction reputation) → **queue** `scheduled_event(king's reaction, +2 days)`, `scheduled_event(hostile family's revenge, +5 days)`.
+- **Strain points**: ① **Deferred scheduling** (the minister responds tomorrow) — needs a clocked pending-event queue; ② how faction/organization aggregate state (reputation, cohesion) is derived from members and events — needs "org-level rules" (org-level effects). **No new primitive needed**: scheduling = a queued event produced by rules; organization = an entity.
 
-### 3.3 SHERLOCK HOLMES — 玩家发现侦探未知的证据
+### 3.3 SHERLOCK HOLMES — The Player Discovers Evidence the Detective Does Not Know
 
-> 玩家发现一件侦探还不知道的证据。
+> The player discovers a piece of evidence the detective does not yet know.
 
-- **建模**：`ObjectEntity(血渍手套, type=evidence_clue)` + `Fact(手套属于嫌疑人)`（可见域 singular_secret）+ `Fact↔Object` 关联；知识门控：玩家/侦探各自 `knownFactIds` 不同。
-- **事件**：`discover_evidence(player, 手套)` → 观察副作用：玩家 `knownFacts` +手套；侦探 `knownFacts` 不含 → 投影器对两人输出不同视图 → 戏剧反讽（`compareEpistemicAsymmetry`）。
-- **吃紧点**：**证据与事实的关联方式**（`ObjectEntity.associatedFactIds` 已存在）以及「发现」作为认知写入口（`reveal_fact` 效果已存在）。**无吃紧**。
+- **Modeling**: `ObjectEntity(bloody glove, type=evidence_clue)` + `Fact(glove belongs to suspect)` (visibility domain singular_secret) + `Fact↔Object` association; knowledge gating: player/detective each have different `knownFactIds`.
+- **Event**: `discover_evidence(player, glove)` → observation side effect: player's `knownFacts` + glove; detective's `knownFacts` does not → the projector outputs different views for the two → dramatic irony (`compareEpistemicAsymmetry`).
+- **Strain points**: **The association between evidence and fact** (`ObjectEntity.associatedFactIds` already exists) and "discovery" as a cognitive write entry (`reveal_fact` effect already exists). **No strain**.
 
-### 3.4 MODERN UNIVERSITY — 日常生活、错过课程、声誉与偶遇
+### 3.4 MODERN UNIVERSITY — Daily Life, Missed Classes, Reputation, and Chance Encounters
 
-> 玩家错过课程 → 声誉变化 → 收到消息 → 之后遇到某人。
+> The player misses class → reputation changes → receives a message → later meets someone.
 
-- **建模**：`Time` 为日历时钟；`scheduled_event(课程开始, 周一 09:00)`；`Relationship(mentorship 教授)`；`Fact(玩家缺勤)`（domain_public）；`Resource(研究经费)`。
-- **事件**：`miss_class(player)` → 规则：声誉 -5、教授关系 trust -10、**排队** `scheduled_event(教授邮件, +2h)`、`scheduled_event(图书馆偶遇同学, +1d)`。
-- **吃紧点**：**例行程序（routine）模拟**——校园世界需要「即使玩家不动作，世界也按日程推进」的能力，即自主世界 tick（见 RUNTIME_LOOP）。**不需要新原语**：日程=调度器上的排队事件。
+- **Modeling**: `Time` as a calendar clock; `scheduled_event(class starts, Mon 09:00)`; `Relationship(mentorship professor)`; `Fact(player absence)` (domain_public); `Resource(research funding)`.
+- **Event**: `miss_class(player)` → rules: reputation -5, professor relationship trust -10, **queue** `scheduled_event(professor email, +2h)`, `scheduled_event(library encounter with classmate, +1d)`.
+- **Strain points**: **Routine simulation** — the campus world needs the ability for "the world to advance by schedule even when the player does nothing", i.e., an autonomous world tick (see RUNTIME_LOOP). **No new primitive needed**: schedule = a queued event on the scheduler.
 
-### 3.5 测试结论
+### 3.5 Test Conclusion
 
-| 结论 | 内容 |
+| Conclusion | Content |
 | :--- | :--- |
-| ✅ **六个原语可表达全部四个世界** | 没有发现需要第七个原语的案例 |
-| ⚠️ **需要三类「事件/规则专门化」** | ① `speech_act` 一阶话语事件；② 带时钟的**调度器**（延迟/定期事件）；③ 组织级与关系级的**复合效果**（一个事件改变多个对象） |
-| ⚠️ **需要一个运行时机制** | **自主世界 tick**（代理在用户不动作时也能行动）——这是循环问题而非原语问题 |
-| ❌ 明确否定 | 不需要 Quest/Inventory/Scene 等独立类；它们分别是目标属性/实体属性/带上下文的事件集合 |
+| ✅ **The six primitives can express all four worlds** | No case requiring a seventh primitive was found |
+| ⚠️ **Three kinds of "event/rule specialization" are needed** | ① `speech_act` first-class utterance event; ② a clocked **scheduler** (deferred/periodic events); ③ org-level and relationship-level **composite effects** (one event changes multiple objects) |
+| ⚠️ **A runtime mechanism is needed** | **Autonomous world tick** (agents can act even when the user does not) — this is a loop problem, not a primitive problem |
+| ❌ Explicitly denied | No separate classes for Quest/Inventory/Scene are needed; they are respectively goal attributes / entity attributes / context-bearing event collections |
 
 ---
 
-## 4. 定义与状态的严格分离（DEFINITION ≠ STATE）
+## 4. Strict Separation of Definition and State (DEFINITION ≠ STATE)
 
-| 层 | 示例 | 性质 | 归属 |
+| Layer | Example | Nature | Belongs to |
 | :--- | :--- | :--- | :--- |
-| **世界定义** | 「Yor 是刺客。」（基线事实+可见域） | 不可变、按版本 | 定义（作者所有） |
-| **世界状态** | 「Yor 目前在 Forger 家。」 | 可变、时刻 T 的快照 | 运行时 |
-| **世界动力学** | 「Yor 通过秘密渠道接任务。」（规则） | 不存储、被应用 | 定义 |
-| **世界观察** | 「玩家看到 Yor 出门。」（投影+观察副作用） | 派生、按观察者 | 运行时（派生） |
+| **World definition** | "Yor is an assassin." (baseline fact + visibility domain) | Immutable, versioned | Definition (author-owned) |
+| **World state** | "Yor is currently at the Forger home." | Mutable, snapshot at time T | Runtime |
+| **World dynamics** | "Yor takes assignments through secret channels." (rule) | Not stored, applied | Definition |
+| **World observation** | "The player sees Yor leave." (projection + observation side effect) | Derived, per observer | Runtime (derived) |
 
-纪律：
-1. **定义不随模拟变化**（仅随版本升级）。状态只引用定义中的 ID，不复制定义内容。
-2. **规则只存在于定义**；状态不携带任何「该如何变化」的信息。
-3. **观察永远派生**：同一时刻，玩家视角、Loid 视角、上帝视角看到的世界不同，但状态只有一个。
-4. **溯源贯穿**：`ProvenanceMeta` 标记每条事实/实体是 authored / derived / observed / inferred / simulated / temporary——这是「正典 vs 幻觉 vs 干预」的唯一判据。
+Disciplines:
+1. **The definition does not change with the simulation** (only with version upgrades). State only references IDs in the definition, never copies definition content.
+2. **Rules exist only in the definition**; state carries no information about "how it should change".
+3. **Observation is always derived**: at the same moment, the player view, Loid view, and god view see different worlds, but there is only one state.
+4. **Provenance is pervasive**: `ProvenanceMeta` marks each fact/entity as authored / derived / observed / inferred / simulated / temporary — this is the sole criterion for "canon vs hallucination vs intervention".
 
 ---
 
-## 5. 世界实例 / 场景 / 时间线 / 分支
+## 5. World Instance / Scenario / Timeline / Branch
 
-避免过度工程。四个概念的关系：
+Avoid over-engineering. The relationship among the four concepts:
 
 ```
-WorldDefinition（法则，一个）
-      │ 实例化（选择场景种子 + 应用初始状态突变）
+WorldDefinition (the law, one)
+      │ instantiate (choose scenario seed + apply initial-state mutation)
       ▼
-WorldInstance（一次运行 = 状态 + 事件日志 + 时钟）
-      │ 事件日志不断增长
+WorldInstance (one run = state + event log + clock)
+      │ event log keeps growing
       ▼
-Timeline（事件日志的时序列视图——派生，不存储）
-      │ 在某回合复制实例 → 应用分歧
+Timeline (sequential view of the event log — derived, not stored)
+      │ at some turn, copy the instance → apply divergence
       ▼
-Branch（一个实例 + parent 指针 + 分歧原因）
+Branch (one instance + parent pointer + divergence reason)
 ```
 
-| 概念 | 是什么 | 关键点 |
+| Concept | What it is | Key points |
 | :--- | :--- | :--- |
-| WorldDefinition | 世界的法则与正典 | 不可变、版本化 |
-| ScenarioSeed | 起始配置：初始情境 + 初始状态突变 + 推荐角色 | 「Voldemort 获胜」「用户成为魔法部长」都是不同种子 |
-| WorldInstance | 一次具体运行 | **状态是快照，日志是真相**；快照可重建自日志 |
-| Timeline | 日志的序列投影 | 不存储 |
-| TimelineBranch | 分支 = 在日志某点的派生实例 | 父指针 + 分歧原因，就足够；不需要分支数据库 |
+| WorldDefinition | The world's laws and canon | Immutable, versioned |
+| ScenarioSeed | Starting configuration: initial situation + initial-state mutation + recommended characters | "Voldemort wins" and "user becomes the magic minister" are different seeds |
+| WorldInstance | One concrete run | **State is a snapshot, the log is the truth**; the snapshot can be rebuilt from the log |
+| Timeline | Sequential projection of the log | Not stored |
+| TimelineBranch | A branch = a derived instance at a point in the log | Parent pointer + divergence reason is enough; no branch database needed |
 
-> 反模式预警：不要把 Branch 设计成复杂的多时间线图数据库。分支就是「复制实例 + 从分歧点继续追加日志」。
+> Anti-pattern warning: Do not design Branch as a complex multi-timeline graph database. A branch is simply "copy the instance + keep appending to the log from the divergence point".
 
 ---
 
-## 6. 内核：重心（THE CENTER OF GRAVITY）
+## 6. The Kernel: Center of Gravity (THE CENTER OF GRAVITY)
 
-### 6.1 候选重心分析
+### 6.1 Candidate Center-of-Gravity Analysis
 
-| 候选 | 评估 |
+| Candidate | Assessment |
 | :--- | :--- |
-| World Graph（世界图） | ❌ 是**状态基底**（实体+关系的形态），但图本身不产生任何变化；没有转移的图是死的 |
-| State Machine（状态机） | ❌ 世界不是有限状态集合；状态空间不可枚举 |
-| Event Engine（事件引擎） | ⚠️ 接近，但事件是被动的；必须有生产者（代理/玩家/规则） |
-| Agent Society（代理社会） | ❌ 代理是**决策源**之一，不是内核；内核必须与「谁在决策」无关 |
-| Knowledge Graph（知识图谱） | ❌ 知识是**投影**；把知识图谱当内核会把真相与认知混为一谈 |
-| Simulation Runtime（模拟运行时） | ✅ **方向正确**，但需精确定义 |
+| World Graph | ❌ It is the **state base** (the shape of entities + relationships), but the graph itself produces no change; a graph with no transition is dead |
+| State Machine | ❌ The world is not a finite set of states; the state space is not enumerable |
+| Event Engine | ⚠️ Close, but events are passive; there must be producers (agents/players/rules) |
+| Agent Society | ❌ The agent is one of the **decision sources**, not the kernel; the kernel must be independent of "who is deciding" |
+| Knowledge Graph | ❌ Knowledge is a **projection**; making the knowledge graph the kernel conflates truth with cognition |
+| Simulation Runtime | ✅ **The right direction**, but needs precise definition |
 
-### 6.2 决策：内核 = 世界转移内核（World Transition Kernel）
+### 6.2 Decision: Kernel = World Transition Kernel
 
-> **内核是一个纯函数：`State × Event → { State′, spawnedEvents, observations, rejected? }`**
-> 由 `Rule` 驱动，是**唯一的写入者**。一切变化——玩家的、NPC 的、主持人的、规则的——都必须作为事件进入它。
+> **The kernel is a pure function: `State × Event → { State′, spawnedEvents, observations, rejected? }`**
+> Driven by `Rule`, it is the **single writer**. Every change — the player's, the NPC's, the host's, the rule's — must enter it as an event.
 
-理由（为什么选它做重心）：
+Rationale (why it is chosen as the center of gravity):
 
-1. **它是一切正确性的汇聚点。** 确定性、前提校验、级联、观察副作用、溯源——所有「世界是否自洽」的问题都在这里裁决。其他地方错了可修，这里错了世界就是假的。
-2. **它使世界独立于界面成立。** 呈现层、代理层、主持人层、持久化层都以它的输入输出为契约；换 UI、换代理、换存储都不动内核。
-3. **它使「可证伪」成为可能。** 内核可以用四个基准世界做回归测试；「一个动作能否级联」「认知是否泄漏」都能写成单元测试。
-4. **它统一了 Player/Host/Agent。** 三者的区别只在事件的生产方式（玩家解析意图、代理决策、主持人直接构造干预事件）与权限（谁被允许提交什么事件），提交后的路径完全相同——「不要为 Host 建第二个引擎」由此自然成立。
+1. **It is the convergence point of all correctness.** Determinism, precondition validation, cascade, observation side effects, provenance — all questions of "is the world self-consistent" are adjudicated here. Errors elsewhere can be fixed; an error here makes the world fake.
+2. **It makes the world independent of the interface hold.** The presentation layer, agent layer, host layer, and persistence layer all take its input/output as their contract; swapping UI, agent, or storage does not touch the kernel.
+3. **It makes "falsifiability" possible.** The kernel can be regression-tested with the four baseline worlds; "can one action cascade" and "does cognition leak" can both be written as unit tests.
+4. **It unifies Player/Host/Agent.** The three differ only in how events are produced (player parses intent, agent decides, host directly constructs intervention events) and in permissions (who is allowed to submit what event); the path after submission is exactly the same — "do not build a second engine for the Host" follows naturally.
 
-### 6.3 内核的三种派生层
+### 6.3 The Kernel's Three Derived Layers
 
-内核之上，一切都是派生的纯函数：
+Everything above the kernel is a derived pure function:
 
 ```
-┌─ 写入（唯一路径）───────────────────────────────┐
-│  玩家事件 │ 代理事件 │ 主持人干预事件 │ 调度事件  │
-└───────────────────┬───────────────────────────┘
-                    ▼
-        【世界转移内核】 State × Event → {State′, Events, Observations}
-                    │
-        ┌───────────┼──────────────┬──────────────────┐
-        ▼           ▼              ▼                  ▼
-   状态快照     事件日志      观察→知识更新       排队事件(调度)
-        └───────────┼──────────────┴──────────────────┘
-                    ▼
-      （派生，只读）认知投影器 → 观察者视图（含玩家/主持人）
-                    ▼
-      （派生，只读）显著性/注意力 → 体验状态
-                    ▼
-      （派生，只读）呈现规划 → 布局引擎 → UI
+┌─ Write (single path)────────────────────────────────┐
+│  player event │ agent event │ host intervention event │ scheduler event  │
+└───────────────────────┬─────────────────────────────┘
+                        ▼
+        【World Transition Kernel】 State × Event → {State′, Events, Observations}
+                        │
+        ┌───────────────┼────────────────┬──────────────────┐
+        ▼               ▼                ▼                  ▼
+   state snapshot    event log      observation→knowledge update   queued event (scheduler)
+        └───────────────┼────────────────┴──────────────────┘
+                        ▼
+      (derived, read-only) cognitive projector → observer view (incl. player/host)
+                        ▼
+      (derived, read-only) salience/attention → experience state
+                        ▼
+      (derived, read-only) presentation planning → layout engine → UI
 ```
 
 ---
 
 ## 7. What HeadConan Actually Is
 
-HeadConan 是一个**面向虚构世界的模拟内核 + 经验层**。作为计算系统：
+HeadConan is a **simulation kernel for fictional worlds + an experience layer**. As a computational system:
 
-- 它维护一个**类型化世界状态**（实体属性、关系状态、时钟、认知记录、资源池），状态只通过**事件日志**演化。
-- 事件由三类生产者产生：**玩家**（意图经解析与校验）、**代理**（感知→决策→动作）、**规则本身**（后果/调度）。
-- 所有事件经**同一转移内核**应用：校验前提 → 应用效果 → 派生观察（谁感知到什么）→ 排队后果。
-- **真相、认知、感知三者分离**：状态存真相（事实+可见域）；代理存「已知事实 ID + 信念」；玩家看到的永远是认知投影器的输出，而非真相本身。
-- **呈现是派生**：显著性计算选出「此刻重要的事」→ 体验状态 → 呈现计划（舞台模式/焦点/卫星/环境/坞）→ 布局引擎渲染。世界不携带 UI。
-- **主持人不是第二个引擎**：干预是带溯源（`player_directive`）与权限校验的普通事件。
-- **持久化分层**：定义（作者所有，版本化）＋ 事件日志与快照（运行时所有）＋ 玩家数据（用户所有）。
-- **确定性记账 + 非确定性决策**：内核与规则是确定性的（可重放、可测试、可分支）；代理决策是唯一的非确定性来源（LLM/策略）。
+- It maintains a **typed world state** (entity attributes, relationship state, clock, cognitive records, resource pools), and the state evolves only through the **event log**.
+- Events are produced by three kinds of producers: **player** (intent parsed and validated), **agent** (perceive → decide → act), and **the rules themselves** (consequences/scheduling).
+- All events are applied through the **same transition kernel**: validate preconditions → apply effects → derive observations (who perceived what) → queue consequences.
+- **Truth, cognition, and perception are separated**: state stores truth (facts + visibility domain); agents store "known fact IDs + beliefs"; what the player sees is always the output of the cognitive projector, not truth itself.
+- **Presentation is derived**: salience computation selects "what matters right now" → experience state → presentation plan (stage mode / focus / satellite / ambient / dock) → layout engine renders. The world carries no UI.
+- **The host is not a second engine**: intervention is an ordinary event with provenance (`player_directive`) and permission validation.
+- **Persistence is layered**: definition (author-owned, versioned) + event log and snapshot (runtime-owned) + player data (user-owned).
+- **Deterministic bookkeeping + non-deterministic decision**: the kernel and rules are deterministic (replayable, testable, branchable); agent decisions are the only source of non-determinism (LLM/strategy).
 
-它的计算本质：**一个以事件为核心、规则为生成机制、认知与呈现为派生层的离散模拟运行时。**
+Its computational essence: **a discrete simulation runtime with events at its core, rules as the generation mechanism, and cognition and presentation as derived layers.**
 
 ---
 
-## 8. What We Still Don't Know（前 10 大不确定性）
+## 8. What We Still Don't Know (Top 10 Uncertainties)
 
-1. **回合与时间的语义**：用户一次动作推进多少世界时间？时钟推进规则是否应属于世界定义的一部分？
-2. **自主性的程度**：NPC 应在何时自主行动（反应式/主动式）？「日常校园」需要后台例行模拟，频率与成本如何平衡？
-3. **话语（speech_act）的粒度**：对话记录到什么结构（引用文本/意图/潜台词/谎言标记）才足以支撑读心与推演，又不至于过度设计？
-4. **信念演化的规则**：观察如何改变置信度？是否需要显式的信念更新规则，还是由 LLM 决策时自然携带？
-5. **LLM 与确定性的分界**：哪些判定必须确定性（前提、权限、记账），哪些可以交给 LLM（代理决策、叙事措辞、意图解析）？分界在何处？
-6. **记忆的规模拐点**：结构化事实在多大的世界/多长的会话后失效，必须引入语义记忆/摘要？摘要如何保证不污染真相（溯源）？
-7. **分支的用户体验**：如何在 UI 上呈现平行时间线而不造成困惑（活跃分支切换、分歧标记、回滚体验）？
-8. **显著性计算的可解释性**：注意力打分公式（`FocusScore`）的权重如何标定？「什么值得看」能否在四个基准世界上一致地成立？
-9. **版权与发布约束**：图册中 50 个金标准世界含受版权 IP（SPY×FAMILY、GoT）——正式产品应以「原创世界+公开领域」为主，还是需要授权流程？
-10. **延迟预算**：多代理并行决策 + 呈现规划的端到端延迟目标是多少？流式输出能否缓解「等待世界反应」的割裂感？
+1. **Semantics of turns and time**: How much world time does one user action advance? Should the clock-advancing rule be part of the world definition?
+2. **Degree of autonomy**: When should NPCs act autonomously (reactive / proactive)? "Daily campus life" needs background routine simulation — how to balance frequency and cost?
+3. **Granularity of utterance (speech_act)**: To what structure should dialogue be recorded (quoted text / intent / subtext / lie marker) to support mind-reading and inference without over-design?
+4. **Belief evolution rules**: How do observations change confidence? Are explicit belief-update rules needed, or are they naturally carried along when the LLM decides?
+5. **Boundary between LLM and determinism**: Which judgments must be deterministic (preconditions, permissions, bookkeeping), and which can be handed to the LLM (agent decisions, narrative phrasing, intent parsing)? Where is the boundary?
+6. **Scale inflection point of memory**: At what world size / session length do structured facts fail, forcing the introduction of semantic memory / summarization? How to ensure summarization does not pollute truth (provenance)?
+7. **User experience of branching**: How to present parallel timelines in the UI without causing confusion (active-branch switching, divergence markers, rollback experience)?
+8. **Explainability of salience computation**: How to calibrate the weights of the attention-scoring formula (`FocusScore`)? Can "what is worth seeing" hold consistently across the four baseline worlds?
+9. **Copyright and release constraints**: The 50 gold-standard worlds in the atlas include copyrighted IP (SPY×FAMILY, GoT) — should the official product focus on "original worlds + public domain", or does it need a licensing process?
+10. **Latency budget**: What is the end-to-end latency target for parallel multi-agent decision + presentation planning? Can streaming output mitigate the fragmentation of "waiting for the world to react"?
 
-> 以上问题需要实验而非臆断，详见 [`ARCHITECTURAL_EXPERIMENTS.md`](./ARCHITECTURAL_EXPERIMENTS.md) 与 [`OPEN_QUESTIONS.md`](./OPEN_QUESTIONS.md)。
+> The above questions require experiments rather than guesswork; see [`ARCHITECTURAL_EXPERIMENTS.md`](./ARCHITECTURAL_EXPERIMENTS.md) and [`OPEN_QUESTIONS.md`](./OPEN_QUESTIONS.md).

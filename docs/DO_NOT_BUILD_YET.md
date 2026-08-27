@@ -1,29 +1,60 @@
-# 暂缓构建清单（DO_NOT_BUILD_YET）
+# HeadConan DO NOT BUILD YET (next-version edition)
 
-> 这些系统**极其诱人**，但当前阶段构建它们会消耗掉验证内核所需的注意力。每项给出「为什么现在不建」「何时才建」。
-> 判据（至少满足其一才建）：**被用户行为证明需要 / 被真实数据证明是瓶颈 / 内核与体验层已验证稳定。**
+> Companion to `../docs/DO_NOT_BUILD_YET.md` (architecture layer, retained). This document is the **product-layer** deferral list — which tempting features would kill the next version.
+> Criteria (build only if any one is met): **proven needed by real user behavior / proven a bottleneck by real data / the 10-minute experience already runs end-to-end completely.**
 
 ---
 
-| # | 暂缓项 | 诱惑 | 为什么不建（现在） | 何时才建 |
+## 1. Must Defer (absolutely do NOT build within the next version)
+
+| # | Deferred Item | Temptation | Why it can't be built (next version) | When to build |
 | :--- | :--- | :--- | :--- | :--- |
-| 1 | **巨型记忆系统**（语义记忆/长期记忆分层/记忆检索） | 「AI 角色必须有记忆」是本能直觉 | ① 我们连「结构化认知记录」都还没接进真实循环；② 记忆的规模拐点未知（OPEN_QUESTIONS Q6）；③ 现在建记忆 = 在没有真相层时建缓存 | P2（认知副作用）跑通且会话超过 ~50 回合、确实出现「记不住」后 |
-| 2 | **复杂多代理社会**（经济模拟/情感模拟/社会网络动力学引擎） | 仿佛「更真实」 | ① 代理决策由 LLM 承担，规则式社会引擎会与 LLM 决策打架；② 一个正确的 NPC（绑定+决策+tick）尚未验证 | P4 单个代理循环稳定后，按需添加（且优先用规则而非引擎） |
-| 3 | **完整本体引擎**（推理机/OWL 式本体/概念分类器） | 「本体」听起来很学术 | ① `CapabilityDefinition` + 校验器已覆盖所需；② 推理机是给「事实检索」用的，而我们的真相层很小 | 出现「从已知事实推导隐含事实」的真实需求（如法证推理链）时 |
-| 4 | **到处用向量数据库**（实体/事件/对话全部 embedding） | 时髦且通用 | ① 我们还没有语义检索用例；② 结构化查询（谁在场、谁知道什么）是确定性的，embedding 是噪音 | P8 持久化出现「全文检索对话历史」需求后，作为派生层添加 |
-| 5 | **任务/任务线系统**（Quest 引擎、剧情分支管理器） | 游戏开发的肌肉记忆 | ① 目标 = 代理上的谓词状态（ADR 原语）；② Quest 引擎会把「世界自洽」替换成「脚本编排」 | 若真实玩法证明「多步剧情需要显式追踪器」，且无法用目标+规则表达 |
-| 6 | **生产级认证/多租户** | 「正式产品都需要」 | ① 单用户本地会话已能验证全部假设；② 认证是产品问题不是架构问题 | 出现真实多用户/多端需求 |
-| 7 | **插件系统**（世界扩展/自定义动作注册 SDK） | 「平台感」 | ① 没有稳定的内核契约，插件系统无从谈起；② 现在做 = 给未定型的 API 加壳 | P3（动作解析）契约稳定后 |
-| 8 | **几十个 UI 组件**（每个世界专属面板/图表/皮肤） | 视觉繁荣 | ① 6 场景矩阵 + 5 原语 + Block 注册表已覆盖所需；② 世界专属组件 = 违反「世界不携带 UI」（ADR-12） | 在 5 原语内证明某数据形态无法表达后，按需增补共享渲染器 |
-| 9 | **世界专属硬编码屏幕**（「哈利波特界面」「权游界面」） | 让演示惊艳 | ① 与「世界独立于界面」的根本主张矛盾；② 每个硬编码屏幕都是未来重构的债务 | 永不（以主题+数据组合替代） |
-| 10 | **实时多人/共享世界** | WebSocket 的诱惑 | ① 单用户循环尚未跑通；② 多人是「并发写者」问题，会把内核的单一写入者模型复杂化 | P4 代理循环 + P8 持久化之后，作为独立里程碑评估 |
-| 11 | **自定义游戏引擎/ECS** | 「性能」幻觉 | ① React + 确定性内核已足够（每回合事件数很小）；② ECS 是给 60fps 实体渲染的，不是给叙事模拟的 | 出现真实性能基准证明 React 是瓶颈后 |
-| 12 | **LLM 直写完整状态**（当前架构，实为「继续用」的诱惑） | 省事 | ① 已观察到的 schema 漂移与成本；② 违反全部 ADR | 永不（ADR-12 已否决） |
+| 1 | **Complex multi-agent society** | "NPCs have their own lives" | The core experience is "the player perceives NPCs taking action" — a single reactive NPC template demonstrates that; a full agent society (P4 in IMPLEMENTATION_ROADMAP) would devour the next version's budget | Only when "reactive NPCs feel lifeless" is proven by testing |
+| 2 | **Full world editor** | Host is one of HeadConan's killer features | The 10-minute experience **only** needs the host to be able to "inspect + intervene," not full CRUD; CRUD is P9 and doesn't block validation | Only when the host feels the tools are insufficient |
+| 3 | **Persistent world database** | "60+ candidate worlds are assets" | It's a discovery tool, not the core; the next version only needs one hand-written SPY×FAMILY | After multi-world switching becomes the dominant daily-active behavior |
+| 4 | **Massive lore management** | Detail of IP worlds | Hand-writing a minimum of 10 characters + 4 locations is enough to run 10 minutes; anything beyond that exceeds the current product stage | When users start asking "for more worlds" |
+| 5 | **Multi-user / multiplayer** | "Be spies together" | Would break the information-asymmetry core (what you don't know — why should others not know either); introduces extremely high sync cost | Re-evaluate after a single world is played simultaneously by 100+ users |
+| 6 | **Complex economy system** | "Resource management is fun" | The spy family has mission pay; that's background, not the simulation goal | Only when users actively attempt resource games |
+| 7 | **Advanced relationship-evolution simulation** | "They'll grow" | Explicit rules "+2/-5" are enough; psychological modeling is paper-level effort | Only when the core experience is tested as "emotionally thin" |
+| 8 | **Full dialogue language (subtext / lie / mind-reading UI suite)** | "The irony of SPY×FAMILY" | A first-class `speech_act` with `intentTag/subtext` suffices; letting Anya "know but not say" in different scenes demonstrates irony, the irony UI is follow-up | When in-scene dialogue can already support Anya's perspective switching |
+| 9 | **Cloud database / multi-device sync** | "Want to continue on phone" | localStorage satisfies "refresh doesn't lose"; sync introduces concurrent writers, breaking the "single world" | When refresh + exit can no longer retain state |
+| 10 | **Plugin system** | "Open world extension" | No stable kernel contract yet; adding a shell is premature; and the next version has only one world | After the kernel interface has been stable for at least 2 iterations |
+| 11 | **Dozens of UI components** | "One panel set per world" | Contradicts the fundamental claim "world is independent of interface"; 5 primitives + shared Blocks are enough | When some scene cannot be expressed with the existing stage |
+| 12 | **World-specific hardcoded screens** | "Harry Potter interface" | Opposes ADR-12: the world declares "what modality matters," not which component | Never |
+| 13 | **Full real-time image-generation integration** | "Every frame AI-generated" | VisualSynthesisStudio is already usable for "portrait / evidence" generation; integrating into the scene loop would add 5–10s latency, breaking the rhythm | When the scene rhythm is long enough (>30s/scene) to absorb the latency |
+| 14 | **Complex realism (wound healing, weather, hunger)** | "Make the world real" | The 10-minute experience doesn't care about these; once introduced, all NPCs must implement them | When users report "this world feels like a dead thing" |
+| 15 | **LLM directly designs UI** | "Let AI write the interface" | Already rejected by ADR-12; LLM outputting UI = uncontrollable + hard to test | Never |
 
 ---
 
-## 通用暂缓原则
+## 2. Easily Misjudged "Deferrals"
 
-1. **没有用户证据，不加系统**：任何新系统必须由「某个真实体验断点」驱动，而非由「别人都这么做」驱动。
-2. **先正确，再聪明，最后规模化**：内核正确性 > 体验智能 > 规模能力。
-3. **派生层随时可加**：记忆/检索/推荐都是派生层；只要真相层（事件日志+状态）干净，派生层随时可以后补且不欠技术债。
+| Misjudgment | Reality |
+| :--- | :--- |
+| "Memory system is foundational" | State + log are enough; memory is an optimization needed only at scale (see `OPEN_QUESTIONS.md` Q6) |
+| "NPC autonomy is mandatory" | "Perceiving NPCs taking action" ≠ "NPC is a full agent"; a minimal reactive NPC (emotion + relationship → reaction template) suffices |
+| "Persistent branching is foundational" | localStorage satisfies single-user; add branching when the user feels the need |
+| "Need a library of dozens of components" | 5 primitives + shared Blocks; call the subset of the existing 11 Block types within a scene |
+| "Must support LLM omniscience" | Host view = omniscient projection (`observerEntityId` empty), unrelated to the LLM |
+
+---
+
+## 3. What Happens If You Accidentally Start Building
+
+| Mis-start | Risk |
+| :--- | :--- |
+| Build the world editor fully | Host tools exhaust resources, the **player-experience core** gets left unfinished |
+| Multiple worlds in parallel | 6 shallow worlds in 6 months is far worse than 1 deep world in 1 month |
+| Fully automatic NPCs | Reaction templates + simple rules suffice for the 10-minute experience; full automation introduces scheduling / priority / conflict-resolution problems |
+| Cloud sync | Sync logic (OT/CRDT) would reshape the kernel contract; better to define the kernel first |
+| Multi-user | Breaks the information-asymmetry core assumption — degrades into an ordinary multiplayer game |
+
+---
+
+## 4. Relationship to the Architecture-Layer DO_NOT_BUILD_YET
+
+`../docs/DO_NOT_BUILD_YET.md` (architecture layer) defers: giant memory, multi-agent society engine, ontology reasoning engine, vector database, quest-line engine, production auth, plugin system, world-specific UI, custom ECS.
+
+**This document (product layer)**: supplements deferrals from the product-experience angle — world database, lore, multi-user, economy, relationship evolution, full dialogue language, cloud sync.
+
+**The two lists combined** = the true taboos of the next version.

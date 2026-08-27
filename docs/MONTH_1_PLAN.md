@@ -1,73 +1,73 @@
-# HeadConan 首月实施计划（MONTH_1_PLAN）
+# HeadConan First-Month Implementation Plan (MONTH_1_PLAN)
 
-> 时间窗：2026-08-31 ~ 2026-09-27（预启动窗口：08-27 ~ 08-30）。
-> 阶段对应：`IMPLEMENTATION_ROADMAP.md` 的 P0→P7 关键路径 + P8a 并行。
-> 唯一目标：**交付一个基准世界的完整体验闭环（垂直切片）**——动作 → 事件内核 → 认知不对称 → 显著性 → 动态布局。
+> Time window: 2026-08-31 ~ 2026-09-27 (pre-launch window: 08-27 ~ 08-30).
+> Stages correspond to: the P0→P7 critical path of `IMPLEMENTATION_ROADMAP.md` + P8a in parallel.
+> Sole objective: **deliver a complete experience loop for a baseline world (vertical slice)** — action → event kernel → cognitive asymmetry → salience → dynamic layout.
 
 ---
 
-## 1. 月目标与出口
+## 1. Monthly Goals and Exits
 
-| 项 | 内容 |
+| Item | Content |
 | :--- | :--- |
-| 目标 | 垂直切片：一个基准世界（候选：SPY×FAMILY / 大学）跑通完整闭环 |
-| 退出判据 | ① 玩家动作成为事件并经内核生效；② 认知不对称真实生效（角色切换改变可见内容）；③ 有一个自主 NPC；④ 布局随焦点变化；⑤ 刷新不丢进度 |
-| 不做 | 语义记忆、多代理社会、任务线、向量库、云同步、作者工具产品化、FLIP 动画、世界专属 UI |
+| Goal | Vertical slice: a baseline world (candidates: SPY×FAMILY / university) runs the complete loop |
+| Exit criteria | ① player actions become events and take effect via the kernel; ② cognitive asymmetry is genuinely in effect (character switching changes visible content); ③ there is one autonomous NPC; ④ layout changes with focus; ⑤ refresh does not lose progress |
+| Out of scope | semantic memory, multi-agent society, quest lines, vector store, cloud sync, authoring-tool productization, FLIP animation, world-specific UI |
 
-## 2. 四周结构
+## 2. Four-Week Structure
 
-| 周 | 主题 | 阶段 | 出口验证（用户可感知） |
+| Week | Theme | Stage | Exit verification (user-perceptible) |
 | :--- | :--- | :--- | :--- |
-| W1 8.31–9.6 | 实验 + 接线 | P0+P1 | 切换角色后界面内容真的变化（玩家看不到隐秘议程，主持人能看到） |
-| W2 9.7–9.13 | 事件内核 | P2 (+P8a 并行) | 公开指控 → 在场者知情、缺席者不知情；后果可回滚可重放 |
-| W3 9.14–9.20 | 动作与代理 | P3+P4 | NPC 主动推进；延迟事件（邮件）出现；Loid/Yor 互不知对方秘密 |
-| W4 9.21–9.27 | 体验与布局 | P6+P7 子集+P5 子集 | 审讯时地图退场；垂直切片演示可用 |
+| W1 8.31–9.6 | Experimentation + wiring | P0+P1 | After switching characters, interface content genuinely changes (player cannot see hidden agendas; host can) |
+| W2 9.7–9.13 | Event kernel | P2 (+P8a in parallel) | Public accusation → those present are informed, those absent are not; consequences are rollbackable and replayable |
+| W3 9.14–9.20 | Actions and agents | P3+P4 | NPC proactively advances; delayed event (email) appears; Loid/Yor are mutually unaware of each other's secrets |
+| W4 9.21–9.27 | Experience and layout | P6+P7 subset+P5 subset | Map withdraws during interrogation; vertical slice demo is usable |
 
-## 3. 每日节奏（必守）
+## 3. Daily Cadence (mandatory)
 
-1. **每日一个可验证增量**：任何改动必须标注「用户视角效果」+ 验证方式，无验证不做。
-2. **当日实验/任务若未完成，次日第一件事补齐，不跳过。**
-3. **每周末复盘**：对照出口验证；未达成则下周初补齐。
-4. 实验结论一律写成断言（绿/红由测试决定，不由印象决定）。
+1. **One verifiable increment per day**: any change must be annotated with "user-perspective effect" + verification method; no verification means no work.
+2. **If the day's experiment/task is unfinished, the first thing next day is to make it up; do not skip.**
+3. **Weekend retrospective**: check against the exit verification; if not achieved, make it up early the following week.
+4. Experiment conclusions are always written as assertions (green/red is decided by tests, not by impressions).
 
 ---
 
-## 4. 今日计划（2026-08-27，启动日）
+## 4. Today's Plan (2026-08-27, launch day)
 
-> 性质：预启动——固化月计划、搭建实验设施、跑通首个实验，为周一正式开工铺路。
+> Nature: pre-launch — solidify the monthly plan, set up the experimental infrastructure, and run the first experiment, to pave the way for the official start on Monday.
 
-| 时间块 | 任务 | 用户视角效果 | 验证 |
+| Time block | Task | User-perspective effect | Verification |
 | :--- | :--- | :--- | :--- |
-| 09:00–09:30 | 固化 `docs/MONTH_1_PLAN.md`（本文件） | 月/周/日计划有据可查 | 文件落盘、退出判据完整 |
-| 09:30–11:00 | 实验脚手架：引入测试设施（vitest 或 tsx 断言脚本，待确认） | 后续每个实验/内核回归可一键跑 | 冒烟测试通过 |
-| 11:00–12:00 | 通读 GoT / SPY×FAMILY 示例定义；编写 `instantiate(world, scenario)` 原语 | E1 有可跑代码 | 接口签名确定并记录 |
-| 14:00–16:00 | **E1 完整跑通**：三种子（正典/分歧/玩家角色）实例隔离 | 得到 E1 结论（成立/证伪） | 断言全绿 + 结论写入 EXPERIMENTS.md |
-| 16:00–17:30 | **E2 启动**（时间盒，不完结则顺延到 W1-D1）：`public_accusation` 规则 + 延迟后果 | E2 有初步结果 | 级联有界 + 日志可重放 |
-| 17:30–18:00 | 复盘：实验结果入 `docs/EXPERIMENTS.md`；更新工作记忆 | 明日起点明确 | 实验日志更新 |
+| 09:00–09:30 | Solidify `docs/MONTH_1_PLAN.md` (this file) | Monthly/weekly/daily plan is documented and traceable | File persisted; exit criteria complete |
+| 09:30–11:00 | Experiment scaffolding: introduce test facilities (vitest or tsx assertion script, TBD) | Subsequent experiments/kernel regressions runnable with one command | Smoke test passes |
+| 11:00–12:00 | Read through the GoT / SPY×FAMILY sample definitions; write the `instantiate(world, scenario)` primitive | E1 has runnable code | Interface signature determined and recorded |
+| 14:00–16:00 | **Run E1 end-to-end**: three seeds (canon / divergence / player character) instance isolation | Obtain the E1 conclusion (holds / falsified) | All assertions green + conclusion written to EXPERIMENTS.md |
+| 16:00–17:30 | **Launch E2** (time-boxed; if not completed, carry over to W1-D1): `public_accusation` rule + delayed consequence | E2 has preliminary results | Cascade is bounded + log is replayable |
+| 17:30–18:00 | Retrospective: experiment results into `docs/EXPERIMENTS.md`; update working memory | Clear starting point for tomorrow | Experiment log updated |
 
-### 今日红线
-- 不写任何生产 UI 代码；不碰 `App.tsx` 实时路径（那是 W1 后半）。
-- E1/E2 只依赖 `src/world/representation/*`，独立可跑。
-- 实验结论若证伪 → 当场记录「修正哪个 ADR」，不硬闯。
+### Today's Red Lines
+- Do not write any production UI code; do not touch the `App.tsx` live path (that is the latter half of W1).
+- E1/E2 depend only on `src/world/representation/*` and run independently.
+- If an experiment conclusion is falsified → immediately record "which ADR to revise"; do not force through.
 
 ---
 
-## 5. 预启动窗口（8.27–8.30，弹性）
+## 5. Pre-launch Window (8.27–8.30, flexible)
 
-| 日期 | 内容 |
+| Date | Content |
 | :--- | :--- |
-| 08-27（今） | 本计划 + 脚手架 + E1 |
-| 08-28（周五） | E2 + E3（认知不对称，最高风险假设） |
-| 08-29~30（周末，可选） | E4–E6 或休息 |
+| 08-27 (today) | This plan + scaffolding + E1 |
+| 08-28 (Fri) | E2 + E3 (cognitive asymmetry, highest-risk assumption) |
+| 08-29~30 (weekend, optional) | E4–E6 or rest |
 
-> 若周末不投入，则 W1 内顺序执行 E2–E6（每个 ≤1 天，W1 容量足够）。
+> If no weekend investment, then execute E2–E6 sequentially within W1 (each ≤1 day; W1 has sufficient capacity).
 
 ---
 
-## 6. 每日增量检查表（模板，每日开工复制）
+## 6. Daily Increment Checklist (template, copy at the start of each day)
 
-- [ ] 今日目标（一句话）
-- [ ] 改动清单（每项含用户视角效果）
-- [ ] 验证结果（断言/演示）
-- [ ] 实验结论（成立/证伪 + 影响的 ADR）
-- [ ] 明日起点
+- [ ] Today's goal (one sentence)
+- [ ] Change list (each item with user-perspective effect)
+- [ ] Verification result (assertion / demo)
+- [ ] Experiment conclusion (holds / falsified + affected ADR)
+- [ ] Starting point for tomorrow

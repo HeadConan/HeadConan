@@ -1,147 +1,148 @@
-# HeadConan 系统架构（SYSTEM ARCHITECTURE）
+# HeadConan System Architecture (SYSTEM ARCHITECTURE)
 
-> 本文件定义系统边界：每个子系统的职责、输入、输出、归属与依赖。实现细节见 [`WORLD_RUNTIME.md`](./WORLD_RUNTIME.md) 与 [`RUNTIME_LOOP.md`](./RUNTIME_LOOP.md)。
+> This file defines the system boundaries: the responsibility, inputs, outputs, ownership, and dependencies of each subsystem. Implementation details are in [`WORLD_RUNTIME.md`](./WORLD_RUNTIME.md) and [`RUNTIME_LOOP.md`](./RUNTIME_LOOP.md).
 
 ---
 
-## 1. 系统总览
+## 1. System Overview
 
 ```
                         ┌─────────────────────────┐
-                        │      WORLD ATLAS        │ 世界目录/基准（发现与测试）
+                        │      WORLD ATLAS        │ World catalog/baseline (discovery & testing)
                         └────────────┬────────────┘
-                                     │ 导入/实例化
+                                     │ import/instantiation
 ┌────────────────────────────────────▼────────────────────────────────────┐
 │                        WORLD DEFINITION SERVICE                        │
-│        作者（人/LLM）产出并校验 WorldDefinition：法则+正典+规则+角色+体验信号 │
+│        Author (human/LLM) produces and validates the WorldDefinition:  │
+│        laws + canon + rules + characters + experience signals          │
 └────────────────────────────────────┬────────────────────────────────────┘
-                                     │ 版本化定义
+                                     │ versioned definition
 ┌────────────────────────────────────▼────────────────────────────────────┐
-│                          WORLD RUNTIME（内核）                          │
-│  · 转移内核 State×Event→{State′,Events,Observations}（唯一写入者）         │
-│  · 状态存储 + 事件日志 + 时钟 + 调度队列                                  │
-│  · 动作解析（玩家文本→候选事件）· 代理绑定与决策 · 主持人干预通道            │
+│                          WORLD RUNTIME (kernel)                        │
+│  · transition kernel State×Event→{State′,Events,Observations} (sole writer)│
+│  · state storage + event log + clock + scheduling queue                │
+│  · action resolution (player text→candidate events) · agent binding & decisions · host intervention channel│
 └───────┬───────────────────────────────┬─────────────────────────────────┘
-        │ 观察者视图（认知投影）           │ 变化/事件流
+        │ observer view (cognition ledger)│ changes/event stream
 ┌───────▼────────────────────────┐  ┌───▼─────────────────────────────────┐
 │      EXPERIENCE SERVICE        │  │           PERSISTENCE              │
-│  显著性/注意力 → 体验状态 → 呈现计划│  │  事件日志+快照+玩家数据+制品引用      │
+│  salience/attention → experience state → presentation plan│  │  event log + snapshots + player data + artifact references│
 └───────┬────────────────────────┘  └────────────────────────────────────┘
-        │ 呈现计划（舞台模式/焦点/卫星/环境/坞）
+        │ presentation plan (stage mode/focus/satellite/ambient/dock)
 ┌───────▼────────────────────────┐
 │      PRESENTATION LAYER        │
-│  布局引擎（5 原语）+ Block 注册表 + 主题 │
+│  layout engine (5 primitives) + Block registry + theme │
 └────────────────────────────────┘
 
-旁路（不进入内核的数据平面）：
+Bypass (does not enter the kernel's data plane):
 ┌────────────────────────────────┐
-│           AI GATEWAY           │  LLM 提供商路由：代理决策/意图解析/叙事/图像
+│           AI GATEWAY           │  LLM provider routing: agent decisions/intent parsing/narrative/images
 └────────────────────────────────┘
 ```
 
-> 关键边界：**世界运行时是唯一允许写入世界状态的子系统**。体验层、呈现层、图册只读。AI 网关不直接改状态——它通过运行时提供的「代理决策/意图解析」接口提交候选事件。
+> Key boundary: **The world runtime is the only subsystem permitted to write world state.** The experience layer, presentation layer, and atlas are read-only. The AI gateway does not mutate state directly — it submits candidate events through the runtime-provided "agent decision / intent parsing" interfaces.
 
 ---
 
-## 2. 子系统规格
+## 2. Subsystem Specifications
 
-### 2.1 WORLD DEFINITION SERVICE（世界定义服务）
+### 2.1 WORLD DEFINITION SERVICE
 
-| 项 | 内容 |
+| Item | Content |
 | :--- | :--- |
-| **职责** | 定义的产生、校验、版本化、序列化。支持人类主持人（表单）与 AI 作者（结构化输出）。 |
-| **输入** | 作者意图（文本/表单）；现有定义（升级）；图册条目（作为作者模板）。 |
-| **输出** | 版本化 `WorldDefinition`（含 `ProvenanceMeta`）；校验报告。 |
-| **归属** | 世界作者（世界定义是作者资产，不是运行时资产）。 |
-| **依赖** | 校验器（`representation/validation`）；AI 网关（AI 作者模式）；持久化（存储定义）。 |
-| **不负责** | 运行、渲染、代理。 |
+| **Responsibility** | Production, validation, versioning, and serialization of definitions. Supports human hosts (forms) and AI authors (structured output). |
+| **Input** | Author intent (text/form); existing definitions (upgrades); atlas entries (as author templates). |
+| **Output** | Versioned `WorldDefinition` (including `ProvenanceMeta`); validation report. |
+| **Ownership** | World author (the world definition is an author asset, not a runtime asset). |
+| **Dependencies** | Validator (`representation/validation`); AI gateway (AI author mode); persistence (storing definitions). |
+| **Not responsible for** | Running, rendering, or acting as an agent. |
 
-### 2.2 WORLD RUNTIME（世界运行时 —— 内核宿主）
+### 2.2 WORLD RUNTIME (World Runtime — Kernel Host)
 
-| 项 | 内容 |
+| Item | Content |
 | :--- | :--- |
-| **职责** | ① 转移内核（唯一写入者）；② 状态与事件日志维护；③ 时钟与调度队列；④ 动作解析；⑤ 代理绑定与决策循环；⑥ 主持人干预通道（带权限）。 |
-| **输入** | 候选事件（玩家/代理/主持人/调度）；世界定义；当前状态。 |
-| **输出** | 新状态；新事件（含观察记录）；被拒绝的事件（含原因）。 |
-| **归属** | 运行时（状态与日志是运行实例的资产）。 |
-| **依赖** | 定义（只读引用）；AI 网关（代理决策与意图解析是回调，不内联）；持久化（落日志）。 |
-| **不负责** | 决定 UI 长什么样；决定用户该看什么；生成叙事散文（叙事是呈现层的措辞，不是状态）。 |
+| **Responsibility** | ① Transition kernel (sole writer); ② state and event log maintenance; ③ clock and scheduling queue; ④ action resolution; ⑤ agent binding and decision loop; ⑥ host intervention channel (with permissions). |
+| **Input** | Candidate events (player/agent/host/scheduled); world definition; current state. |
+| **Output** | New state; new events (including observation records); rejected events (including reasons). |
+| **Ownership** | Runtime (state and log are assets of the running instance). |
+| **Dependencies** | Definition (read-only reference); AI gateway (agent decisions and intent parsing are callbacks, not inlined); persistence (writing log). |
+| **Not responsible for** | Deciding what the UI looks like; deciding what the user should see; generating narrative prose (narrative is presentation-layer wording, not state). |
 
-### 2.3 EXPERIENCE SERVICE（体验服务）
+### 2.3 EXPERIENCE SERVICE
 
-| 项 | 内容 |
+| Item | Content |
 | :--- | :--- |
-| **职责** | 从「世界发生了什么」计算「用户此刻该关注什么」：显著性打分、注意力分配、戏剧性/不确定性识别、体验状态（ExperienceState）与呈现计划（PresentationPlan）。 |
-| **输入** | 状态快照 + 事件增量 + 用户最近动作 + 认知投影后的观察者视图 + 定义的 ExperienceProfile。 |
-| **输出** | `ExperienceState`（焦点实体、显著事件、变化摘要、张力指标）；`PresentationPlan`（舞台模式、焦点、卫星内容、环境指标、建议动作词条、基调）。 |
-| **归属** | 派生层（每次用户回合后计算，不存储或缓存于世界状态）。 |
-| **依赖** | 认知投影器；定义（体验信号）；AI 网关（可选：叙事措辞/显著性解释的 LLM 辅助）。 |
-| **不负责** | 布局像素级渲染；世界状态写入。 |
+| **Responsibility** | Computing "what the user should attend to right now" from "what happened in the world": salience scoring, attention allocation, drama/uncertainty identification, experience state (ExperienceState) and presentation plan (PresentationPlan). |
+| **Input** | State snapshot + event delta + user's recent actions + observer view after cognition ledger projection + the definition's ExperienceProfile. |
+| **Output** | `ExperienceState` (focus entity, salient events, change summary, tension metrics); `PresentationPlan` (stage mode, focus, satellite content, ambient metrics, suggested action lexemes, tone). |
+| **Ownership** | Derived layer (computed after each user turn, not stored or cached in world state). |
+| **Dependencies** | Cognition ledger projector; definition (experience signals); AI gateway (optional: LLM assistance for narrative wording/salience explanation). |
+| **Not responsible for** | Pixel-level layout rendering; writing world state. |
 
-### 2.4 PRESENTATION LAYER（呈现层）
+### 2.4 PRESENTATION LAYER
 
-| 项 | 内容 |
+| Item | Content |
 | :--- | :--- |
-| **职责** | 将呈现计划实例化为实际 UI：布局引擎（5 空间原语编排）、Block 注册表（渲染器映射）、世界主题（tokens/排版/氛围）。 |
-| **输入** | PresentationPlan；观察者视图（投影后的数据子集）；世界定义体验信号。 |
-| **输出** | 渲染界面（React/未来任意前端）。 |
-| **归属** | 前端团队/平台层；与领域无关。 |
-| **依赖** | 体验服务（计划）；注册表（渲染器）。 |
-| **不负责** | 世界模拟；内容生成（Block 只渲染已投影的数据，不自行生成领域内容）。 |
+| **Responsibility** | Instantiating the presentation plan into the actual UI: layout engine (5 spatial primitives orchestration), Block registry (renderer mapping), world theme (tokens/typography/atmosphere). |
+| **Input** | PresentationPlan; observer view (projected data subset); world definition experience signals. |
+| **Output** | Rendered interface (React / any future frontend). |
+| **Ownership** | Frontend team / platform layer; domain-agnostic. |
+| **Dependencies** | Experience service (plan); registry (renderers). |
+| **Not responsible for** | World simulation; content generation (Blocks only render already-projected data, they do not generate domain content themselves). |
 
-### 2.5 PERSISTENCE（持久化）
+### 2.5 PERSISTENCE
 
-| 项 | 内容 |
+| Item | Content |
 | :--- | :--- |
-| **职责** | 事件日志（追加写）、定期快照、玩家数据（绑定/笔记/偏好）、生成制品（图片/文档，内容寻址引用）、世界定义版本库。 |
-| **输入** | 内核产出的事件与快照；用户笔记；制品 URL。 |
-| **输出** | 恢复会话、分支、导出（世界档案）。 |
-| **归属** | 分层：定义→作者；日志+状态→运行时；玩家数据→用户；制品→运行时+用户共有。 |
-| **依赖** | 内核（订阅事件流）。 |
-| **不负责** | 计算、渲染。 |
+| **Responsibility** | Event log (append-only writes), periodic snapshots, player data (bindings/notes/preferences), generated artifacts (images/documents, content-addressed references), world definition version repository. |
+| **Input** | Events and snapshots produced by the kernel; user notes; artifact URLs. |
+| **Output** | Resuming sessions, branching, exporting (world archive). |
+| **Ownership** | Layered: definitions → author; log + state → runtime; player data → user; artifacts → jointly owned by runtime and user. |
+| **Dependencies** | Kernel (subscribes to event stream). |
+| **Not responsible for** | Computation, rendering. |
 
-### 2.6 AI GATEWAY（AI 网关）
+### 2.6 AI GATEWAY
 
-| 项 | 内容 |
+| Item | Content |
 | :--- | :--- |
-| **职责** | 多提供商路由（DeepSeek/Gemini/本地回退）；四类任务：① 代理决策（感知→意图→动作）；② 意图解析（玩家文本→结构化候选事件）；③ 叙事措辞（把事件变成文字）；④ 世界定义合成（AI 作者）。 |
-| **输入** | 任务类型 + 上下文（投影后的视图、定义、事件）。 |
-| **输出** | 决策/候选事件/文本/定义片段。 |
-| **归属** | 基础设施层。 |
-| **依赖** | 提供商 API。 |
-| **不负责** | **写入世界状态**。所有产出必须以候选事件形式经内核进入世界。 |
+| **Responsibility** | Multi-provider routing (DeepSeek/Gemini/local fallback); four task classes: ① agent decisions (perceive→intent→action); ② intent parsing (player text→structured candidate event); ③ narrative wording (turning events into text); ④ world definition synthesis (AI author). |
+| **Input** | Task type + context (projected view, definition, events). |
+| **Output** | Decisions / candidate events / text / definition fragments. |
+| **Ownership** | Infrastructure layer. |
+| **Dependencies** | Provider APIs. |
+| **Not responsible for** | **Writing world state.** All outputs must enter the world as candidate events through the kernel. |
 
-### 2.7 WORLD ATLAS（世界图册）
+### 2.7 WORLD ATLAS
 
-| 项 | 内容 |
+| Item | Content |
 | :--- | :--- |
-| **职责** | 世界目录（400+）、金标准基准（50）、测试基准（4 个表示基准世界）、评分框架。 |
-| **输入** | 用户查询/筛选。 |
-| **输出** | 条目 → 作者模板（转化为 WorldDefinition 的起点）；基准 → 内核回归测试。 |
-| **归属** | 数据资产。 |
-| **依赖** | 无（被定义服务与测试消费）。 |
-| **不负责** | 运行；不包含实例状态。 |
+| **Responsibility** | World catalog (400+), gold-standard baselines (50), test baselines (4 representative baseline worlds), scoring framework. |
+| **Input** | User queries/filters. |
+| **Output** | Entries → author templates (a starting point for producing a WorldDefinition); baselines → kernel regression tests. |
+| **Ownership** | Data asset. |
+| **Dependencies** | None (consumed by the definition service and tests). |
+| **Not responsible for** | Running; does not contain instance state. |
 
 ---
 
-## 3. 依赖规则（DEPENDENCY RULES）
+## 3. Dependency Rules
 
-1. **依赖方向**：呈现层 → 体验服务 → 运行时 → 定义服务；运行时 → AI 网关（仅回调）。任何子系统不得反向依赖。
-2. **写入权限**：只有运行时写入世界状态。体验服务、呈现层、图册、AI 网关只读。
-3. **数据契约**：子系统间的边界是类型（`WorldDefinition`、`WorldStateInstance`、`SimulationEvent`、`EpistemicPerspective`、`PresentationPlan`），而不是 JSON 自由形态或文本前缀。
-4. **叙事与真相分离**：LLM 生成的散文（叙事措辞）是呈现层的输入，永不被视为状态的一部分；状态中的叙事字段（如 `currentSituationNarrative`）必须是事件的派生摘要，且可由日志重建。
-5. **可替换性**：UI 可替换（换前端不换内核）；代理可替换（换决策策略不换内核）；存储可替换（换数据库不换内核）。内核是契约的锚点。
+1. **Dependency direction**: presentation layer → experience service → runtime → definition service; runtime → AI gateway (callbacks only). No subsystem may depend in the reverse direction.
+2. **Write permission**: only the runtime writes world state. The experience service, presentation layer, atlas, and AI gateway are read-only.
+3. **Data contracts**: the boundaries between subsystems are types (`WorldDefinition`, `WorldStateInstance`, `SimulationEvent`, `EpistemicPerspective`, `PresentationPlan`), not free-form JSON or text prefixes.
+4. **Narrative/truth separation**: LLM-generated prose (narrative wording) is input to the presentation layer and is never treated as part of state; narrative fields in state (such as `currentSituationNarrative`) must be derived summaries of events and must be reconstructable from the log.
+5. **Replaceability**: the UI is replaceable (swap frontends without swapping the kernel); agents are replaceable (swap decision policies without swapping the kernel); storage is replaceable (swap databases without swapping the kernel). The kernel is the anchor of the contract.
 
 ---
 
-## 4. 与原型现状的映射（MIGRATION MAP）
+## 4. Migration Map (MIGRATION MAP)
 
-| 现状 | 迁移到 |
+| Current State | Migrate To |
 | :--- | :--- |
-| `App.tsx` 中 `useState<WorldState>` | 运行时状态存储（经事件内核更新的 `WorldStateInstance`） |
-| `server.ts` 单轮巨型 JSON 端点 | AI 网关四类任务的工具化端点 |
-| `computeUIPlan` 规则树 | Experience Service 的显著性 + 呈现计划 |
-| `renderer.tsx` 3 列网格 | Presentation Layer 的布局引擎 |
-| `localStorage` 世界+编年史 | 事件日志 + 快照 + 玩家数据分层持久化 |
-| `[DIRECTOR INTERVENTION]` 前缀 | 主持人干预事件（带权限与溯源） |
-| `engine.ts` 关键词匹配 | 定义合成（LLM 产出定义）+ 确定性实例化 + 确定性回退 |
+| `useState<WorldState>` in `App.tsx` | Runtime state storage (a `WorldStateInstance` updated via the event kernel) |
+| Monolithic single-turn JSON endpoint in `server.ts` | Tool-oriented endpoints for the AI gateway's four task classes |
+| `computeUIPlan` rules tree | Experience Service's salience + presentation plan |
+| `renderer.tsx` 3-column grid | Presentation Layer's layout engine |
+| `localStorage` world + chronicle | Layered persistence of event log + snapshots + player data |
+| `[DIRECTOR INTERVENTION]` prefix | Host intervention event (with permissions and provenance) |
+| `engine.ts` keyword matching | Definition synthesis (LLM-produced definition) + deterministic instantiation + deterministic fallback |

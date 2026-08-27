@@ -1,136 +1,136 @@
-# HeadConan 架构决策记录（ARCHITECTURAL DECISIONS）
+# HeadConan Architectural Decisions
 
-> 每条决策遵循固定格式：**问题 / 选项 / 决策 / 理由 / 代价 / 什么会让我们改变主意**。
-> 最后一项至关重要：架构必须保持可证伪。
-
----
-
-## ADR-1 内核形态：事件转移内核（而非图/状态机/代理社会）
-
-- **问题**：HeadConan 的重心应是什么？一个世界图、一个状态机、一个事件引擎、一个代理社会，还是一个模拟运行时？
-- **选项**：A) 世界图（实体+关系为内核）；B) 状态机；C) 事件引擎；D) 代理社会；E) 模拟运行时（精确定义）。
-- **决策**：**E，精确定义为「世界转移内核」**：纯函数 `State × Event → { State′, Events, Observations, rejected? }`，由规则驱动，是唯一写入者。
-- **理由**：① 它是所有正确性的汇聚点（确定性/前提/级联/观察/溯源都在此裁决）；② 它使「世界独立于界面」成立（一切子系统以它的契约为界）；③ 它统一 Player/Host/Agent（区别只在事件生产方式与权限）；④ 可测试（四个基准世界回归）。
-- **代价**：需要投入把规则引擎做对；调度与预算控制是额外复杂度；拒绝「图/代理」直觉的诱惑。
-- **什么会改变我们的主意**：若在真实场景中发现「规则外推演」（完全自由形式的 LLM 因果）占比过高、确定性记账成为瓶颈，且事件日志重放/回滚从未被用到——则退化为「LLM 直写状态 + 纯审计日志」。
+> Each decision follows a fixed format: **Problem / Options / Decision / Rationale / Cost / What would change our mind**.
+> The last item is crucial: the architecture must remain falsifiable.
 
 ---
 
-## ADR-2 运行节奏：双节奏（用户循环 + 世界 tick），共用内核
+## ADR-1 Kernel Shape: Event Transition Kernel (not graph / state machine / agent society)
 
-- **问题**：世界如何推进？纯用户驱动、纯事件驱动、纯 actor，还是混合？
-- **选项**：A) 单循环（用户输入→一步转移）；B) 纯事件驱动（分发处理器）；C) 纯 actor（消息传递）；D) 双节奏单内核。
-- **决策**：**D**。用户循环（意图→事件→内核→排水→呈现）与世界 tick（代理感知→决策→动作）共用 `applyEvent`。
-- **理由**：A 无法表达自主世界与延迟后果；B/C 时序非确定、难回放；D 把「确定性记账」与「非确定性决策」分离，支持离线演化与在线增量呈现。
-- **代价**：调度器 + 排水预算（防级联爆炸）；「tick 结果挑重要的呈现」需要显著性层（P6）配合。
-- **什么会改变我们的主意**：若自主 tick 导致用户感知失控（世界在用户看不到时跑偏），且「用户回合制」被证明体验更好——则回归 A，把 tick 仅用于延迟后果。
-
----
-
-## ADR-3 事件模型：五概念区分，但事件日志是唯一存储脊柱
-
-- **问题**：Action / Event / StateChange / Observation / Consequence 应否合并？
-- **选项**：A) 全部合并为一个「变化对象」；B) 各自独立存储；C) 语义区分、物理单层（日志）。
-- **决策**：**C**。动作是输入，事件是日志记录，状态变化与观察是事件的投影，后果是排队事件。**只有事件日志被持久化。**
-- **理由**：语义不合并（否则无法表达「攻击失败但被看到」），物理不重复（避免多真相源）。
-- **代价**：需要一套事件类型系统与投影规则；物化观察（写回认知记录）需谨慎设计以保持与日志一致。
-- **什么会改变我们的主意**：若观察/状态派生在重放时成本过高且无法增量，则允许「物化快照 + 日志校验」，但快照必须可证明是日志的函数。
+- **Problem**: What should be the center of gravity of HeadConan? A world graph, a state machine, an event engine, an agent society, or a simulation runtime?
+- **Options**: A) World graph (entities + relationships as kernel); B) State machine; C) Event engine; D) Agent society; E) Simulation runtime (precisely defined).
+- **Decision**: **E, precisely defined as the "world transition kernel"**: the pure function `State × Event → { State′, Events, Observations, rejected? }`, rule-driven and the single writer.
+- **Rationale**: ① It is the convergence point of all correctness (determinism/preconditions/cascade/observation/provenance are all adjudicated here); ② It makes "the world is independent of the interface" hold (all subsystems are bounded by its contract); ③ It unifies Player/Host/Agent (the only difference is in how events are produced and permissions); ④ It is testable (regression over the four baseline worlds).
+- **Cost**: Requires investment to get the rules engine right; the scheduler and budget control are extra complexity; resisting the temptation of the "graph/agent" intuition.
+- **What would change our mind**: If in real scenarios "out-of-rule inference" (fully free-form LLM causality) occupies too large a share, deterministic bookkeeping becomes a bottleneck, and event-log replay/rollback is never actually used — then degrade to "LLM writes state directly + pure audit log".
 
 ---
 
-## ADR-4 信息不对称：认知账本 + 投影函数（不做完整认知逻辑）
+## ADR-2 Runtime Cadence: Dual-cadence (user loop + world tick), sharing one kernel
 
-- **问题**：如何处理 真相 ≠ 认知 ≠ 感知？
-- **选项**：A) 完整认知逻辑（可能世界/知识算子）；B) 认知账本（knownFacts 归属）+ 纯读投影；C) 角色可见性掩码。
-- **决策**：**B**。事实层带可见域与溯源；认知记录只存「实体→已知事实 ID + 信念」；观察是唯一写入通道；投影在呈现时执行。
-- **理由**：A 过度工程；C 无法表达信念（错误认知）与秘密的暴露动力学；B 在表达力与复杂度间平衡，且已被 `representation/` 部分实现。
-- **代价**：信念演化规则尚未定义（见 OPEN_QUESTIONS）；「泄漏」bug 可能藏在使用投影结果之外的直读路径上——需要纪律与测试。
-- **什么会改变我们的主意**：若出现「同一事实在同一实体上需要两个互相矛盾的信念版本且都重要」的场景，升级 Belief 为带情境的列表。
-
----
-
-## ADR-5 角色/代理/玩家/主持人：绑定模型，而非类继承
-
-- **问题**：Entity / Character / Agent / NPC / Player / Host 应如何分离？
-- **选项**：A) 六类各自的类层次；B) 实体（含心智）+ 运行时控制绑定；C) Player 就是「被人类控制的 NPC」。
-- **决策**：**B**。Character = 有心智的实体；Agent = 实体 + `AgentBinding(controller: player|ai|script|none)`；Player/Host = 视角 + 代理权 + 绑定 + 认知边界；统一 `Controller` 接口（perceive→decide→候选事件）。
-- **理由**：A 制造特殊案例丛林；C 是错误隐喻（玩家是视角不是 NPC）；B 使「一个玩家控制多个角色」「NPC 被玩家临时接管」「主持人同时是角色」零特殊代码。
-- **代价**：绑定状态需随实例持久化；切换绑定（接管/释放）是运行时操作，需在 P4 定义清楚。
-- **什么会改变我们的主意**：若出现「控制器本身需要世界内身份」（例如 AI 角色需要被其他 AI 当作角色对待），扩展 Controller 而非打破绑定模型。
+- **Problem**: How does the world advance? Pure user-driven, pure event-driven, pure actor, or hybrid?
+- **Options**: A) Single loop (user input → one transition); B) Pure event-driven (dispatch handlers); C) Pure actor (message passing); D) Dual-cadence single kernel.
+- **Decision**: **D**. The user loop (intent → event → kernel → drain → present) and the world tick (agent perceives → decides → acts) share `applyEvent`.
+- **Rationale**: A cannot express an autonomous world and delayed consequences; B/C have non-deterministic timing and are hard to replay; D separates "deterministic bookkeeping" from "non-deterministic decision", supporting offline evolution and online incremental presentation.
+- **Cost**: Scheduler + drain budget (to prevent cascade explosion); "present only the important results of a tick" needs the salience layer (P6) to cooperate.
+- **What would change our mind**: If autonomous ticks cause the user to lose a sense of control (the world drifts while the user isn't looking), and "user-turn-based" proves to be the better experience — then revert to A, using ticks only for delayed consequences.
 
 ---
 
-## ADR-6 主持人：角色+权限+透镜，走同一内核（不建第二引擎）
+## ADR-3 Event Model: Five-concept distinction, but the event log is the sole storage spine
 
-- **问题**：Host 是角色、权限、模式还是视角？需要独立引擎吗？
-- **选项**：A) 独立主机引擎；B) 文本前缀伪装（现状）；C) 角色+权限+全知透镜，干预为带溯源的事件。
-- **决策**：**C**。干预 = `directorial_intervention` / `define_modification` 事件（溯源 `player_directive`），经同一内核与权限校验；全知 = 投影参数（observer 为空），不改变状态。
-- **理由**：A 会制造两套真相；B 是已知缺陷；C 保持「唯一写入者」不变式，主持人能力全部可日志化、可回滚。
-- **代价**：需要权限模型（谁能干预什么范围）；「改规则」需要定义版本化 diff。
-- **什么会改变我们的主意**：若主持人操作的吞吐量（批量改几十个实体）使事件方式不可接受，可加「批量事件」原语，但必须仍是事件。
-
----
-
-## ADR-7 体验层：独立的显著性抽象（不是 UI 计划的别名）
-
-- **问题**：呈现之前是否需要一个「意义/显著性」层？
-- **选项**：A) 直接渲染状态；B) UI 计划由规则树生成（现状）；C) 显著性 → 体验状态 → 呈现计划三级派生。
-- **决策**：**C**。`Significance`（什么变了/什么紧急/什么戏剧化）→ `ExperienceState` → `PresentationPlan` → 布局引擎。
-- **理由**：A 会把整个世界倒给用户；B 无注意力模型；C 让「世界如何变化」与「用户该看什么」正交，且可解释（FocusScore 四因子）。
-- **代价**：多一层计算；显著性标定（权重）需要四基准世界调优。
-- **什么会改变我们的主意**：若显著性输出与用户直觉频繁冲突且无法通过权重修复，改为「用户显式关注 + 事件流」混合驱动。
+- **Problem**: Should Action / Event / StateChange / Observation / Consequence be merged?
+- **Options**: A) Merge all into one "change object"; B) Store each independently; C) Semantic distinction, single physical layer (the log).
+- **Decision**: **C**. Action is input, event is a log record, state change and observation are projections of the event, consequence is a queued event. **Only the event log is persisted.**
+- **Rationale**: Semantics are not merged (otherwise one cannot express "the attack failed but was seen"); physically not duplicated (avoids multiple sources of truth).
+- **Cost**: Requires an event type system and projection rules; materializing observations (writing back into cognitive records) must be carefully designed to stay consistent with the log.
+- **What would change our mind**: If observation/state derivation is too expensive to replay and cannot be done incrementally, then allow "materialized snapshot + log verification", but the snapshot must be provably a function of the log.
 
 ---
 
-## ADR-8 布局：动态信息空间 + 5 原语 + 显式焦点（不是屏幕集合）
+## ADR-4 Information Asymmetry: Cognition Ledger + Projection Function (no full cognitive logic)
 
-- **问题**：HeadConan 是屏幕集合还是动态信息空间？最小布局语法是什么？
-- **选项**：A) 屏幕路由；B) 固定网格（现状）；C) 动态信息空间：5 原语 + 焦点对象。
-- **决策**：**C**。Anchor/Stage/Satellite/Ambient/Dock + 显式 `Focus`（type/targetId/activity/sticky/origin），Stage 形态与 Satellite 内容由焦点驱动，FLIP 过渡。
-- **理由**：LAYOUT_RESEARCH 14 问的完整推理（见该文档）；焦点缺失是现有 5 原语设计无法实现的原因。
-- **代价**：布局引擎实现成本高；自动形态切换可能让用户眩晕（需 sticky 锁定缓解）。
-- **什么会改变我们的主意**：若六场景矩阵证明 5 原语不足（出现需要第六原语的场景），扩展原语集而非退回屏幕。
-
----
-
-## ADR-9 世界定义：组合结构，不新增文化/机构/地理类
-
-- **问题**：WorldDefinition 需要为文化、机构、地理、角色、组织等各建类吗？
-- **选项**：A) 每类别一个类；B) 最小组合体（公理+本体+基线+动力学+可能性空间+体验信号）。
-- **决策**：**B**。机构=OrganizationEntity+规范；文化=公理+规范+体验信号的涌现；地理=LocationEntity+关系。
-- **理由**：类别增长会以类爆炸告终；组合体已被四个基准世界验证够用。
-- **代价**：某些「文化直觉」（如服装、饮食）需要显式表达为对象/属性/公理，作者负担略高。
-- **什么会改变我们的主意**：若多个世界出现「同样的文化结构需要重复声明」，提炼为可复用的定义片段（snippet），而非新类。
+- **Problem**: How to handle truth ≠ cognition ≠ perception?
+- **Options**: A) Full cognitive logic (possible worlds / knowledge operators); B) Cognition ledger (knownFacts attribution) + pure-read projection; C) Character visibility mask.
+- **Decision**: **B**. The fact layer carries visibility domain and provenance; the cognitive record stores only "entity → known fact IDs + beliefs"; observation is the sole write channel; projection happens at presentation time.
+- **Rationale**: A is over-engineered; C cannot express beliefs (false cognition) and the exposure dynamics of secrets; B balances expressiveness and complexity, and is already partly implemented by `representation/`.
+- **Cost**: Belief evolution rules are not yet defined (see OPEN_QUESTIONS); "leak" bugs may hide in direct-read paths that bypass the projection result — requires discipline and testing.
+- **What would change our mind**: If a scenario arises where "the same fact on the same entity needs two contradictory belief versions, both important", upgrade Belief to a context-bearing list.
 
 ---
 
-## ADR-10 信念归属：从定义迁到状态
+## ADR-5 Character / Agent / Player / Host: Binding Model, not class inheritance
 
-- **问题**：`CharacterEntity.beliefs` 应留在定义还是进入状态？
-- **选项**：A) 静态定义数组（现状）；B) 运行时状态，定义只留初始种子。
-- **决策**：**B**。信念随观察/事件演化；定义中的 `knownFactIds`/`beliefs` 仅作实例化种子；运行时以 `epistemics` 为准（消除双源）。
-- **理由**：静态信念与模拟冲突（Loid 的信念必须能随证据漂移）。
-- **代价**：需要迁移与一条数据迁移规则（旧世界数据升级）。
-- **什么会改变我们的主意**：无——这是修正而非试探；若发现「信念从未变化」，则可退化，但预计不可能。
-
----
-
-## ADR-11 持久化：事件日志 + 快照 + 玩家数据分层（不是单对象，也不是上来就上云）
-
-- **问题**：什么需要持久化，以何种形态？
-- **选项**：A) 单对象 JSON（现状）；B) 事件日志+周期快照+玩家数据分层；C) 立即云数据库。
-- **决策**：**B**。日志为真相（可重放/分支/回滚），快照为性能，玩家数据（笔记/绑定/偏好）独立于世界状态；云同步推迟（P8b 之后）。
-- **理由**：A 无法表达历史/分支/回滚；C 在会话模型未验证前过早（且单机验证更便宜）。
-- **代价**：日志增长需要压缩策略（快照合并）；存储层抽象需稳定（后续可换云端）。
-- **什么会改变我们的主意**：若真实用户会话超长且快照压缩频繁失败，引入分段日志（epoch）——但分层原则不变。
+- **Problem**: How should Entity / Character / Agent / NPC / Player / Host be separated?
+- **Options**: A) Six separate class hierarchies; B) Entity (with mind) + runtime control binding; C) Player is "an NPC controlled by a human".
+- **Decision**: **B**. Character = entity with a mind; Agent = entity + `AgentBinding(controller: player|ai|script|none)`; Player/Host = perspective + agency + binding + cognitive boundary; a unified `Controller` interface (perceive → decide → candidate event).
+- **Rationale**: A creates a jungle of special cases; C is the wrong metaphor (the player is a perspective, not an NPC); B makes "one player controls multiple characters", "an NPC temporarily taken over by a player", "a host who is also a character" require zero special-case code.
+- **Cost**: Binding state must persist with the instance; switching bindings (takeover/release) is a runtime operation that must be clearly defined in P4.
+- **What would change our mind**: If a scenario arises where "the controller itself needs an in-world identity" (e.g., an AI character must be treated as a character by other AIs), extend the Controller rather than breaking the binding model.
 
 ---
 
-## ADR-12 LLM 的职责边界：决策是 LLM，记账是确定性；世界不携带 UI
+## ADR-6 Host: Character + Permission + Lens, through the same kernel (no second engine)
 
-- **问题**：LLM 在世界运行时中扮演什么角色？
-- **选项**：A) LLM 直写完整状态+UI 计划（现状）；B) LLM 决策（代理意图/叙事措辞/定义合成），记账与布局完全确定性；C) 全确定性无 LLM。
-- **决策**：**B**。LLM 产出：意图解析候选、代理决策、叙事措辞、定义合成片段；**不得**：直接写状态、设计布局、持有真相。
-- **理由**：A 是已知的 schema 漂移与成本源，且违反「世界独立于界面」；C 无表达力。
-- **代价**：需要「候选事件」校验器把 LLM 输出转化为合法事件（P3）；需要防「叙事泄漏」（措辞由投影视图生成）。
-- **什么会改变我们的主意**：若结构化工具调用在意图解析上长期失败（歧义不可收敛），引入「LLM 事件提议 + 人工确认」模式，但边界不变。
+- **Problem**: Is the Host a character, a permission, a mode, or a perspective? Does it need a separate engine?
+- **Options**: A) Independent host engine; B) Text-prefix disguise (current state); C) Character + permission + omniscient lens, with intervention as a provenance-bearing event.
+- **Decision**: **C**. Intervention = `directorial_intervention` / `define_modification` event (provenance `player_directive`), through the same kernel with permission validation; omniscience = a projection parameter (observer empty), does not change state.
+- **Rationale**: A creates two sources of truth; B is a known defect; C preserves the "single writer" invariant, and all host capabilities are fully loggable and rollbackable.
+- **Cost**: Requires a permission model (who can intervene in what scope); "changing rules" needs a defined versioned diff.
+- **What would change our mind**: If the host's operational throughput (batch-editing dozens of entities) makes the event approach unacceptable, add a "batch event" primitive, but it must still be an event.
+
+---
+
+## ADR-7 Experience Layer: An independent salience abstraction (not an alias for the UI plan)
+
+- **Problem**: Is a "meaning/salience" layer needed before presentation?
+- **Options**: A) Render state directly; B) UI plan generated by a rules tree (current state); C) Salience → experience state → presentation plan, a three-stage derivation.
+- **Decision**: **C**. `Significance` (what changed / what is urgent / what is dramatic) → `ExperienceState` → `PresentationPlan` → layout engine.
+- **Rationale**: A would dump the whole world on the user; B has no attention model; C makes "how the world changes" orthogonal to "what the user should see", and is explainable (FocusScore four factors).
+- **Cost**: One extra layer of computation; salience calibration (weights) needs tuning over the four baseline worlds.
+- **What would change our mind**: If salience output frequently conflicts with user intuition and cannot be fixed via weights, switch to a hybrid driven by "explicit user focus + event stream".
+
+---
+
+## ADR-8 Layout: Dynamic information space + 5 primitives + explicit focus (not a set of screens)
+
+- **Problem**: Is HeadConan a set of screens or a dynamic information space? What is the minimal layout syntax?
+- **Options**: A) Screen routing; B) Fixed grid (current state); C) Dynamic information space: 5 primitives + focus object.
+- **Decision**: **C**. Anchor/Stage/Satellite/Ambient/Dock + explicit `Focus` (type/targetId/activity/sticky/origin); Stage mode and Satellite content are driven by focus, with FLIP transitions.
+- **Rationale**: The full reasoning of the LAYOUT_RESEARCH 14 questions (see that document); the missing focus is why the existing 5-primitive design cannot be realized.
+- **Cost**: High cost of implementing the layout engine; automatic mode switching may cause user dizziness (mitigated with sticky lock).
+- **What would change our mind**: If the six-scenario matrix proves 5 primitives insufficient (a scenario requiring a sixth primitive appears), extend the primitive set rather than reverting to screens.
+
+---
+
+## ADR-9 World Definition: Compositional structure, no new culture/institution/geography classes
+
+- **Problem**: Does WorldDefinition need a separate class for culture, institution, geography, character, organization, etc.?
+- **Options**: A) One class per category; B) Minimal composition (axioms + ontology + baseline + dynamics + possibility space + experience signals).
+- **Decision**: **B**. Institution = OrganizationEntity + norms; culture = emergence of axioms + norms + experience signals; geography = LocationEntity + relationships.
+- **Rationale**: Category growth ends in class explosion; the compositional approach is already validated as sufficient by the four baseline worlds.
+- **Cost**: Some "cultural intuitions" (e.g., clothing, diet) need to be explicitly expressed as objects/attributes/axioms, slightly increasing author burden.
+- **What would change our mind**: If multiple worlds show "the same cultural structure needing to be re-declared repeatedly", extract it into a reusable definition snippet rather than a new class.
+
+---
+
+## ADR-10 Belief Attribution: Migrate from definition to state
+
+- **Problem**: Should `CharacterEntity.beliefs` stay in the definition or move into the state?
+- **Options**: A) Static definition array (current state); B) Runtime state, with the definition keeping only the initial seed.
+- **Decision**: **B**. Beliefs evolve with observations/events; `knownFactIds`/`beliefs` in the definition serve only as instantiation seeds; at runtime `epistemics` is authoritative (eliminating the dual source).
+- **Rationale**: Static beliefs conflict with the simulation (Loid's beliefs must be able to drift with evidence).
+- **Cost**: Requires a migration and a data-migration rule (upgrading old world data).
+- **What would change our mind**: None — this is a correction, not a probe; if it turns out "beliefs never change", it could degrade, but that is not expected.
+
+---
+
+## ADR-11 Persistence: Event log + snapshot + player-data layering (not a single object, nor jumping to cloud)
+
+- **Problem**: What needs to be persisted, and in what form?
+- **Options**: A) Single-object JSON (current state); B) Event log + periodic snapshots + player-data layering; C) Immediate cloud database.
+- **Decision**: **B**. The log is the truth (replayable/branchable/rollbackable), snapshots are for performance, and player data (notes/bindings/preferences) is independent of world state; cloud sync is deferred (after P8b).
+- **Rationale**: A cannot express history/branching/rollback; C is premature before the session model is validated (and single-machine validation is cheaper).
+- **Cost**: Log growth needs a compaction strategy (snapshot merging); the storage layer abstraction must be stable (swappable for cloud later).
+- **What would change our mind**: If real user sessions run very long and snapshot compaction frequently fails, introduce segmented logs (epoch) — but the layering principle remains.
+
+---
+
+## ADR-12 LLM Responsibility Boundary: Decisions are LLM, bookkeeping is deterministic; the world carries no UI
+
+- **Problem**: What role does the LLM play in the world runtime?
+- **Options**: A) LLM writes complete state + UI plan directly (current state); B) LLM decides (agent intent / narrative phrasing / definition synthesis), bookkeeping and layout fully deterministic; C) Fully deterministic, no LLM.
+- **Decision**: **B**. The LLM produces: intent-parse candidates, agent decisions, narrative phrasing, definition synthesis fragments; **must not**: write state directly, design layout, or hold truth.
+- **Rationale**: A is a known source of schema drift and cost, and violates "the world is independent of the interface"; C lacks expressiveness.
+- **Cost**: Requires a "candidate event" validator to convert LLM output into legal events (P3); requires guarding against "narrative leakage" (phrasing generated by the projection view).
+- **What would change our mind**: If structured tool calls chronically fail at intent parsing (ambiguity that cannot converge), introduce an "LLM event proposal + human confirmation" mode, but the boundary remains.

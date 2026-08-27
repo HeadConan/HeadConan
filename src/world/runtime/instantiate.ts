@@ -58,7 +58,8 @@ export function instantiate(world: WorldDefinition, opts: InstantiateOptions = {
 
 /**
  * 从定义合成初始状态（无手写基态时的确定性默认）。
- * 覆盖：实体快照（primaryLocationId / publicReputationScore → 状态字段）、
+ * 覆盖：实体快照（primaryLocationId / currentActivity / emotionalState /
+ *       publicReputationScore / physicalStatus → 状态字段）、
  *       关系动态值（基线 → current*）、认知种子（knownFactIds + universal_public）、
  *       资源池（quantity → pool）。
  */
@@ -68,8 +69,8 @@ export function synthesizeInitialState(world: WorldDefinition): WorldStateInstan
     entityStates[c.id] = {
       entityId: c.id,
       currentLocationId: c.primaryLocationId,
-      currentActivity: '',
-      emotionalState: '',
+      currentActivity: c.currentActivity ?? '',
+      emotionalState: c.emotionalState ?? '',
       reputationScore: c.publicReputationScore ?? 50,
       physicalStatus: c.physicalStatus ?? 'healthy',
       dynamicAttributes: {},

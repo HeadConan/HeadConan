@@ -1,105 +1,105 @@
-# HeadConan 运行时循环（RUNTIME_LOOP）
+# HeadConan Runtime Loop (RUNTIME_LOOP)
 
-> 回答：世界如何「走一步」？为什么是双节奏？备选方案为何被否决？
-
----
-
-## 1. 结论：双节奏、单内核
-
-- **一个内核**（唯一写入者）：`applyEvent(state, def, event) → { nextState, spawnedEvents, observations, rejected? }`。
-- **两个节奏**：
-  1. **用户循环**（响应式）：用户意图 → 事件 → 内核 → 排水 → 呈现。
-  2. **世界 tick**（自主式）：代理感知→决策→动作（可独立于用户输入推进，受调度器触发）。
-
-两者共用内核；区别只在「谁产生候选事件」与「推进多少次」。
+> Answers: how does the world "take a step"? Why the dual cadence? Why were the alternatives rejected?
 
 ---
 
-## 2. 用户循环（USER CYCLE）—— 详细步骤
+## 1. Conclusion: Dual-Cadence, Single Kernel
+
+- **One kernel** (sole writer): `applyEvent(state, def, event) → { nextState, spawnedEvents, observations, rejected? }`.
+- **Two cadences**:
+  1. **User cycle** (reactive): user intent → event → kernel → drain → presentation.
+  2. **World tick** (autonomous): agent perceives → decides → acts (can advance independently of user input, triggered by the scheduler).
+
+Both share the kernel; they differ only in "who produces the candidate event" and "how many times it advances".
+
+---
+
+## 2. User Cycle — Detailed Steps
 
 ```
-① 捕获用户意图
-   文本/点选/拖拽（多模态目标）
+① Capture user intent
+   text/click/drag (multimodal goal)
         │
-② 意图解析（LLM 辅助 + 确定性校正）
-   自由文本 → { verb, target(实体解析), payload, context }
-   失败 → 澄清反馈（不产生事件）
+② Intent parsing (LLM-assisted + deterministic correction)
+   free text → { verb, target (entity resolution), payload, context }
+   failure → clarification feedback (no event produced)
         │
-③ 构造候选事件（动作→事件）
-   intent → CandidateEvent（校验角色权限、动作类别可用性）
+③ Construct candidate event (action → event)
+   intent → CandidateEvent (validate character permission, action category availability)
         │
-④ 内核应用（唯一写入）
-   前提校验 → 效果 → 观察派生 → 后果排队 → 日志追加
-   被拒绝 → 拒绝理由进入体验层（"因为你不在场"也是体验）
+④ Kernel application (sole write)
+   precondition validation → effect → observation derivation → consequence queueing → log append
+   rejected → rejection reason goes to experience layer ("because you weren't present" is also an experience)
         │
-⑤ 排水调度队列（有界）
-   处理本轮触发的延迟事件直到队列稳定或达到预算（防级联爆炸）
+⑤ Drain scheduling queue (bounded)
+   process delayed events triggered this round until the queue stabilizes or the budget is hit (prevent cascade explosion)
         │
-⑥ 认知副作用落定
-   observations 写回 entityKnownFacts / beliefs / rumors
+⑥ Cognition side-effects settle
+   observations written back to entityKnownFacts / beliefs / rumors
         │
-⑦ 计算显著性（体验服务）
-   事件增量 + 投影视图 + ExperienceProfile → ExperienceState
-   （什么变了 / 什么紧急 / 什么戏剧化 / 什么不确定）
+⑦ Compute salience (experience service)
+   event delta + projected view + ExperienceProfile → ExperienceState
+   (what changed / what is urgent / what is dramatic / what is uncertain)
         │
-⑧ 投影观察者视图
+⑧ Project observer view
    projectEpistemicPerspective(state, activeRole)
         │
-⑨ 生成呈现计划
-   焦点对象 + 舞台模式 + 卫星内容 + 环境指标 + 建议词条 + 基调
+⑨ Generate presentation plan
+   focus object + stage mode + satellite content + ambient metrics + suggested lexemes + tone
         │
-⑩ 布局引擎渲染（FLIP 过渡）
+⑩ Layout engine renders (FLIP transition)
         │
-⑪ 等待下一次用户输入
+⑪ Wait for next user input
 ```
 
-**预算纪律**：⑤ 必须有上限（如每回合最多 8 个连锁事件 + 最多 3 层深度），否则「我公开指控大臣」会无限连锁。
+**Budget discipline**: ⑤ must have an upper bound (e.g. at most 8 chained events per turn + at most 3 levels of depth), otherwise "I publicly accuse the minister" would cascade infinitely.
 
 ---
 
-## 3. 世界 tick（WORLD TICK）—— 自主推进
+## 3. World Tick — Autonomous Advancement
 
-何时发生：
+When it happens:
 
-| 触发 | 示例 |
+| Trigger | Example |
 | :--- | :--- |
-| 调度器触发 | 倒计时到期、截止日、预排日程（教授 2 小时后发邮件） |
-| 例行推进 | 校园世界每天早晨：NPC 上课、食堂偶遇 |
-| 代理主动 | 高主动性 NPC 在用户静默时推进自己的目标 |
-| 后果回流 | 上一回合排队的事件到期 |
+| Scheduler trigger | Countdown expires, deadline, pre-arranged schedule (professor sends email in 2 hours) |
+| Routine advancement | Campus world every morning: NPCs attend class, cafeteria encounters |
+| Agent initiative | High-initiative NPC advances its own goals while the user is silent |
+| Consequence reflux | Events queued in the previous turn come due |
 
 ```
 tick(state, def, budget):
   for i in budget:
-    stimulus = 调度队列.next() ∪ 主动性代理提案
-    if 无刺激: break
-    event = 代理.perceive(投影) → decide() → 候选事件
+    stimulus = scheduling_queue.next() ∪ initiative_agent_proposals
+    if no stimulus: break
+    event = agent.perceive(projection) → decide() → candidate event
     state = applyEvent(...)
-  用户循环恢复（若用户在线：呈现 tick 产生的显著变化）
+  user cycle resumes (if user online: present the salient changes produced by the tick)
 ```
 
-**关键点**：世界 tick 也经过同一内核、同一日志、同一显著性计算。**玩家离线时世界可以继续，但在线时 tick 结果必须能「挑重要的」呈现**——这就是显著性层存在的意义。
+**Key point**: the world tick also goes through the same kernel, the same log, the same salience computation. **The world can continue while the player is offline, but when online, the tick results must be able to "pick the important ones" for presentation** — this is the purpose of the salience layer's existence.
 
 ---
 
-## 4. 备选模型分析（为何否决）
+## 4. Alternative Model Analysis (why rejected)
 
-| 模型 | 是什么 | 优点 | 致命缺陷 |
+| Model | What it is | Advantage | Fatal flaw |
 | :--- | :--- | :--- | :--- |
-| **纯事件驱动**（仅事件→处理器） | 事件分发到各处理器 | 松耦合 | ① 无「谁先谁后」的确定性；② 处理器隐式改状态，难回放；③ 没有统一的候选事件校验入口 |
-| **纯 actor/消息传递** | 实体互相发消息，各自治 | 符合直觉 | ① 时序非确定，分支/回放不可靠；② 调试与测试困难；③ 需要消息总线，过度工程 |
-| **单循环状态机**（用户动作→转移） | 每次用户输入一步转移 | 简单 | ① 无法表达自主世界（NPC 不动）；② 无法表达延迟后果；③ 一切皆用户驱动，校园/阴谋世界失真 |
-| **双节奏单内核（采用）** | 用户循环 + 世界 tick 共用 reducer 内核 | ① 确定性记账 + 非确定性决策分离；② 可回放/可分支/可测试；③ 玩家/Host/代理统一；④ 支持自主世界 | 需要清晰的调度器与预算控制（已纳入设计） |
+| **Pure event-driven** (only event→handler) | Events dispatched to handlers | Loose coupling | ① No determinism for "who goes first"; ② handlers implicitly mutate state, hard to replay; ③ no unified candidate-event validation entry point |
+| **Pure actor/message passing** | Entities message each other, each autonomous | Intuitive | ① Non-deterministic ordering, unreliable branching/replay; ② debugging and testing difficult; ③ needs a message bus, over-engineering |
+| **Single-loop state machine** (user action→transition) | One step transition per user input | Simple | ① cannot express autonomous world (NPCs don't move); ② cannot express delayed consequences; ③ everything user-driven, distorts campus/conspiracy worlds |
+| **Dual-cadence single kernel (adopted)** | User cycle + world tick sharing a reducer kernel | ① separates deterministic bookkeeping from non-deterministic decisions; ② replayable/branchable/testable; ③ unified player/Host/agent; ④ supports autonomous world | Needs a clear scheduler and budget control (already incorporated into the design) |
 
-> 一句话：**事件驱动是「谁通知谁」，actor 是「谁驱动谁」，reducer 内核是「世界怎么变」。三者中只有 reducer 内核能承担「唯一真相写入者」，事件与 actor 都只是它的生产者。**
+> In one sentence: **event-driven is "who notifies whom", actor is "who drives whom", the reducer kernel is "how the world changes". Of the three, only the reducer kernel can bear the "sole truth writer"; events and actors are merely its producers.**
 
 ---
 
-## 5. 循环的边界条件与不变式
+## 5. Loop Boundary Conditions and Invariants
 
-1. **内核外无状态写入**。任何子系统（包括 AI 网关、呈现层）不得直接改状态。
-2. **事件不可变**。修正 = 新事件。
-3. **拒绝是事件**。前提不满足 → 拒绝记录入日志 → 体验层可呈现「尝试失败」。
-4. **排水有界**。防级联爆炸（预算配置在定义或运行时配置）。
-5. **投影在呈现前执行**。任何 UI/LLM 拿到的数据都先过认知投影。
-6. **确定性记账**：给定相同日志前缀，重放得到相同状态（代理决策的非确定性只影响「未来日志」，不影响「已发生」）。
+1. **No state writes outside the kernel.** No subsystem (including the AI gateway and presentation layer) may directly modify state.
+2. **Events are immutable.** Correction = a new event.
+3. **Rejection is an event.** Precondition unmet → rejection record enters the log → experience layer can present "attempt failed".
+4. **Drain is bounded.** Prevents cascade explosion (budget configured in the definition or runtime config).
+5. **Projection executed before presentation.** Any data an UI/LLM receives first passes through the cognition projection.
+6. **Deterministic bookkeeping**: given the same log prefix, replay yields the same state (non-determinism in agent decisions only affects the "future log", not the "already happened").
