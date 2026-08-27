@@ -6,6 +6,7 @@ import { applyWorldMutations } from '../world/mutations';
 import { EmptyPromptSpace } from '../components/world/EmptyPromptSpace';
 import { WorldGenesisAnimation } from '../components/world/WorldGenesisAnimation';
 import { Header } from '../components/layout/Header';
+import { AppSidebar, SidebarItemId } from '../components/layout/AppSidebar';
 import { WorldCanvasRenderer } from '../ui/renderer';
 import { ActionDock } from '../components/layout/ActionDock';
 import { ChronicleModal } from '../components/world/ChronicleModal';
@@ -14,7 +15,7 @@ import { WorldAtlasExplorer } from '../components/atlas/WorldAtlasExplorer';
 import { LayoutLab } from '../components/layout/LayoutLab';
 import { computeUIPlan } from '../interface/director';
 import { RoleSlot } from '../roles/model';
-import { Sparkles, Wand2, Shield, Eye, AlertCircle } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 interface ChronicleEntry {
   turn: number;
@@ -55,6 +56,9 @@ export const App: React.FC = () => {
   const [showNotesDrawer, setShowNotesDrawer] = useState(false);
   const [showAtlasModal, setShowAtlasModal] = useState(false);
   const [showLayoutLabModal, setShowLayoutLabModal] = useState(false);
+
+  // Sidebar active item
+  const [sidebarActive, setSidebarActive] = useState<SidebarItemId>('overview');
 
   // Temporary container while genesis animation runs
   const [pendingWorldData, setPendingWorldData] = useState<{ world: WorldState; uiPlanning?: UIPlanning } | null>(null);
@@ -182,6 +186,35 @@ export const App: React.FC = () => {
     });
   };
 
+  // Handler: Sidebar navigation
+  const handleSidebarNavigate = (id: SidebarItemId) => {
+    setSidebarActive(id);
+    switch (id) {
+      case 'chronicle':
+        setShowChronicleModal(true);
+        break;
+      case 'notes':
+        setShowNotesDrawer(true);
+        break;
+      case 'atlas':
+        setShowAtlasModal(true);
+        break;
+      case 'layout-lab':
+        setShowLayoutLabModal(true);
+        break;
+      case 'director':
+        setIsDirectorOverlayOpen(v => !v);
+        break;
+      case 'new-world':
+        handleResetToPrompt();
+        break;
+      case 'overview':
+      default:
+        document.getElementById('main-scroll-container')?.scrollTo({ top: 0, behavior: 'smooth' });
+        break;
+    }
+  };
+
   // Handler: User performs an action
   const handleDispatchAction = async (action: string) => {
     if (!world || isProcessingAction) return;
@@ -240,6 +273,7 @@ export const App: React.FC = () => {
     setLatestNarrativeOutcome(null);
     setChronicle([]);
     setIsDirectorOverlayOpen(false);
+    setSidebarActive('overview');
     setAppPhase('prompt');
   };
 
@@ -281,96 +315,109 @@ export const App: React.FC = () => {
     return null;
   }
 
-  const canvasBgClass = world.style?.tokens?.canvasBg || 'bg-[#08090d]';
-
   return (
-    <div className={`min-h-screen ${canvasBgClass} text-slate-100 flex flex-col justify-between selection:bg-indigo-500/30 selection:text-indigo-200 transition-colors duration-500`}>
-      {/* World Frame (Layer 0) */}
-      <Header
-        world={world}
-        onResetToPrompt={handleResetToPrompt}
-        onSelectPreset={handleSelectPreset}
-        onOpenFeedModal={() => setShowChronicleModal(true)}
-        onOpenNotesModal={() => setShowNotesDrawer(true)}
-        onOpenAtlas={() => setShowAtlasModal(true)}
-        onOpenLayoutLab={() => setShowLayoutLabModal(true)}
+    <div className="flex h-screen gap-2 overflow-hidden bg-zinc-100 p-2 text-zinc-950">
+      {/* Sidebar (Layer 0 nav, §7.1) */}
+      <AppSidebar
+        activeItem={sidebarActive}
+        onNavigate={handleSidebarNavigate}
+        noteCount={world.notes?.length || 0}
+        isDirectorOpen={isDirectorOverlayOpen}
         selectedEngine={selectedEngine}
         onSelectEngine={handleSelectEngine}
-        activeRole={activeRole}
-        onSelectRole={handleSelectRole}
-        isDirectorOverlayOpen={isDirectorOverlayOpen}
-        onToggleDirectorOverlay={() => setIsDirectorOverlayOpen(!isDirectorOverlayOpen)}
+        worldName={world.name}
+        turnCount={world.turnCount}
       />
 
-      {/* Main World Canvas (Layer 1 & Layer 2) */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-3 sm:px-6 py-6">
-        {/* Role Banner / Active Lens Notice */}
-        {activeRole.type !== 'PLAYER' && (
-          <div className="mb-5 px-4 py-2.5 rounded-xl border flex items-center justify-between text-xs font-mono backdrop-blur-md animate-in fade-in duration-200 shadow-lg bg-purple-950/40 border-purple-500/30 text-purple-200">
-            <div className="flex items-center space-x-2.5">
-              <span className="text-base">{activeRole.avatar || '🎭'}</span>
-              <div>
-                <span className="font-bold uppercase tracking-wider">{activeRole.name}</span>
-                <span className="opacity-70 ml-2 hidden sm:inline">— {activeRole.description}</span>
-              </div>
-            </div>
-            <button
-              onClick={() => {
-                const playerRole = world.roles.find(r => r.type === 'PLAYER');
-                if (playerRole) handleSelectRole(playerRole.id);
-              }}
-              className="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-white font-mono text-[11px] transition-colors shrink-0"
-            >
-              Return to Player Role
-            </button>
-          </div>
-        )}
+      {/* Main Content Area (floating panel on zinc canvas, §3.1) */}
+      <main className="relative min-w-0 flex-1 overflow-hidden rounded-xl border border-zinc-200/80 bg-zinc-50 shadow-sm">
+        <div id="main-scroll-container" className="flex h-full flex-col overflow-y-auto scrollbar-fade">
+          {/* World Frame (Layer 0) */}
+          <Header
+            world={world}
+            onResetToPrompt={handleResetToPrompt}
+            onSelectPreset={handleSelectPreset}
+            onOpenFeedModal={() => setShowChronicleModal(true)}
+            onOpenNotesModal={() => setShowNotesDrawer(true)}
+            onOpenAtlas={() => setShowAtlasModal(true)}
+            onOpenLayoutLab={() => setShowLayoutLabModal(true)}
+            activeRole={activeRole}
+            onSelectRole={handleSelectRole}
+            isDirectorOverlayOpen={isDirectorOverlayOpen}
+            onToggleDirectorOverlay={() => setIsDirectorOverlayOpen(!isDirectorOverlayOpen)}
+          />
 
-        {/* Narrative Outcome Consequence Banner */}
-        {latestNarrativeOutcome && (
-          <div className="mb-6 p-4 rounded-xl bg-indigo-950/40 border border-indigo-500/30 backdrop-blur-md shadow-2xl animate-in fade-in slide-in-from-top-2 duration-300">
-            <div className="flex items-start justify-between">
-              <div className="flex items-start space-x-3">
-                <div className="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-300 mt-0.5">
-                  <Sparkles className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="text-[11px] font-mono uppercase tracking-wider text-indigo-400 font-bold mb-1">
-                    Consequence & World Reaction // {world.style?.temporalGrammar?.timeDisplayPrefix || 'Turn'} #{world.turnCount}
+          {/* Main World Canvas (Layer 1 & Layer 2) */}
+          <div className="mx-auto w-full max-w-7xl flex-1 px-3 py-6 sm:px-6">
+            {/* Role Banner / Active Lens Notice */}
+            {activeRole.type !== 'PLAYER' && (
+              <div className="mb-5 flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-xs shadow-card animate-in fade-in duration-200">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-base">{activeRole.avatar || '🎭'}</span>
+                  <div>
+                    <span className="font-semibold uppercase tracking-wider text-zinc-900">{activeRole.name}</span>
+                    <span className="ml-2 hidden text-zinc-500 sm:inline">— {activeRole.description}</span>
                   </div>
-                  <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-sans">
-                    {latestNarrativeOutcome}
-                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    const playerRole = world.roles.find(r => r.type === 'PLAYER');
+                    if (playerRole) handleSelectRole(playerRole.id);
+                  }}
+                  className="shrink-0 rounded-md border border-zinc-200 bg-white px-2.5 py-1 font-mono text-[11px] text-zinc-700 transition-colors hover:bg-zinc-100"
+                >
+                  Return to Player Role
+                </button>
+              </div>
+            )}
+
+            {/* Narrative Outcome Consequence Banner */}
+            {latestNarrativeOutcome && (
+              <div className="mb-6 rounded-xl border border-zinc-200 bg-white p-4 shadow-card animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5 rounded-lg bg-zinc-100 p-1.5 text-zinc-700">
+                      <Sparkles className="size-4" strokeWidth={1.75} />
+                    </div>
+                    <div>
+                      <div className="mb-1 text-[11px] font-medium uppercase tracking-wider text-zinc-500">
+                        Consequence & World Reaction // {world.style?.temporalGrammar?.timeDisplayPrefix || 'Turn'} #{world.turnCount}
+                      </div>
+                      <p className="font-sans text-sm leading-relaxed text-zinc-800">
+                        {latestNarrativeOutcome}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setLatestNarrativeOutcome(null)}
+                    className="ml-4 shrink-0 rounded-md px-2 py-1 text-xs text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+                  >
+                    Dismiss
+                  </button>
                 </div>
               </div>
-              <button
-                onClick={() => setLatestNarrativeOutcome(null)}
-                className="text-xs text-slate-400 hover:text-white px-2 py-1 rounded bg-white/5 hover:bg-white/10 transition-colors ml-4 shrink-0"
-              >
-                Dismiss
-              </button>
-            </div>
+            )}
+
+            {/* Dynamic Composition Surface (World Canvas Renderer) */}
+            <WorldCanvasRenderer
+              world={world}
+              blocks={activeUiPlan.blocks}
+              onAction={handleDispatchAction}
+              onAddNote={handleAddNote}
+            />
           </div>
-        )}
 
-        {/* Dynamic Composition Surface (World Canvas Renderer) */}
-        <WorldCanvasRenderer
-          world={world}
-          blocks={activeUiPlan.blocks}
-          onAction={handleDispatchAction}
-          onAddNote={handleAddNote}
-        />
+          {/* Interaction Surface (Layer 3) */}
+          <ActionDock
+            suggestedActions={activeUiPlan.suggestedInteractions || []}
+            onSubmitAction={handleDispatchAction}
+            isProcessing={isProcessingAction}
+            selectedEngine={selectedEngine}
+            worldStyle={world.style}
+            activeRole={activeRole}
+          />
+        </div>
       </main>
-
-      {/* Interaction Surface (Layer 3) */}
-      <ActionDock
-        suggestedActions={activeUiPlan.suggestedInteractions || []}
-        onSubmitAction={handleDispatchAction}
-        isProcessing={isProcessingAction}
-        selectedEngine={selectedEngine}
-        worldStyle={world.style}
-        activeRole={activeRole}
-      />
 
       {/* Modals */}
       <ChronicleModal

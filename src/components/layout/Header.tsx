@@ -1,21 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { WorldState } from '../../world/types';
-import { 
-  Layers, 
-  Plus, 
-  ChevronDown, 
-  StickyNote,
-  History,
-  UserCheck,
-  Wand2,
-  Eye,
-  Sliders,
-  Sparkles,
-  Compass
-} from 'lucide-react';
+import { ChevronDown, History, Compass, Layers, StickyNote, Wand2 as Wand2Icon, Plus as PlusIcon } from 'lucide-react';
 import { DEMO_PRESETS } from '../../data/mockWorlds';
-import { AIProviderId } from '../../ai/client';
-import { EngineSelector } from './EngineSelector';
 import { RoleSlot, getRoleBadgeStyle } from '../../roles/model';
 
 interface HeaderProps {
@@ -26,8 +12,6 @@ interface HeaderProps {
   onOpenNotesModal: () => void;
   onOpenAtlas?: () => void;
   onOpenLayoutLab?: () => void;
-  selectedEngine: AIProviderId;
-  onSelectEngine: (engine: AIProviderId) => void;
   activeRole: RoleSlot;
   onSelectRole: (roleId: string) => void;
   isDirectorOverlayOpen: boolean;
@@ -42,8 +26,6 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenNotesModal,
   onOpenAtlas,
   onOpenLayoutLab,
-  selectedEngine,
-  onSelectEngine,
   activeRole,
   onSelectRole,
   isDirectorOverlayOpen,
@@ -51,71 +33,80 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [showPresetsMenu, setShowPresetsMenu] = useState(false);
   const [showRolesMenu, setShowRolesMenu] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   const roleStyle = getRoleBadgeStyle(activeRole.type);
   const roles = world.roles || [];
 
+  // Scroll-aware divider (§7.2): hairline + soft shadow fade in only after scrolling
+  useEffect(() => {
+    const el = document.getElementById('main-scroll-container');
+    if (!el) return;
+    const onScroll = () => setScrolled(el.scrollTop > 4);
+    onScroll();
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
-    <header className="h-16 border-b border-white/10 bg-[#090b12]/95 backdrop-blur-md sticky top-0 z-40 px-3 sm:px-6 flex items-center justify-between">
+    <header
+      className={`sticky top-0 z-30 h-14 bg-zinc-50/95 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between transition-[border-color,box-shadow] duration-200 border-b ${
+        scrolled ? 'border-zinc-200 shadow-sm' : 'border-transparent'
+      }`}
+    >
       {/* Left: Brand & World Title */}
-      <div className="flex items-center space-x-3 sm:space-x-4">
+      <div className="flex items-center gap-3 sm:gap-4">
         <button
           onClick={onResetToPrompt}
-          className="flex items-center space-x-2 text-left group cursor-pointer"
+          className="flex items-center gap-2 text-left cursor-pointer group"
           title="Return to creative space"
         >
-          <div className="w-7 h-7 rounded-lg bg-indigo-600/30 border border-indigo-400/40 flex items-center justify-center group-hover:bg-indigo-600/50 transition-colors">
-            <span className="w-2.5 h-2.5 rounded-sm bg-indigo-300 transform rotate-45" />
+          <div className="flex size-7 items-center justify-center rounded-lg bg-zinc-900 transition-colors group-hover:bg-zinc-800">
+            <span className="size-2.5 rotate-45 rounded-[3px] bg-zinc-100" />
           </div>
-          <span className="text-xs font-mono font-bold tracking-widest text-slate-300 uppercase hidden md:inline">
+          <span className="hidden text-xs font-semibold tracking-widest text-zinc-900 uppercase md:inline">
             HeadConan
           </span>
         </button>
 
-        <div className="h-4 w-[1px] bg-white/10 hidden md:block" />
+        <div className="hidden h-4 w-px bg-zinc-200 md:block" />
 
         {/* Current World Name & Temporal Stamp */}
-        <div className="flex items-center space-x-2">
-          <h2 className="text-xs sm:text-sm font-serif font-semibold text-slate-100 truncate max-w-[130px] sm:max-w-xs">
+        <div className="flex items-center gap-2">
+          <h2 className="truncate max-w-[130px] text-sm font-semibold text-zinc-900 sm:max-w-xs">
             {world.name}
           </h2>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/5 text-slate-400 border border-white/5 hidden lg:inline">
+          <span className="hidden rounded-full border border-zinc-200 bg-white px-2 py-0.5 text-[10px] font-medium tabular-nums text-zinc-500 lg:inline">
             {world.style?.temporalGrammar?.timeDisplayPrefix || 'Turn'} #{world.turnCount || 1}
           </span>
         </div>
       </div>
 
-      {/* Center / Right: Role Slot Selector (Agency Shifting) */}
-      <div className="flex items-center space-x-1.5 sm:space-x-2">
+      {/* Right: Role Slot Selector + actions */}
+      <div className="flex items-center gap-1.5 sm:gap-2">
         {/* Role Selector Pill */}
         <div className="relative">
           <button
             id="btn-role-selector"
             onClick={() => setShowRolesMenu(!showRolesMenu)}
-            className={`px-2.5 sm:px-3 py-1.5 rounded-xl border text-xs font-medium transition-all flex items-center space-x-1.5 ${roleStyle.bg} ${roleStyle.border} ${roleStyle.text} hover:opacity-90 shadow-sm`}
+            className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all hover:opacity-90 sm:px-3 ${roleStyle.bg} ${roleStyle.border} ${roleStyle.text}`}
             title="Shift Agency / Occupy another role in this world"
           >
-            <span className="text-sm">{activeRole.avatar || roleStyle.icon}</span>
-            <div className="text-left hidden sm:block">
+            <span className="text-sm leading-none">{activeRole.avatar || roleStyle.icon}</span>
+            <span className="hidden text-left sm:block">
               <span className="font-semibold">{activeRole.name}</span>
-              <span className="text-[9px] font-mono block opacity-70 uppercase tracking-wider -mt-0.5">
-                {activeRole.type} • {activeRole.agency}
-              </span>
-            </div>
-            <ChevronDown className="w-3 h-3 opacity-60 ml-0.5" />
+            </span>
+            <ChevronDown className="size-3 opacity-60" />
           </button>
 
           {showRolesMenu && (
             <>
-              <div
-                className="fixed inset-0 z-40"
-                onClick={() => setShowRolesMenu(false)}
-              />
-              <div className="absolute right-0 sm:left-0 mt-2 w-72 bg-[#0d101a] border border-white/15 rounded-2xl shadow-2xl p-2 z-50 divide-y divide-white/5 backdrop-blur-xl">
-                <div className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-slate-400">
+              <div className="fixed inset-0 z-40" onClick={() => setShowRolesMenu(false)} />
+              <div className="absolute right-0 z-50 mt-2 w-72 rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+                <div className="px-3 py-1.5 text-[10px] font-medium uppercase tracking-wider text-zinc-500">
                   Select Role Slot (Agency Shift)
                 </div>
-                <div className="py-1.5 space-y-1">
+                <div className="space-y-1 py-1.5">
                   {roles.map((role) => {
                     const isSelected = role.id === activeRole.id;
                     const rStyle = getRoleBadgeStyle(role.type);
@@ -126,30 +117,23 @@ export const Header: React.FC<HeaderProps> = ({
                           onSelectRole(role.id);
                           setShowRolesMenu(false);
                         }}
-                        className={`w-full text-left p-2.5 rounded-xl text-xs transition-all flex items-start space-x-2.5 ${
-                          isSelected
-                            ? 'bg-white/10 border border-white/20'
-                            : 'hover:bg-white/5 border border-transparent'
+                        className={`w-full rounded-lg p-2.5 text-left text-xs transition-all flex items-start gap-2.5 ${
+                          isSelected ? 'bg-zinc-100' : 'hover:bg-zinc-50'
                         }`}
                       >
-                        <span className="text-lg mt-0.5">{role.avatar || rStyle.icon}</span>
+                        <span className="mt-0.5 text-lg leading-none">{role.avatar || rStyle.icon}</span>
                         <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <span className={`font-semibold ${isSelected ? 'text-white' : 'text-slate-200'}`}>
+                          <div className="flex items-center justify-between gap-2">
+                            <span className={`font-semibold ${isSelected ? 'text-zinc-900' : 'text-zinc-800'}`}>
                               {role.name}
                             </span>
-                            <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border ${rStyle.bg} ${rStyle.text} ${rStyle.border}`}>
+                            <span className={`rounded border px-1.5 py-0.5 font-mono text-[9px] ${rStyle.bg} ${rStyle.text} ${rStyle.border}`}>
                               {role.type}
                             </span>
                           </div>
-                          <p className="text-[10px] text-slate-400 line-clamp-1 mt-0.5 font-sans">
+                          <p className="mt-0.5 line-clamp-1 font-sans text-[10px] text-zinc-500">
                             {role.description}
                           </p>
-                          <div className="text-[9px] font-mono text-slate-500 mt-1 flex items-center space-x-2">
-                            <span>Agency: <b className="text-slate-400">{role.agency}</b></span>
-                            <span>•</span>
-                            <span>Sight: <b className="text-slate-400">{role.knowledge}</b></span>
-                          </div>
                         </div>
                       </button>
                     );
@@ -164,32 +148,25 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           id="btn-toggle-director-overlay"
           onClick={onToggleDirectorOverlay}
-          className={`px-2.5 py-1.5 rounded-xl border text-xs font-mono transition-all flex items-center space-x-1.5 ${
+          className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors ${
             isDirectorOverlayOpen
-              ? 'bg-purple-600/30 border-purple-400/50 text-purple-200 shadow-[0_0_15px_rgba(168,85,247,0.3)] font-bold'
-              : 'bg-white/[0.03] hover:bg-white/[0.07] border-white/10 text-slate-300'
+              ? 'border-zinc-900 bg-zinc-900 text-white shadow-sm'
+              : 'border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-100'
           }`}
           title="Toggle Director intervention & spawning overlay"
         >
-          <Wand2 className="w-3.5 h-3.5 text-purple-400" />
+          <Wand2Icon className="size-4" strokeWidth={1.75} />
           <span className="hidden md:inline">Director</span>
         </button>
-
-        {/* AI Engine Switcher (DeepSeek / Gemini / Procedural) */}
-        <EngineSelector
-          selectedEngine={selectedEngine}
-          onSelectEngine={onSelectEngine}
-          compact
-        />
 
         {/* Narrative Log Button */}
         <button
           id="btn-open-narrative-log"
           onClick={onOpenFeedModal}
-          className="px-2.5 py-1.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 text-xs font-medium text-slate-300 transition-colors flex items-center space-x-1.5"
+          className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-100"
           title="Review narrative chronicle"
         >
-          <History className="w-3.5 h-3.5 text-indigo-400" />
+          <History className="size-4 text-zinc-500" strokeWidth={1.75} />
           <span className="hidden xl:inline">Chronicle</span>
         </button>
 
@@ -198,10 +175,10 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             id="btn-open-atlas"
             onClick={onOpenAtlas}
-            className="px-2.5 py-1.5 rounded-xl bg-indigo-950/40 hover:bg-indigo-900/50 border border-indigo-500/30 text-xs font-medium text-indigo-200 transition-colors flex items-center space-x-1.5 shadow-sm"
-            title="Browse World Atlas & Portfolio (60+ Archetypes)"
+            className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-100"
+            title="Browse World Atlas & Portfolio"
           >
-            <Compass className="w-3.5 h-3.5 text-indigo-400" />
+            <Compass className="size-4 text-zinc-500" strokeWidth={1.75} />
             <span className="hidden lg:inline">Atlas</span>
           </button>
         )}
@@ -211,10 +188,10 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             id="btn-open-layout-lab"
             onClick={onOpenLayoutLab}
-            className="px-2.5 py-1.5 rounded-xl bg-purple-950/40 hover:bg-purple-900/50 border border-purple-500/30 text-xs font-medium text-purple-200 transition-colors flex items-center space-x-1.5 shadow-sm"
-            title="Open HeadConan Layout Lab (6 Dynamic Spatial Compositions)"
+            className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-100"
+            title="Open HeadConan Layout Lab"
           >
-            <Layers className="w-3.5 h-3.5 text-purple-400" />
+            <Layers className="size-4 text-zinc-500" strokeWidth={1.75} />
             <span className="hidden lg:inline">Layout Lab</span>
           </button>
         )}
@@ -223,13 +200,13 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           id="btn-open-notes"
           onClick={onOpenNotesModal}
-          className="px-2.5 py-1.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 text-xs font-medium text-slate-300 transition-colors flex items-center space-x-1.5 relative"
+          className="relative flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-100"
           title="Open deduction scratchpad"
         >
-          <StickyNote className="w-3.5 h-3.5 text-amber-400" />
+          <StickyNote className="size-4 text-zinc-500" strokeWidth={1.75} />
           <span className="hidden xl:inline">Notes</span>
           {world.notes && world.notes.length > 0 && (
-            <span className="w-4 h-4 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-[10px] font-mono flex items-center justify-center">
+            <span className="flex size-4 items-center justify-center rounded-full bg-zinc-200 text-[10px] font-medium tabular-nums text-zinc-700">
               {world.notes.length}
             </span>
           )}
@@ -240,24 +217,20 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             id="btn-switch-world"
             onClick={() => setShowPresetsMenu(!showPresetsMenu)}
-            className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 text-xs font-medium text-indigo-200 transition-colors flex items-center space-x-1.5"
+            className="flex items-center gap-1.5 rounded-lg bg-zinc-900 px-2.5 py-1.5 text-xs font-medium text-zinc-50 transition-colors hover:bg-zinc-800 sm:px-3"
           >
-            <Layers className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Worlds</span>
-            <ChevronDown className="w-3 h-3 text-indigo-300" />
+            Worlds
+            <ChevronDown className="size-3 text-zinc-400" />
           </button>
 
           {showPresetsMenu && (
             <>
-              <div
-                className="fixed inset-0 z-40"
-                onClick={() => setShowPresetsMenu(false)}
-              />
-              <div className="absolute right-0 mt-2 w-72 bg-[#0e111a] border border-white/15 rounded-2xl shadow-2xl p-2 z-50 divide-y divide-white/5 backdrop-blur-xl">
-                <div className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-slate-400">
+              <div className="fixed inset-0 z-40" onClick={() => setShowPresetsMenu(false)} />
+              <div className="absolute right-0 z-50 mt-2 w-72 rounded-xl border border-zinc-200 bg-white p-2 shadow-lg">
+                <div className="px-3 py-1.5 text-[10px] font-medium uppercase tracking-wider text-zinc-500">
                   Archetype Demo Worlds
                 </div>
-                <div className="py-1.5 space-y-1">
+                <div className="space-y-1 py-1.5">
                   {DEMO_PRESETS.map((preset) => (
                     <button
                       key={preset.id}
@@ -265,27 +238,27 @@ export const Header: React.FC<HeaderProps> = ({
                         onSelectPreset(preset.id);
                         setShowPresetsMenu(false);
                       }}
-                      className="w-full text-left p-2.5 rounded-xl text-xs text-slate-300 hover:text-white hover:bg-white/5 transition-colors flex flex-col group"
+                      className="flex w-full flex-col rounded-lg p-2.5 text-left text-xs text-zinc-700 transition-colors hover:bg-zinc-50"
                     >
-                      <div className="flex items-center justify-between">
-                        <span className="font-semibold text-indigo-300 group-hover:text-indigo-200">{preset.title}</span>
-                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white/5 text-slate-400 border border-white/10">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-semibold text-zinc-900">{preset.title}</span>
+                        <span className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[9px] text-zinc-500">
                           {preset.tag}
                         </span>
                       </div>
-                      <span className="text-[11px] text-slate-400 truncate mt-0.5 font-sans">{preset.subtitle}</span>
+                      <span className="mt-0.5 truncate font-sans text-[11px] text-zinc-500">{preset.subtitle}</span>
                     </button>
                   ))}
                 </div>
-                <div className="pt-1.5">
+                <div className="border-t border-zinc-100 pt-1.5">
                   <button
                     onClick={() => {
                       onResetToPrompt();
                       setShowPresetsMenu(false);
                     }}
-                    className="w-full text-left p-2 rounded-xl text-xs text-amber-300 hover:bg-white/5 transition-colors flex items-center space-x-2 font-medium"
+                    className="flex w-full items-center gap-2 rounded-lg p-2 text-left text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
                   >
-                    <Plus className="w-3.5 h-3.5" />
+                    <PlusIcon className="size-3.5" strokeWidth={1.75} />
                     <span>Create Custom World from Prompt</span>
                   </button>
                 </div>

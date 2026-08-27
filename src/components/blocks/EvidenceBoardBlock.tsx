@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { WorldState, UIBlock, ClueItem } from '../../world/types';
-import { 
-  Pin, 
-  Search, 
-  Plus, 
-  FileText, 
-  User, 
-  MapPin, 
-  HelpCircle, 
-  CheckCircle2, 
+import {
+  Pin,
+  Search,
+  Plus,
+  FileText,
+  User,
+  MapPin,
+  HelpCircle,
+  CheckCircle2,
   XCircle,
   Eye,
   Link as LinkIcon
@@ -40,13 +40,13 @@ export const EvidenceBoardBlock: React.FC<EvidenceBoardBlockProps> = ({
   const getCategoryBadge = (cat: ClueItem['category']) => {
     switch (cat) {
       case 'physical':
-        return <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30">Physical Exhibit</span>;
+        return <span className="rounded border border-amber-200 bg-amber-50 px-1.5 py-0.5 font-mono text-[10px] text-amber-700">Physical Exhibit</span>;
       case 'testimony':
-        return <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Witness Statement</span>;
+        return <span className="rounded border border-cyan-200 bg-cyan-50 px-1.5 py-0.5 font-mono text-[10px] text-cyan-700">Witness Statement</span>;
       case 'documentary':
-        return <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-purple-500/20 text-purple-300 border border-purple-500/30">Archival Document</span>;
+        return <span className="rounded border border-purple-200 bg-purple-50 px-1.5 py-0.5 font-mono text-[10px] text-purple-700">Archival Document</span>;
       case 'environmental':
-        return <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Crime Scene Anomaly</span>;
+        return <span className="rounded border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 font-mono text-[10px] text-emerald-700">Crime Scene Anomaly</span>;
     }
   };
 
@@ -55,58 +55,58 @@ export const EvidenceBoardBlock: React.FC<EvidenceBoardBlockProps> = ({
       case 'connected':
         return (
           <span title="Key Linked Clue">
-            <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" />
+            <CheckCircle2 className="size-3.5 text-emerald-600" strokeWidth={1.75} />
           </span>
         );
       case 'refuted':
         return (
           <span title="Refuted / False Lead">
-            <XCircle className="w-3.5 h-3.5 text-rose-400" />
+            <XCircle className="size-3.5 text-rose-600" strokeWidth={1.75} />
           </span>
         );
       default:
         return (
           <span title="Unresolved Lead">
-            <HelpCircle className="w-3.5 h-3.5 text-slate-400" />
+            <HelpCircle className="size-3.5 text-zinc-400" strokeWidth={1.75} />
           </span>
         );
     }
   };
 
   return (
-    <div className="bg-[#110f0b]/95 border border-amber-500/25 rounded-2xl p-5 shadow-2xl relative overflow-hidden backdrop-blur-md">
-      {/* Background corkboard subtle texture effect */}
-      <div className="absolute inset-0 bg-[radial-gradient(#d97706_1px,transparent_1px)] [background-size:20px_20px] opacity-10 pointer-events-none" />
+    <div className="relative overflow-hidden rounded-xl border border-zinc-200 bg-white p-5 shadow-card">
+      {/* Background subtle texture effect */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#a1a1aa_1px,transparent_1px)] [background-size:20px_20px] opacity-20" />
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 border-b border-amber-500/15 pb-4 relative z-10">
-        <div className="flex items-center space-x-2.5">
-          <div className="p-2 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300">
-            <Pin className="w-4 h-4" />
+      <div className="relative z-10 mb-5 flex flex-col justify-between gap-3 border-b border-zinc-100 pb-4 sm:flex-row sm:items-center">
+        <div className="flex items-center gap-2.5">
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700">
+            <Pin className="size-4" strokeWidth={1.75} />
           </div>
           <div>
-            <h3 className="text-sm font-serif font-bold text-amber-100 flex items-center space-x-2">
+            <h3 className="flex items-center gap-2 font-serif text-sm font-bold text-zinc-900">
               <span>{block.title || 'Case Evidence & Deduction Board'}</span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30">
+              <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 font-mono text-[10px] text-amber-700">
                 {clues.length} Exhibits Tracked
               </span>
             </h3>
-            <p className="text-xs text-amber-200/60 font-sans mt-0.5">
+            <p className="mt-0.5 font-sans text-xs text-zinc-500">
               Pinned forensic leads, red yarn connections, and witness testimony
             </p>
           </div>
         </div>
 
         {/* Filter Chips */}
-        <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 sm:pb-0">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
           {(['all', 'physical', 'testimony', 'documentary', 'environmental'] as const).map((cat) => (
             <button
               key={cat}
               onClick={() => setFilterCategory(cat)}
-              className={`text-[11px] font-mono px-2.5 py-1 rounded-lg border transition-all ${
+              className={`rounded-md border px-2.5 py-1 font-mono text-[11px] transition-all ${
                 filterCategory === cat
-                  ? 'bg-amber-500/25 text-amber-200 border-amber-500/40 font-bold'
-                  : 'bg-white/[0.02] text-amber-200/50 border-transparent hover:border-amber-500/20'
+                  ? 'border-zinc-900 bg-zinc-900 font-bold text-zinc-50'
+                  : 'border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300'
               }`}
             >
               {cat.toUpperCase()}
@@ -116,7 +116,7 @@ export const EvidenceBoardBlock: React.FC<EvidenceBoardBlockProps> = ({
       </div>
 
       {/* Main Evidence Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 relative z-10 mb-4">
+      <div className="relative z-10 mb-4 grid grid-cols-1 gap-3.5 md:grid-cols-2">
         {filteredClues.map((clue) => {
           const isSelected = selectedClue?.id === clue.id;
           const relatedSuspect = world.characters.find((c) => c.id === clue.relatedSuspectId);
@@ -126,52 +126,52 @@ export const EvidenceBoardBlock: React.FC<EvidenceBoardBlockProps> = ({
             <div
               key={clue.id}
               onClick={() => setSelectedClue(isSelected ? null : clue)}
-              className={`p-4 rounded-xl border transition-all cursor-pointer relative group flex flex-col justify-between ${
+              className={`group relative flex cursor-pointer flex-col justify-between rounded-xl border p-4 transition-all ${
                 isSelected
-                  ? 'bg-amber-950/40 border-amber-400/60 shadow-[0_0_20px_rgba(217,119,6,0.2)]'
-                  : 'bg-[#181510]/80 hover:bg-[#201c15] border-amber-500/20 hover:border-amber-400/40'
+                  ? 'border-zinc-900 bg-zinc-50 shadow-sm'
+                  : 'border-zinc-100 bg-white hover:border-zinc-300'
               }`}
             >
               {/* Pushpin visual header */}
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center space-x-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.8)] border border-rose-300" />
+              <div className="mb-2 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="size-2.5 rounded-full border border-rose-300 bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.5)]" />
                   {getCategoryBadge(clue.category)}
                 </div>
-                <div className="flex items-center space-x-1.5">
+                <div className="flex items-center gap-1.5">
                   {getStatusIcon(clue.status)}
                 </div>
               </div>
 
               {/* Title & Description */}
               <div className="mb-3">
-                <h4 className="text-xs font-serif font-bold text-amber-100 group-hover:text-amber-200 mb-1 leading-snug">
+                <h4 className="mb-1 font-serif text-xs font-bold leading-snug text-zinc-900 group-hover:text-zinc-950">
                   {clue.title}
                 </h4>
-                <p className="text-[11px] text-amber-200/70 font-sans leading-relaxed line-clamp-2">
+                <p className="line-clamp-2 font-sans text-[11px] leading-relaxed text-zinc-500">
                   {clue.description}
                 </p>
               </div>
 
               {/* Connected Meta (Suspect / Location / Thread) */}
-              <div className="pt-2 border-t border-amber-500/10 flex items-center justify-between text-[10px] font-mono text-amber-300/80">
-                <div className="flex items-center space-x-2 truncate">
+              <div className="flex items-center justify-between border-t border-zinc-100 pt-2 font-mono text-[10px] text-zinc-500">
+                <div className="flex items-center gap-2 truncate">
                   {relatedSuspect && (
-                    <span className="flex items-center space-x-1 text-amber-300 truncate">
-                      <User className="w-3 h-3 text-amber-400 shrink-0" />
+                    <span className="flex items-center gap-1 truncate text-zinc-600">
+                      <User className="size-3 shrink-0 text-zinc-400" strokeWidth={1.75} />
                       <span>{relatedSuspect.name}</span>
                     </span>
                   )}
                   {relatedLoc && (
-                    <span className="flex items-center space-x-1 text-amber-400/80 truncate">
-                      <MapPin className="w-3 h-3 text-amber-500 shrink-0" />
+                    <span className="flex items-center gap-1 truncate text-zinc-500">
+                      <MapPin className="size-3 shrink-0 text-zinc-400" strokeWidth={1.75} />
                       <span>{relatedLoc.name}</span>
                     </span>
                   )}
                 </div>
                 {clue.connectedTo && clue.connectedTo.length > 0 && (
-                  <span className="flex items-center space-x-1 text-rose-400 font-bold shrink-0">
-                    <LinkIcon className="w-3 h-3" />
+                  <span className="flex shrink-0 items-center gap-1 font-bold text-rose-700">
+                    <LinkIcon className="size-3" strokeWidth={1.75} />
                     <span>{clue.connectedTo.length} threads</span>
                   </span>
                 )}
@@ -183,35 +183,35 @@ export const EvidenceBoardBlock: React.FC<EvidenceBoardBlockProps> = ({
 
       {/* Selected Clue Inspector & Fast Interrogation Actions */}
       {selectedClue && (
-        <div className="p-4 rounded-xl bg-amber-950/30 border border-amber-400/40 relative z-10 animate-in fade-in duration-200 space-y-3">
+        <div className="relative z-10 animate-in fade-in space-y-3 rounded-xl border border-zinc-200 bg-zinc-50 p-4 duration-200">
           <div className="flex items-start justify-between">
             <div>
-              <div className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold mb-0.5">
+              <div className="mb-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-amber-700">
                 Exhibit Inspection • {selectedClue.title}
               </div>
-              <p className="text-xs text-amber-100 font-sans leading-relaxed">
+              <p className="font-sans text-xs leading-relaxed text-zinc-700">
                 {selectedClue.description}
               </p>
             </div>
             <button
               onClick={() => setSelectedClue(null)}
-              className="text-xs text-amber-300/60 hover:text-amber-200 p-1"
+              className="p-1 text-xs text-zinc-400 hover:text-zinc-900"
             >
               ✕
             </button>
           </div>
 
-          <div className="p-2.5 rounded-lg bg-black/40 border border-amber-500/20 text-xs font-mono text-amber-300/90">
-            <span className="text-amber-400 font-bold">Investigative Significance:</span> {selectedClue.significance}
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-2.5 font-mono text-xs text-amber-800">
+            <span className="font-bold text-amber-900">Investigative Significance:</span> {selectedClue.significance}
           </div>
 
           {/* Quick Deduction Actions */}
           <div className="flex flex-wrap gap-2 pt-1">
             <button
               onClick={() => onAction && onAction(`Examine forensic traces on "${selectedClue.title}" under magnifying glass`)}
-              className="px-3 py-1.5 rounded-lg bg-amber-600/30 hover:bg-amber-600/40 border border-amber-400/40 text-xs font-medium text-amber-200 transition-colors flex items-center space-x-1.5"
+              className="flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-zinc-50 transition-colors hover:bg-zinc-800"
             >
-              <Search className="w-3.5 h-3.5" />
+              <Search className="size-3.5" strokeWidth={1.75} />
               <span>Forensic Analysis</span>
             </button>
 
@@ -221,9 +221,9 @@ export const EvidenceBoardBlock: React.FC<EvidenceBoardBlockProps> = ({
                   const s = world.characters.find(c => c.id === selectedClue.relatedSuspectId);
                   if (onAction) onAction(`Confront ${s?.name || 'suspect'} with evidence: "${selectedClue.title}"`);
                 }}
-                className="px-3 py-1.5 rounded-lg bg-rose-600/30 hover:bg-rose-600/40 border border-rose-400/40 text-xs font-medium text-rose-200 transition-colors flex items-center space-x-1.5"
+                className="flex items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-medium text-rose-700 transition-colors hover:bg-rose-100"
               >
-                <User className="w-3.5 h-3.5" />
+                <User className="size-3.5" strokeWidth={1.75} />
                 <span>Confront Linked Suspect</span>
               </button>
             )}
@@ -232,9 +232,9 @@ export const EvidenceBoardBlock: React.FC<EvidenceBoardBlockProps> = ({
               onClick={() => {
                 if (onAddNote) onAddNote(`Deduction on ${selectedClue.title}: ${selectedClue.significance}`);
               }}
-              className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-slate-300 transition-colors flex items-center space-x-1.5"
+              className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-100"
             >
-              <FileText className="w-3.5 h-3.5" />
+              <FileText className="size-3.5" strokeWidth={1.75} />
               <span>Pin Note to Dossier</span>
             </button>
           </div>

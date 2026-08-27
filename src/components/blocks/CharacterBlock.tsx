@@ -7,75 +7,75 @@ export const CharacterBlock: React.FC<UIBlockProps> = ({ block, world, onAction,
   const [selectedChar, setSelectedChar] = useState<Character | null>(world.characters[0] || null);
 
   return (
-    <div id="block-characters-view" className="bg-[#0d101a] border border-white/10 rounded-xl overflow-hidden flex flex-col h-[520px]">
+    <div id="block-characters-view" className="flex h-[520px] flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-card">
       {/* Header */}
-      <div className="px-4 py-3 bg-white/[0.02] border-b border-white/5 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Users className="w-4 h-4 text-indigo-400" />
-          <h3 className="text-sm font-medium tracking-wider uppercase text-slate-200">{block.title || 'Characters & Cabinet'}</h3>
+      <div className="flex items-center justify-between border-b border-zinc-100 bg-zinc-50/80 px-4 py-3">
+        <div className="flex items-center gap-2">
+          <Users className="size-4 text-zinc-500" strokeWidth={1.75} />
+          <h3 className="text-sm font-semibold tracking-wide text-zinc-900">{block.title || 'Characters & Cabinet'}</h3>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-2">
           {onOpenVisualStudio && (
             <button
               onClick={() => onOpenVisualStudio({ type: 'character', id: selectedChar?.id })}
-              className="flex items-center space-x-1 px-2.5 py-1 rounded bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs transition-colors"
+              className="flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-2.5 py-1 text-xs text-zinc-700 transition-colors hover:bg-zinc-100"
             >
-              <Camera className="w-3.5 h-3.5" />
+              <Camera className="size-3.5" strokeWidth={1.75} />
               <span>Portrait Studio</span>
             </button>
           )}
-          <span className="text-xs font-mono text-slate-400">{world.characters.length} Key Personas</span>
+          <span className="font-mono text-xs tabular-nums text-zinc-500">{world.characters.length} Key Personas</span>
         </div>
       </div>
 
       {/* Grid Layout */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex flex-1 overflow-hidden">
         {/* Character List */}
-        <div className="w-1/2 border-r border-white/5 overflow-y-auto divide-y divide-white/5">
+        <div className="w-1/2 divide-y divide-zinc-100 overflow-y-auto border-r border-zinc-100">
           {world.characters.map((char) => {
             const isSelected = selectedChar?.id === char.id;
-            const loyaltyColor = 
-              char.loyalty >= 75 ? 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20' :
-              char.loyalty >= 50 ? 'text-amber-400 bg-amber-400/10 border-amber-400/20' :
-              'text-rose-400 bg-rose-400/10 border-rose-400/20';
+            const loyaltyColor =
+              char.loyalty >= 75 ? 'text-emerald-700 bg-emerald-50 border-emerald-200' :
+              char.loyalty >= 50 ? 'text-amber-700 bg-amber-50 border-amber-200' :
+              'text-rose-700 bg-rose-50 border-rose-200';
 
             return (
               <div
                 key={char.id}
                 id={`char-card-${char.id}`}
                 onClick={() => setSelectedChar(char)}
-                className={`p-3.5 cursor-pointer transition-all ${
-                  isSelected 
-                    ? 'bg-indigo-950/30 border-l-2 border-l-indigo-400 pl-3' 
-                    : 'hover:bg-white/[0.02]'
+                className={`cursor-pointer p-3.5 transition-all ${
+                  isSelected
+                    ? 'border-l-2 border-l-zinc-900 bg-zinc-50 pl-3'
+                    : 'hover:bg-zinc-50'
                 }`}
               >
                 <div className="flex items-start justify-between">
-                  <div className="flex items-center space-x-2.5">
+                  <div className="flex items-center gap-2.5">
                     {char.imageUrl || char.avatar ? (
                       <img
                         src={char.imageUrl || char.avatar}
                         alt={char.name}
                         referrerPolicy="no-referrer"
-                        className="w-8 h-8 rounded-lg object-cover border border-indigo-500/30 shadow-sm"
+                        className="size-8 rounded-lg border border-zinc-200 object-cover shadow-sm"
                       />
                     ) : (
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-900/40 to-slate-800 border border-white/10 flex items-center justify-center text-slate-300 font-serif font-bold text-sm">
+                      <div className="flex size-8 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-100 font-serif text-sm font-bold text-zinc-600">
                         {char.name.charAt(0)}
                       </div>
                     )}
                     <div>
-                      <h4 className="text-sm font-medium text-slate-100 leading-tight">{char.name}</h4>
-                      <p className="text-[11px] text-slate-400 mt-0.5">{char.role}</p>
+                      <h4 className="text-sm font-medium leading-tight text-zinc-900">{char.name}</h4>
+                      <p className="mt-0.5 text-[11px] text-zinc-500">{char.role}</p>
                     </div>
                   </div>
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono border ${loyaltyColor}`}>
+                  <span className={`rounded border px-1.5 py-0.5 font-mono text-[10px] tabular-nums ${loyaltyColor}`}>
                     {char.loyalty}%
                   </span>
                 </div>
 
                 {char.faction && (
-                  <div className="mt-2 text-[10px] font-mono text-slate-500 flex items-center space-x-1">
+                  <div className="mt-2 flex items-center font-mono text-[10px] text-zinc-400">
                     <span>{char.faction}</span>
                   </div>
                 )}
@@ -85,57 +85,57 @@ export const CharacterBlock: React.FC<UIBlockProps> = ({ block, world, onAction,
         </div>
 
         {/* Selected Character Detail & Direct Interaction */}
-        <div className="w-1/2 p-5 bg-[#0a0c14] overflow-y-auto flex flex-col justify-between">
+        <div className="flex w-1/2 flex-col justify-between overflow-y-auto bg-zinc-50/60 p-5">
           {selectedChar ? (
             <div>
-              <div className="flex items-center space-x-3 pb-3 border-b border-white/5">
+              <div className="flex items-center gap-3 border-b border-zinc-100 pb-3">
                 {selectedChar.imageUrl || selectedChar.avatar ? (
-                  <div className="relative group/avatar">
+                  <div className="group/avatar relative">
                     <img
                       src={selectedChar.imageUrl || selectedChar.avatar}
                       alt={selectedChar.name}
                       referrerPolicy="no-referrer"
-                      className="w-14 h-14 rounded-xl object-cover border border-indigo-500/40 shadow-md"
+                      className="size-14 rounded-xl border border-zinc-200 object-cover shadow-md"
                     />
                     {onOpenVisualStudio && (
                       <button
                         onClick={() => onOpenVisualStudio({ type: 'character', id: selectedChar.id })}
-                        className="absolute inset-0 bg-black/60 opacity-0 group-hover/avatar:opacity-100 transition-opacity rounded-xl flex items-center justify-center text-white"
+                        className="absolute inset-0 flex items-center justify-center rounded-xl bg-zinc-900/60 text-white opacity-0 transition-opacity group-hover/avatar:opacity-100"
                         title="Regenerate Portrait"
                       >
-                        <Sparkles className="w-4 h-4 text-cyan-400" />
+                        <Sparkles className="size-4 text-zinc-100" strokeWidth={1.75} />
                       </button>
                     )}
                   </div>
                 ) : (
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-tr from-indigo-950 via-slate-800 to-indigo-900 border border-indigo-500/20 flex flex-col items-center justify-center text-xl font-serif text-indigo-200 relative group/avatar">
+                  <div className="group/avatar relative flex size-14 flex-col items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 font-serif text-xl text-zinc-600">
                     <span>{selectedChar.name.charAt(0)}</span>
                     {onOpenVisualStudio && (
                       <button
                         onClick={() => onOpenVisualStudio({ type: 'character', id: selectedChar.id })}
-                        className="absolute inset-0 bg-black/70 opacity-0 group-hover/avatar:opacity-100 transition-opacity rounded-xl flex flex-col items-center justify-center text-[10px] text-cyan-300 font-sans"
+                        className="absolute inset-0 flex flex-col items-center justify-center rounded-xl bg-zinc-900/70 font-sans text-[10px] text-zinc-100 opacity-0 transition-opacity group-hover/avatar:opacity-100"
                       >
-                        <Camera className="w-3.5 h-3.5 mb-0.5" />
+                        <Camera className="mb-0.5 size-3.5" strokeWidth={1.75} />
                         <span>Generate</span>
                       </button>
                     )}
                   </div>
                 )}
                 <div>
-                  <h4 className="text-base font-serif font-semibold text-slate-100">{selectedChar.name}</h4>
-                  <p className="text-xs text-indigo-300/80">{selectedChar.role}</p>
-                  <div className="flex items-center space-x-2 mt-1">
+                  <h4 className="font-serif text-base font-semibold text-zinc-900">{selectedChar.name}</h4>
+                  <p className="text-xs text-zinc-500">{selectedChar.role}</p>
+                  <div className="mt-1 flex items-center gap-2">
                     {selectedChar.faction && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-slate-400 font-mono">
+                      <span className="rounded-full border border-zinc-200 bg-white px-2 py-0.5 font-mono text-[10px] text-zinc-500">
                         {selectedChar.faction}
                       </span>
                     )}
                     {onOpenVisualStudio && (
                       <button
                         onClick={() => onOpenVisualStudio({ type: 'character', id: selectedChar.id })}
-                        className="text-[10px] text-cyan-400 hover:text-cyan-300 flex items-center space-x-1"
+                        className="flex items-center gap-1 text-[10px] text-zinc-500 hover:text-zinc-900"
                       >
-                        <Sparkles className="w-3 h-3" />
+                        <Sparkles className="size-3" strokeWidth={1.75} />
                         <span>{selectedChar.imageUrl ? 'Redraw Portrait' : 'Generate Portrait'}</span>
                       </button>
                     )}
@@ -145,11 +145,11 @@ export const CharacterBlock: React.FC<UIBlockProps> = ({ block, world, onAction,
 
               {/* Loyalty Bar */}
               <div className="mt-4">
-                <div className="flex justify-between text-xs mb-1 font-mono">
-                  <span className="text-slate-400">Allegiance Index</span>
-                  <span className="text-slate-200 font-semibold">{selectedChar.loyalty} / 100</span>
+                <div className="mb-1 flex justify-between font-mono text-xs">
+                  <span className="text-zinc-500">Allegiance Index</span>
+                  <span className="font-semibold tabular-nums text-zinc-900">{selectedChar.loyalty} / 100</span>
                 </div>
-                <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-200">
                   <div
                     className={`h-full rounded-full transition-all duration-500 ${
                       selectedChar.loyalty >= 75 ? 'bg-emerald-500' :
@@ -162,39 +162,39 @@ export const CharacterBlock: React.FC<UIBlockProps> = ({ block, world, onAction,
 
               {/* Status & Motives */}
               <div className="mt-4 space-y-3">
-                <div className="p-3 rounded-lg bg-white/[0.02] border border-white/5">
-                  <div className="text-[10px] uppercase font-mono text-slate-500 mb-1">Current Stance</div>
-                  <p className="text-xs text-slate-300 leading-relaxed">{selectedChar.status}</p>
+                <div className="rounded-lg border border-zinc-100 bg-white p-3">
+                  <div className="mb-1 font-mono text-[10px] uppercase text-zinc-500">Current Stance</div>
+                  <p className="text-xs leading-relaxed text-zinc-700">{selectedChar.status}</p>
                 </div>
 
-                <div className="p-3 rounded-lg bg-white/[0.02] border border-white/5">
-                  <div className="text-[10px] uppercase font-mono text-slate-500 mb-1">Intelligence Summary</div>
-                  <p className="text-xs text-slate-400 leading-relaxed">{selectedChar.summary}</p>
+                <div className="rounded-lg border border-zinc-100 bg-white p-3">
+                  <div className="mb-1 font-mono text-[10px] uppercase text-zinc-500">Intelligence Summary</div>
+                  <p className="text-xs leading-relaxed text-zinc-500">{selectedChar.summary}</p>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="flex-1 flex items-center justify-center text-xs text-slate-500">
+            <div className="flex flex-1 items-center justify-center text-xs text-zinc-400">
               Select a persona to inspect dossiers
             </div>
           )}
 
           {selectedChar && onAction && (
-            <div className="mt-4 pt-3 border-t border-white/5 space-y-2">
+            <div className="mt-4 space-y-2 border-t border-zinc-100 pt-3">
               <button
                 id={`interact-confront-${selectedChar.id}`}
                 onClick={() => onAction(`Summon ${selectedChar.name} for a private audience regarding their loyalties and recent decisions`)}
-                className="w-full px-3 py-2 text-xs font-medium text-slate-200 bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 rounded-lg transition-colors flex items-center justify-center space-x-2"
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-zinc-900 px-3 py-2 text-xs font-medium text-zinc-50 transition-colors hover:bg-zinc-800"
               >
-                <MessageSquare className="w-3.5 h-3.5 text-indigo-400" />
+                <MessageSquare className="size-3.5" strokeWidth={1.75} />
                 <span>Interrogate {selectedChar.name.split(' ')[0]}</span>
               </button>
               <button
                 id={`interact-surveil-${selectedChar.id}`}
                 onClick={() => onAction(`Initiate discrete surveillance on ${selectedChar.name} and audit private communications`)}
-                className="w-full px-3 py-2 text-xs font-medium text-slate-400 hover:text-slate-200 bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 rounded-lg transition-colors flex items-center justify-center space-x-2"
+                className="flex w-full items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
               >
-                <ShieldAlert className="w-3.5 h-3.5 text-amber-400/80" />
+                <ShieldAlert className="size-3.5 text-amber-600" strokeWidth={1.75} />
                 <span>Audit Secret Communications</span>
               </button>
             </div>

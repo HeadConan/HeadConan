@@ -206,36 +206,36 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
 
   return (
     <div id="visual-synthesis-modal" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-6xl max-h-[90vh] bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-slate-100">
+      <div className="relative w-full max-w-6xl max-h-[90vh] bg-zinc-900 border border-zinc-200/80 rounded-2xl shadow-2xl flex flex-col overflow-hidden text-zinc-900">
         
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/60">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 bg-zinc-100/60">
           <div className="flex items-center space-x-3">
-            <div className="p-2.5 rounded-xl bg-cyan-950/80 border border-cyan-500/40 text-cyan-400">
+            <div className="p-2.5 rounded-xl bg-cyan-50/80 border border-cyan-200 text-cyan-600">
               <ImageIcon className="w-5 h-5 animate-pulse" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
                 <h2 className="text-lg font-bold tracking-wide text-white">Visual Synthesis Studio</h2>
-                <span className="px-2 py-0.5 text-[10px] font-mono tracking-wider uppercase rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+                <span className="px-2 py-0.5 text-[10px] font-mono tracking-wider uppercase rounded bg-cyan-50 text-cyan-600 border border-cyan-200">
                   AI & Procedural Engine
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
-                Generate high-fidelity portraits, tactical maps, forensic exhibits & concept illustrations grounded in <span className="text-slate-200 font-medium">"{world.name}"</span>
+              <p className="text-xs text-zinc-500">
+                Generate high-fidelity portraits, tactical maps, forensic exhibits & concept illustrations grounded in <span className="text-zinc-800 font-medium">"{world.name}"</span>
               </p>
             </div>
           </div>
 
           <div className="flex items-center space-x-3">
             {/* Tab switch */}
-            <div className="flex bg-slate-800/80 p-1 rounded-xl border border-slate-700">
+            <div className="flex bg-zinc-200/80 p-1 rounded-xl border border-zinc-200">
               <button
                 onClick={() => setActiveTab('create')}
                 className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   activeTab === 'create'
-                    ? 'bg-cyan-500 text-slate-950 shadow-md'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-cyan-500 text-zinc-950 shadow-md'
+                    : 'text-zinc-500 hover:text-zinc-800'
                 }`}
               >
                 <Sparkles className="w-3.5 h-3.5" />
@@ -245,8 +245,8 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
                 onClick={() => setActiveTab('gallery')}
                 className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   activeTab === 'gallery'
-                    ? 'bg-cyan-500 text-slate-950 shadow-md'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-cyan-500 text-zinc-950 shadow-md'
+                    : 'text-zinc-500 hover:text-zinc-800'
                 }`}
               >
                 <Layers className="w-3.5 h-3.5" />
@@ -256,7 +256,7 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
 
             <button
               onClick={onClose}
-              className="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+              className="p-2 text-zinc-500 hover:text-white rounded-lg hover:bg-zinc-200 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -265,9 +265,9 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
 
         {/* Toast Alert */}
         {appliedToast && (
-          <div className="bg-emerald-950/90 border-b border-emerald-500/40 text-emerald-300 text-xs px-6 py-2 flex items-center justify-between animate-fade-in">
+          <div className="bg-emerald-50/90 border-b border-emerald-200 text-emerald-700 text-xs px-6 py-2 flex items-center justify-between animate-fade-in">
             <div className="flex items-center space-x-2">
-              <Check className="w-4 h-4 text-emerald-400" />
+              <Check className="w-4 h-4 text-emerald-700" />
               <span>{appliedToast}</span>
             </div>
           </div>
@@ -283,7 +283,7 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
                 
                 {/* 1. Target Entity Type Selection */}
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-2">
                     1. Target Entity Binding
                   </label>
                   <div className="grid grid-cols-5 gap-2">
@@ -303,11 +303,11 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
                           onClick={() => setTargetType(item.type as any)}
                           className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
                             isSelected
-                              ? 'bg-cyan-950/70 border-cyan-500 text-cyan-300 shadow-sm shadow-cyan-500/20'
-                              : 'bg-slate-850/60 border-slate-750 text-slate-400 hover:border-slate-600 hover:text-slate-200'
+                              ? 'bg-cyan-50/70 border-cyan-200 text-cyan-700 shadow-sm shadow-cyan-500/20'
+                              : 'bg-zinc-100/60 border-zinc-200 text-zinc-500 hover:border-zinc-200 hover:text-zinc-800'
                           }`}
                         >
-                          <Icon className={`w-4 h-4 mb-1.5 ${isSelected ? 'text-cyan-400' : 'text-slate-400'}`} />
+                          <Icon className={`w-4 h-4 mb-1.5 ${isSelected ? 'text-cyan-600' : 'text-zinc-500'}`} />
                           <span className="text-xs font-medium">{item.label}</span>
                         </button>
                       );
@@ -317,14 +317,14 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
 
                 {/* 2. Specific Entity Selector (if not freeform) */}
                 {targetType !== 'freeform' && (
-                  <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-3.5">
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                  <div className="bg-zinc-100/60 border border-zinc-200 rounded-xl p-3.5">
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-2">
                       Select {targetType === 'character' ? 'Character' : targetType === 'location' ? 'Outpost / Sector' : targetType === 'evidence' ? 'Evidence Clue' : 'Timeline Event'}
                     </label>
                     <select
                       value={selectedEntityId}
                       onChange={(e) => setSelectedEntityId(e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-cyan-500 font-medium"
+                      className="w-full bg-zinc-900 border border-zinc-200 rounded-lg px-3 py-2 text-sm text-zinc-900 focus:outline-none focus:border-cyan-200 font-medium"
                     >
                       {targetType === 'character' &&
                         world.characters?.map(c => (
@@ -357,13 +357,13 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
                 {/* 3. Prompt Canvas & World Enhancer */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
                       2. Visual Synthesis Prompt
                     </label>
                     <button
                       type="button"
                       onClick={handleEnhancePrompt}
-                      className="flex items-center space-x-1 text-xs text-cyan-400 hover:text-cyan-300 font-medium px-2 py-0.5 rounded bg-cyan-950/60 border border-cyan-500/30 transition-colors"
+                      className="flex items-center space-x-1 text-xs text-cyan-600 hover:text-cyan-700 font-medium px-2 py-0.5 rounded bg-cyan-50 border border-cyan-200 transition-colors"
                     >
                       <Sparkles className="w-3 h-3" />
                       <span>✨ Enhance with World Atmosphere</span>
@@ -374,13 +374,13 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
                     placeholder="Describe characters, environments, lighting, textures, camera angle..."
-                    className="w-full bg-slate-950/80 border border-slate-700 rounded-xl p-3.5 text-sm text-slate-100 focus:outline-none focus:border-cyan-500 transition-colors resize-none leading-relaxed font-sans placeholder-slate-500"
+                    className="w-full bg-zinc-100/80 border border-zinc-200 rounded-xl p-3.5 text-sm text-zinc-900 focus:outline-none focus:border-cyan-200 transition-colors resize-none leading-relaxed font-sans placeholder-zinc-400"
                   />
                 </div>
 
                 {/* 4. Style Preset Selection */}
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-2">
                     3. Aesthetic & Style Preset
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -393,12 +393,12 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
                           onClick={() => setStylePreset(preset.id)}
                           className={`p-2.5 rounded-xl border text-left transition-all ${
                             isSelected
-                              ? 'bg-cyan-950/60 border-cyan-500 text-cyan-300 shadow-sm'
-                              : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                              ? 'bg-cyan-50 border-cyan-200 text-cyan-700 shadow-sm'
+                              : 'bg-zinc-100/40 border-zinc-200 text-zinc-500 hover:border-zinc-200 hover:text-zinc-800'
                           }`}
                         >
-                          <div className="text-xs font-bold truncate text-slate-200">{preset.label}</div>
-                          <div className="text-[10px] text-slate-400 line-clamp-2 mt-0.5 leading-tight">
+                          <div className="text-xs font-bold truncate text-zinc-800">{preset.label}</div>
+                          <div className="text-[10px] text-zinc-500 line-clamp-2 mt-0.5 leading-tight">
                             {preset.description}
                           </div>
                         </button>
@@ -410,7 +410,7 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
                 {/* 5. Aspect Ratio & Model Quality */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-2">
                       4. Aspect Ratio
                     </label>
                     <div className="flex space-x-1.5">
@@ -421,8 +421,8 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
                           onClick={() => setAspectRatio(ratio)}
                           className={`flex-1 py-2 text-xs font-mono rounded-lg border text-center transition-all ${
                             aspectRatio === ratio
-                              ? 'bg-cyan-500 text-slate-950 font-bold border-cyan-400'
-                              : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200'
+                              ? 'bg-cyan-500 text-zinc-950 font-bold border-cyan-200'
+                              : 'bg-zinc-100/60 border-zinc-200 text-zinc-500 hover:text-zinc-800'
                           }`}
                         >
                           {ratio}
@@ -432,13 +432,13 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-2">
                       5. Model Tier
                     </label>
                     <select
                       value={modelQuality}
                       onChange={(e) => setModelQuality(e.target.value as any)}
-                      className="w-full bg-slate-950/80 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 font-mono"
+                      className="w-full bg-zinc-100/80 border border-zinc-200 rounded-lg px-3 py-2 text-xs text-zinc-800 focus:outline-none focus:border-cyan-200 font-mono"
                     >
                       <option value="gemini-3.1-flash-lite-image">Gemini 3.1 Flash Lite Image (Fast, Standard)</option>
                       <option value="gemini-3.1-flash-image">Gemini 3.1 Flash Image (High Fidelity 1K/2K)</option>
@@ -463,13 +463,13 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
                   disabled={isGenerating}
                   className={`w-full py-3.5 px-6 rounded-xl font-bold text-sm tracking-wide flex items-center justify-center space-x-2 transition-all shadow-lg ${
                     isGenerating
-                      ? 'bg-slate-800 text-slate-400 cursor-not-allowed border border-slate-700'
-                      : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 shadow-cyan-500/20 active:scale-[0.99]'
+                      ? 'bg-zinc-200 text-zinc-500 cursor-not-allowed border border-zinc-200'
+                      : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-zinc-950 shadow-cyan-500/20 active:scale-[0.99]'
                   }`}
                 >
                   {isGenerating ? (
                     <>
-                      <RefreshCw className="w-4 h-4 animate-spin text-cyan-400" />
+                      <RefreshCw className="w-4 h-4 animate-spin text-cyan-600" />
                       <span>Synthesizing Visual Asset from Latent Continuum...</span>
                     </>
                   ) : (
@@ -483,34 +483,34 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
 
               {/* Right Column: Live Result & Target Preview (5 cols) */}
               <div className="lg:col-span-5 flex flex-col">
-                <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 flex-1 flex flex-col justify-between">
+                <div className="bg-zinc-100/80 border border-zinc-200 rounded-2xl p-4 flex-1 flex flex-col justify-between">
                   <div>
-                    <div className="flex items-center justify-between pb-3 border-b border-slate-800/80 mb-4">
+                    <div className="flex items-center justify-between pb-3 border-b border-zinc-200/80 mb-4">
                       <div className="flex items-center space-x-2">
-                        <Camera className="w-4 h-4 text-cyan-400" />
-                        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                        <Camera className="w-4 h-4 text-cyan-600" />
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-700">
                           Synthesis Output
                         </h3>
                       </div>
                       {currentResult && (
-                        <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-500/30">
+                        <span className="text-[10px] font-mono text-cyan-600 bg-cyan-50 px-2 py-0.5 rounded border border-cyan-200">
                           {currentResult.isAiGenerated ? 'Gemini Generative Art' : 'Procedural Vector Asset'}
                         </span>
                       )}
                     </div>
 
                     {/* Image Render Canvas */}
-                    <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-slate-900 border border-slate-800 flex items-center justify-center group">
+                    <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-zinc-900 border border-zinc-200 flex items-center justify-center group">
                       {isGenerating ? (
                         <div className="flex flex-col items-center justify-center p-6 text-center space-y-3">
                           <div className="relative w-16 h-16">
-                            <div className="absolute inset-0 rounded-full border-2 border-cyan-500/30 animate-ping" />
+                            <div className="absolute inset-0 rounded-full border-2 border-cyan-200 animate-ping" />
                             <div className="absolute inset-0 rounded-full border-2 border-t-cyan-400 animate-spin" />
-                            <Sparkles className="absolute inset-0 m-auto w-6 h-6 text-cyan-400" />
+                            <Sparkles className="absolute inset-0 m-auto w-6 h-6 text-cyan-600" />
                           </div>
                           <div className="space-y-1">
-                            <p className="text-xs font-semibold text-slate-200">Sampling Diffusion Field...</p>
-                            <p className="text-[10px] text-slate-400">Grounding composition in {world.genre}</p>
+                            <p className="text-xs font-semibold text-zinc-800">Sampling Diffusion Field...</p>
+                            <p className="text-[10px] text-zinc-500">Grounding composition in {world.genre}</p>
                           </div>
                         </div>
                       ) : currentResult ? (
@@ -521,17 +521,17 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
                             referrerPolicy="no-referrer"
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
-                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
+                          <div className="absolute inset-0 bg-zinc-100 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
                             <button
                               onClick={() => setZoomImage(currentResult.imageUrl)}
-                              className="p-2 rounded-lg bg-slate-900/90 text-white hover:bg-cyan-500 hover:text-slate-950 transition-colors shadow-lg"
+                              className="p-2 rounded-lg bg-zinc-900/90 text-white hover:bg-cyan-500 hover:text-zinc-950 transition-colors shadow-lg"
                               title="Inspect Full Resolution"
                             >
                               <Maximize2 className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => handleDownload(currentResult.imageUrl, `${currentResult.entityTitle || 'headconan'}.png`)}
-                              className="p-2 rounded-lg bg-slate-900/90 text-white hover:bg-cyan-500 hover:text-slate-950 transition-colors shadow-lg"
+                              className="p-2 rounded-lg bg-zinc-900/90 text-white hover:bg-cyan-500 hover:text-zinc-950 transition-colors shadow-lg"
                               title="Download Asset"
                             >
                               <Download className="w-4 h-4" />
@@ -539,10 +539,10 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
                           </div>
                         </>
                       ) : (
-                        <div className="flex flex-col items-center justify-center p-8 text-center text-slate-500 space-y-2">
-                          <ImageIcon className="w-12 h-12 stroke-[1.2] text-slate-600" />
+                        <div className="flex flex-col items-center justify-center p-8 text-center text-zinc-500 space-y-2">
+                          <ImageIcon className="w-12 h-12 stroke-[1.2] text-zinc-500" />
                           <p className="text-xs">No image synthesized yet in this session.</p>
-                          <p className="text-[10px] text-slate-600 max-w-xs">
+                          <p className="text-[10px] text-zinc-500 max-w-xs">
                             Select an entity or enter custom prompt on the left, then click Generate.
                           </p>
                         </div>
@@ -552,18 +552,18 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
                     {/* Metadata & Actions for Generated Result */}
                     {currentResult && (
                       <div className="mt-4 space-y-3">
-                        <div className="bg-slate-900/90 rounded-xl p-3 border border-slate-800 text-xs space-y-1">
-                          <div className="flex justify-between text-slate-400">
+                        <div className="bg-zinc-900/90 rounded-xl p-3 border border-zinc-200 text-xs space-y-1">
+                          <div className="flex justify-between text-zinc-500">
                             <span>Entity:</span>
-                            <span className="font-semibold text-slate-200">{currentResult.entityTitle || targetType}</span>
+                            <span className="font-semibold text-zinc-800">{currentResult.entityTitle || targetType}</span>
                           </div>
-                          <div className="flex justify-between text-slate-400">
+                          <div className="flex justify-between text-zinc-500">
                             <span>Style:</span>
-                            <span className="text-cyan-400 font-mono">{currentResult.stylePreset}</span>
+                            <span className="text-cyan-600 font-mono">{currentResult.stylePreset}</span>
                           </div>
-                          <div className="flex justify-between text-slate-400">
+                          <div className="flex justify-between text-zinc-500">
                             <span>Aspect Ratio:</span>
-                            <span className="font-mono text-slate-200">{currentResult.aspectRatio}</span>
+                            <span className="font-mono text-zinc-800">{currentResult.aspectRatio}</span>
                           </div>
                         </div>
 
@@ -571,7 +571,7 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
                           <button
                             type="button"
                             onClick={() => handleApplyToEntity(currentResult)}
-                            className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs flex items-center justify-center space-x-2 transition-all shadow-md shadow-emerald-900/30"
+                            className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-zinc-950 font-bold text-xs flex items-center justify-center space-x-2 transition-all shadow-md shadow-emerald-500/20"
                           >
                             <Check className="w-4 h-4" />
                             <span>Apply Image to World State</span>
@@ -581,7 +581,7 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
                     )}
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-slate-800 text-[10px] text-slate-500 flex items-center justify-between">
+                  <div className="mt-4 pt-3 border-t border-zinc-200 text-[10px] text-zinc-500 flex items-center justify-between">
                     <span>Generated assets are saved automatically</span>
                     <span>{gallery.length} in Gallery</span>
                   </div>
@@ -592,22 +592,22 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
           ) : (
             /* Gallery Tab */
             <div className="space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center justify-between pb-3 border-b border-zinc-200">
                 <div>
                   <h3 className="text-sm font-bold text-white">Visual Asset History Bank</h3>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-zinc-500">
                     Browse, inspect, download, or rebind previously synthesized imagery to any world entity.
                   </p>
                 </div>
               </div>
 
               {gallery.length === 0 ? (
-                <div className="py-16 text-center text-slate-500 space-y-3">
-                  <Layers className="w-12 h-12 mx-auto stroke-[1.2] text-slate-600" />
+                <div className="py-16 text-center text-zinc-500 space-y-3">
+                  <Layers className="w-12 h-12 mx-auto stroke-[1.2] text-zinc-500" />
                   <p className="text-sm">The visual gallery is currently empty.</p>
                   <button
                     onClick={() => setActiveTab('create')}
-                    className="px-4 py-2 rounded-xl bg-cyan-500 text-slate-950 font-bold text-xs hover:bg-cyan-400 transition-colors"
+                    className="px-4 py-2 rounded-xl bg-cyan-500 text-zinc-950 font-bold text-xs hover:bg-cyan-400 transition-colors"
                   >
                     Synthesize First Image
                   </button>
@@ -617,26 +617,26 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
                   {gallery.map(item => (
                     <div
                       key={item.id}
-                      className="group relative bg-slate-950/80 rounded-xl border border-slate-800 overflow-hidden flex flex-col hover:border-cyan-500/60 transition-all shadow-md"
+                      className="group relative bg-zinc-100/80 rounded-xl border border-zinc-200 overflow-hidden flex flex-col hover:border-cyan-200/60 transition-all shadow-md"
                     >
-                      <div className="aspect-square relative overflow-hidden bg-slate-900">
+                      <div className="aspect-square relative overflow-hidden bg-zinc-900">
                         <img
                           src={item.imageUrl}
                           alt={item.entityTitle || 'Gallery asset'}
                           referrerPolicy="no-referrer"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-1.5 p-2">
+                        <div className="absolute inset-0 bg-zinc-100 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-1.5 p-2">
                           <button
                             onClick={() => setZoomImage(item.imageUrl)}
-                            className="p-1.5 rounded-lg bg-slate-800 text-white hover:bg-cyan-500 hover:text-slate-950 transition-colors"
+                            className="p-1.5 rounded-lg bg-zinc-200 text-white hover:bg-cyan-500 hover:text-zinc-950 transition-colors"
                             title="Inspect"
                           >
                             <Eye className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => handleDownload(item.imageUrl, `${item.entityTitle || 'asset'}.png`)}
-                            className="p-1.5 rounded-lg bg-slate-800 text-white hover:bg-cyan-500 hover:text-slate-950 transition-colors"
+                            className="p-1.5 rounded-lg bg-zinc-200 text-white hover:bg-cyan-500 hover:text-zinc-950 transition-colors"
                             title="Download"
                           >
                             <Download className="w-3.5 h-3.5" />
@@ -646,7 +646,7 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
                               ImageService.deleteFromGallery(item.id);
                               setGallery(ImageService.getGallery());
                             }}
-                            className="p-1.5 rounded-lg bg-slate-800 text-red-400 hover:bg-red-500 hover:text-white transition-colors"
+                            className="p-1.5 rounded-lg bg-zinc-200 text-red-400 hover:bg-red-500 hover:text-white transition-colors"
                             title="Delete"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -656,10 +656,10 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
 
                       <div className="p-2.5 flex flex-col justify-between flex-1 space-y-2">
                         <div>
-                          <div className="text-xs font-bold text-slate-200 truncate">
+                          <div className="text-xs font-bold text-zinc-800 truncate">
                             {item.entityTitle || item.entityType}
                           </div>
-                          <div className="text-[10px] text-slate-400 line-clamp-1 mt-0.5">
+                          <div className="text-[10px] text-zinc-500 line-clamp-1 mt-0.5">
                             {item.rawPrompt}
                           </div>
                         </div>
@@ -668,7 +668,7 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
                           <button
                             type="button"
                             onClick={() => handleApplyToEntity(item)}
-                            className="w-full py-1 text-[10px] font-bold rounded-lg bg-slate-800 hover:bg-cyan-500 hover:text-slate-950 text-cyan-400 border border-slate-700 transition-colors"
+                            className="w-full py-1 text-[10px] font-bold rounded-lg bg-zinc-200 hover:bg-cyan-500 hover:text-zinc-950 text-cyan-600 border border-zinc-200 transition-colors"
                           >
                             Bind to Entity
                           </button>
@@ -691,7 +691,7 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
             <div className="relative max-w-4xl max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
               <button
                 onClick={() => setZoomImage(null)}
-                className="absolute -top-10 right-0 text-white hover:text-cyan-400 transition-colors"
+                className="absolute -top-10 right-0 text-white hover:text-cyan-600 transition-colors"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -699,7 +699,7 @@ export const VisualSynthesisStudio: React.FC<VisualSynthesisStudioProps> = ({
                 src={zoomImage}
                 alt="Full resolution inspection"
                 referrerPolicy="no-referrer"
-                className="max-w-full max-h-[85vh] rounded-xl border border-slate-700 shadow-2xl object-contain"
+                className="max-w-full max-h-[85vh] rounded-xl border border-zinc-200 shadow-2xl object-contain"
               />
             </div>
           </div>

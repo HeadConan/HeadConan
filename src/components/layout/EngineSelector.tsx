@@ -27,15 +27,15 @@ export const EngineSelector: React.FC<EngineSelectorProps> = ({
   const getProviderIcon = (id: AIProviderId) => {
     switch (id) {
       case 'deepseek-chat':
-        return <Zap className="w-3.5 h-3.5 text-cyan-400" />;
+        return <Zap className="size-3.5 text-cyan-600" strokeWidth={1.75} />;
       case 'deepseek-reasoner':
-        return <Brain className="w-3.5 h-3.5 text-purple-400" />;
+        return <Brain className="size-3.5 text-purple-600" strokeWidth={1.75} />;
       case 'gemini-3.7-flash':
-        return <Sparkles className="w-3.5 h-3.5 text-blue-400" />;
+        return <Sparkles className="size-3.5 text-blue-600" strokeWidth={1.75} />;
       case 'procedural':
-        return <Server className="w-3.5 h-3.5 text-emerald-400" />;
+        return <Server className="size-3.5 text-emerald-600" strokeWidth={1.75} />;
       default:
-        return <Cpu className="w-3.5 h-3.5 text-indigo-400" />;
+        return <Cpu className="size-3.5 text-zinc-600" strokeWidth={1.75} />;
     }
   };
 
@@ -44,49 +44,46 @@ export const EngineSelector: React.FC<EngineSelectorProps> = ({
       <button
         id="btn-engine-selector"
         onClick={() => setIsOpen(!isOpen)}
-        className={`rounded-lg bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 text-xs font-medium text-slate-200 transition-all flex items-center space-x-2 ${
+        className={`flex items-center gap-2 rounded-lg border border-zinc-200 bg-white text-xs font-medium text-zinc-700 transition-all hover:bg-zinc-50 ${
           compact ? 'px-2.5 py-1.5' : 'px-3 py-1.5'
         }`}
         title="Select AI Engine (DeepSeek V3, DeepSeek R1, Gemini 3.7 Flash, Procedural)"
       >
         {getProviderIcon(selectedEngine)}
-        <span className="font-mono text-slate-200 font-semibold">{currentConfig.badge}</span>
-        <ChevronDown className="w-3 h-3 text-slate-400" />
+        <span className="font-mono font-semibold text-zinc-800">{currentConfig.badge}</span>
+        <ChevronDown className="size-3 text-zinc-400" />
       </button>
 
       {isOpen && (
         <>
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setIsOpen(false)}
-          />
-          <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-[#0e111a] border border-white/15 rounded-xl shadow-2xl py-2 z-50 divide-y divide-white/10 animate-in fade-in zoom-in-95 duration-150">
+          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+          <div className="absolute right-0 z-50 mt-2 w-72 rounded-xl border border-zinc-200 bg-white py-2 shadow-lg sm:w-80">
             {/* Header / Server Status Indicator */}
             <div className="px-3.5 py-2">
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
+              <div className="mb-1.5 flex items-center justify-between">
+                <span className="text-[10px] font-medium uppercase tracking-widest text-zinc-500">
                   AI Gateway & Engines
                 </span>
-                <span className="flex items-center space-x-1.5 text-[10px] font-mono text-emerald-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="flex items-center gap-1.5 text-[10px] font-mono text-emerald-600">
+                  <span className="size-1.5 animate-pulse rounded-full bg-emerald-500" />
                   <span>Ready</span>
                 </span>
               </div>
               <div className="flex items-center gap-1.5 text-[10px] font-mono">
                 <span
-                  className={`px-1.5 py-0.5 rounded border ${
+                  className={`rounded border px-1.5 py-0.5 ${
                     health?.providers?.deepseek?.available
-                      ? 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30'
-                      : 'bg-white/5 text-slate-400 border-white/10'
+                      ? 'border-cyan-200 bg-cyan-50 text-cyan-700'
+                      : 'border-zinc-200 bg-zinc-50 text-zinc-500'
                   }`}
                 >
                   DeepSeek: {health?.providers?.deepseek?.available ? 'Connected' : 'Standby / Local'}
                 </span>
                 <span
-                  className={`px-1.5 py-0.5 rounded border ${
+                  className={`rounded border px-1.5 py-0.5 ${
                     health?.providers?.gemini?.available
-                      ? 'bg-blue-500/10 text-blue-300 border-blue-500/30'
-                      : 'bg-white/5 text-slate-400 border-white/10'
+                      ? 'border-blue-200 bg-blue-50 text-blue-700'
+                      : 'border-zinc-200 bg-zinc-50 text-zinc-500'
                   }`}
                 >
                   Gemini: {health?.providers?.gemini?.available ? 'Connected' : 'Standby'}
@@ -106,23 +103,19 @@ export const EngineSelector: React.FC<EngineSelectorProps> = ({
                       onSelectEngine(provider.id);
                       setIsOpen(false);
                     }}
-                    className={`w-full text-left px-3.5 py-2.5 hover:bg-white/[0.04] transition-colors flex items-start space-x-3 ${
-                      isSelected ? 'bg-white/[0.03]' : ''
+                    className={`flex w-full items-start gap-3 px-3.5 py-2.5 text-left transition-colors hover:bg-zinc-50 ${
+                      isSelected ? 'bg-zinc-50' : ''
                     }`}
                   >
                     <div className="mt-0.5 shrink-0">{getProviderIcon(provider.id)}</div>
-                    <div className="flex-1 min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between">
-                        <span
-                          className={`text-xs font-semibold ${
-                            isSelected ? 'text-indigo-300 font-bold' : 'text-slate-200'
-                          }`}
-                        >
+                        <span className={`text-xs font-semibold ${isSelected ? 'font-bold text-zinc-900' : 'text-zinc-800'}`}>
                           {provider.name}
                         </span>
-                        {isSelected && <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0 ml-2" />}
+                        {isSelected && <Check className="ml-2 size-3.5 shrink-0 text-zinc-900" strokeWidth={2} />}
                       </div>
-                      <p className="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                      <p className="mt-0.5 text-[11px] leading-snug text-zinc-500">
                         {provider.description}
                       </p>
                     </div>
@@ -131,7 +124,7 @@ export const EngineSelector: React.FC<EngineSelectorProps> = ({
               })}
             </div>
 
-            <div className="px-3.5 py-2 text-[10px] font-mono text-slate-400 bg-black/20">
+            <div className="border-t border-zinc-100 px-3.5 py-2 text-[10px] font-mono text-zinc-500">
               DeepSeek-V3 and DeepSeek-R1 support zero-latency simulation and structured JSON output.
             </div>
           </div>

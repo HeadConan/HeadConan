@@ -16,8 +16,8 @@ export const WorldCanvasRenderer: React.FC<WorldCanvasRendererProps> = ({
   onAddNote,
 }) => {
   return (
-    <div id="world-canvas-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-      {blocks.map((block) => {
+    <div id="world-canvas-grid" className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {blocks.map((block, index) => {
         const descriptor = UI_CAPABILITY_REGISTRY[block.type];
         if (!descriptor) {
           return null;
@@ -37,7 +37,8 @@ export const WorldCanvasRenderer: React.FC<WorldCanvasRendererProps> = ({
           <div
             key={block.id}
             id={`ui-block-container-${block.id}`}
-            className={`${colSpanClass} transition-all duration-300`}
+            className={`${colSpanClass} pay-fade-up`}
+            style={{ animationDelay: `${Math.min(index, 8) * 45}ms` }}
           >
             <Component
               block={block}

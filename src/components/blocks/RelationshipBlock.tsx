@@ -6,18 +6,18 @@ export const RelationshipBlock: React.FC<UIBlockProps> = ({ block, world, onActi
   const relationships = world.relationships || [];
 
   return (
-    <div id="block-relationships-view" className="bg-[#0d101a] border border-white/10 rounded-xl overflow-hidden flex flex-col h-[480px]">
+    <div id="block-relationships-view" className="flex h-[480px] flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-card">
       {/* Header */}
-      <div className="px-4 py-3 bg-white/[0.02] border-b border-white/5 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <GitCommit className="w-4 h-4 text-purple-400" />
-          <h3 className="text-sm font-medium tracking-wider uppercase text-slate-200">{block.title || 'Interpersonal Dynamics & Friction'}</h3>
+      <div className="flex items-center justify-between border-b border-zinc-100 bg-zinc-50/80 px-4 py-3">
+        <div className="flex items-center gap-2">
+          <GitCommit className="size-4 text-zinc-500" strokeWidth={1.75} />
+          <h3 className="text-sm font-semibold tracking-wide text-zinc-900">{block.title || 'Interpersonal Dynamics & Friction'}</h3>
         </div>
-        <span className="text-xs font-mono text-purple-400/90">{relationships.length} Active Ties</span>
+        <span className="font-mono text-xs tabular-nums text-zinc-500">{relationships.length} Active Ties</span>
       </div>
 
       {/* Network List */}
-      <div className="flex-1 p-4 space-y-3 overflow-y-auto">
+      <div className="flex-1 space-y-3 overflow-y-auto p-4">
         {relationships.length > 0 ? (
           relationships.map((rel) => {
             const isTension = rel.type === 'rivalry' || rel.type === 'distrust';
@@ -25,40 +25,40 @@ export const RelationshipBlock: React.FC<UIBlockProps> = ({ block, world, onActi
               <div
                 key={rel.id}
                 id={`rel-card-${rel.id}`}
-                className="p-3.5 rounded-lg bg-white/[0.02] border border-white/5 hover:border-purple-500/20 transition-all"
+                className="rounded-lg border border-zinc-100 bg-white p-3.5 transition-all hover:border-zinc-300"
               >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center space-x-2 text-xs font-medium text-slate-200">
-                    <span className="text-indigo-300">{rel.sourceName}</span>
-                    <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
-                    <span className="text-purple-300">{rel.targetName}</span>
+                <div className="mb-2 flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-xs font-medium text-zinc-800">
+                    <span className="text-zinc-900">{rel.sourceName}</span>
+                    <ArrowRight className="size-3.5 text-zinc-400" strokeWidth={1.75} />
+                    <span className="text-zinc-900">{rel.targetName}</span>
                   </div>
 
-                  <span className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded border ${
-                    isTension 
-                      ? 'bg-rose-500/10 text-rose-300 border-rose-500/20' 
-                      : 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20'
+                  <span className={`rounded border px-2 py-0.5 font-mono text-[10px] uppercase ${
+                    isTension
+                      ? 'border-rose-200 bg-rose-50 text-rose-700'
+                      : 'border-emerald-200 bg-emerald-50 text-emerald-700'
                   }`}>
                     {rel.type} ({rel.intensity}%)
                   </span>
                 </div>
 
-                <p className="text-xs text-slate-400 leading-relaxed">{rel.description}</p>
+                <p className="text-xs leading-relaxed text-zinc-500">{rel.description}</p>
 
                 {onAction && (
                   <button
                     onClick={() => onAction(`Intervene in the dynamic between ${rel.sourceName} and ${rel.targetName}`)}
-                    className="mt-2.5 px-2 py-1 text-[11px] font-medium text-purple-300 hover:text-purple-200 bg-purple-500/10 hover:bg-purple-500/20 rounded border border-purple-500/20 transition-colors flex items-center space-x-1"
+                    className="mt-2.5 flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-2 py-1 text-[11px] font-medium text-zinc-700 transition-colors hover:bg-zinc-100"
                   >
                     <span>Influence Dynamic</span>
-                    <Shuffle className="w-3 h-3 ml-1" />
+                    <Shuffle className="size-3" strokeWidth={1.75} />
                   </button>
                 )}
               </div>
             );
           })
         ) : (
-          <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500">
+          <div className="flex h-full flex-col items-center justify-center p-6 text-center text-zinc-400">
             <p className="text-xs">Dynamic relational network evolving with your actions.</p>
           </div>
         )}

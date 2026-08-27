@@ -47,32 +47,32 @@ export const WorldGenesisAnimation: React.FC<WorldGenesisAnimationProps> = ({
   const config = AI_PROVIDERS.find((p) => p.id === selectedEngine) || AI_PROVIDERS[0];
 
   return (
-    <div className="min-h-screen bg-[#08090d] text-slate-100 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-zinc-100 p-6 text-zinc-950">
       {/* Subtle pulse background */}
-      <div className="w-96 h-96 bg-indigo-600/10 rounded-full blur-[120px] animate-pulse pointer-events-none" />
+      <div className="pointer-events-none size-96 animate-pulse rounded-full bg-zinc-300/40 blur-[120px]" />
 
-      <div className="max-w-md w-full text-center relative z-10">
-        <div className="w-14 h-14 mx-auto rounded-2xl bg-white/[0.03] border border-white/10 flex items-center justify-center mb-5 shadow-2xl">
-          <CurrentIcon className="w-6 h-6 text-indigo-400 animate-spin" style={{ animationDuration: '4s' }} />
+      <div className="relative z-10 w-full max-w-md text-center">
+        <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-2xl border border-zinc-200 bg-white shadow-card">
+          <CurrentIcon className="size-6 animate-spin text-zinc-800" style={{ animationDuration: '4s' }} strokeWidth={1.5} />
         </div>
 
-        <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/[0.03] border border-white/10 text-[10px] font-mono uppercase tracking-widest text-indigo-400/90 mb-3">
+        <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-zinc-600 shadow-sm">
           <span>Engine: {config.name}</span>
         </div>
 
-        <h3 className="text-lg font-serif font-medium text-slate-200 mb-6 h-8 flex items-center justify-center">
+        <h3 className="mb-6 flex h-8 items-center justify-center text-lg font-medium text-zinc-800">
           {STAGES[currentStageIndex]?.text}
         </h3>
 
         {/* Prompt quotation */}
-        <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 text-xs text-slate-400 italic max-w-sm mx-auto line-clamp-2">
+        <div className="mx-auto line-clamp-2 max-w-sm rounded-xl border border-zinc-200 bg-white p-3.5 font-sans text-xs italic text-zinc-500 shadow-sm">
           “{prompt}”
         </div>
 
         {/* Progress Bar */}
-        <div className="mt-6 h-1 w-48 mx-auto bg-white/5 rounded-full overflow-hidden">
+        <div className="mt-6 mx-auto h-1 w-48 overflow-hidden rounded-full bg-zinc-200">
           <div
-            className="h-full bg-gradient-to-r from-cyan-500 via-indigo-500 to-purple-500 transition-all duration-500 rounded-full"
+            className="h-full rounded-full bg-zinc-900 transition-all duration-500"
             style={{ width: `${((currentStageIndex + 1) / STAGES.length) * 100}%` }}
           />
         </div>

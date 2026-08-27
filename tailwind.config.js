@@ -1,32 +1,72 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
-  darkMode: 'class',
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
-        background: '#090a0f',
-        canvas: '#0d0f17',
-        card: '#131622',
-        border: 'rgba(255, 255, 255, 0.08)',
-        subtle: 'rgba(255, 255, 255, 0.03)',
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
         accent: {
-          DEFAULT: '#6366f1',
-          gold: '#d97706',
-          cyan: '#06b6d4',
-          emerald: '#10b981',
-          rose: '#f43f5e'
-        }
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        sidebar: {
+          DEFAULT: "hsl(var(--sidebar))",
+          foreground: "hsl(var(--sidebar-foreground))",
+          border: "hsl(var(--sidebar-border))",
+        },
+      },
+      borderRadius: {
+        sm: "calc(var(--radius) - 4px)", // 10px — sidebar items, chips
+        md: "calc(var(--radius) - 2px)", // 12px — buttons
+        lg: "var(--radius)", // 14px — default radius
+        xl: "calc(var(--radius) + 4px)", // 18px — cards, panels
+        "2xl": "calc(var(--radius) + 8px)", // 22px — dialogs / modals
       },
       fontFamily: {
-        sans: ['"Inter"', 'system-ui', 'sans-serif'],
-        serif: ['"Playfair Display"', '"Cinzel"', 'Georgia', 'serif'],
-        mono: ['"JetBrains Mono"', 'monospace']
-      }
+        sans: [
+          '"Inter"',
+          "ui-sans-serif",
+          "system-ui",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          '"Segoe UI"',
+          "sans-serif",
+        ],
+        mono: ['"JetBrains Mono"', "ui-monospace", "SFMono-Regular", "monospace"],
+      },
+      boxShadow: {
+        card: "0 1px 2px 0 rgb(0 0 0 / 0.04), 0 1px 3px 0 rgb(0 0 0 / 0.06)",
+      },
     },
   },
   plugins: [],
-}
+};

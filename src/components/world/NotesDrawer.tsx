@@ -29,61 +29,61 @@ export const NotesDrawer: React.FC<NotesDrawerProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-[#0e111a] border border-white/10 rounded-2xl w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 p-4 backdrop-blur-sm">
+      <div className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-xl">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
-          <div className="flex items-center space-x-2.5">
-            <StickyNote className="w-5 h-5 text-amber-400" />
-            <h3 className="text-base font-serif font-semibold text-slate-100">
+        <div className="flex items-center justify-between border-b border-zinc-100 px-6 py-4">
+          <div className="flex items-center gap-2.5">
+            <StickyNote className="size-5 text-amber-600" strokeWidth={1.75} />
+            <h3 className="font-serif text-base font-semibold text-zinc-900">
               Deductive Memory & Scratchpad
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
+            className="rounded-lg p-1 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
           >
-            <X className="w-5 h-5" />
+            <X className="size-5" strokeWidth={1.75} />
           </button>
         </div>
 
         {/* Input */}
-        <form onSubmit={handleAdd} className="p-4 border-b border-white/5 bg-white/[0.01]">
+        <form onSubmit={handleAdd} className="border-b border-zinc-100 bg-zinc-50/60 p-4">
           <div className="flex gap-2">
             <input
               type="text"
               value={newNote}
               onChange={(e) => setNewNote(e.target.value)}
               placeholder="e.g. I don't trust the Chancellor..."
-              className="flex-1 bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-400/50"
+              className="flex-1 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
               autoFocus
             />
             <button
               type="submit"
               disabled={!newNote.trim()}
-              className="px-3 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/30 rounded-lg text-xs font-medium transition-colors disabled:opacity-40 flex items-center space-x-1"
+              className="flex items-center gap-1 rounded-lg bg-zinc-900 px-3 py-2 text-xs font-medium text-zinc-50 transition-colors hover:bg-zinc-800 disabled:opacity-40"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="size-4" strokeWidth={1.75} />
               <span>Record</span>
             </button>
           </div>
         </form>
 
         {/* List */}
-        <div className="flex-1 p-6 overflow-y-auto space-y-3">
+        <div className="flex-1 space-y-3 overflow-y-auto p-6">
           {notes.length > 0 ? (
             notes.map((note) => (
               <div
                 key={note.id}
-                className="p-3.5 rounded-xl bg-amber-500/[0.04] border border-amber-500/20 space-y-2"
+                className="space-y-2 rounded-xl border border-amber-200/70 bg-amber-50/50 p-3.5"
               >
-                <div className="flex items-center justify-between text-[10px] font-mono text-amber-400/80">
-                  <span className="flex items-center space-x-1">
-                    <Pin className="w-3 h-3" />
+                <div className="flex items-center justify-between font-mono text-[10px] text-amber-700">
+                  <span className="flex items-center gap-1">
+                    <Pin className="size-3" strokeWidth={1.75} />
                     <span>{note.createdAt}</span>
                   </span>
                 </div>
-                <p className="text-xs text-slate-200 leading-relaxed font-sans">{note.content}</p>
+                <p className="font-sans text-xs leading-relaxed text-zinc-800">{note.content}</p>
 
                 {onActionFromNote && (
                   <button
@@ -91,7 +91,7 @@ export const NotesDrawer: React.FC<NotesDrawerProps> = ({
                       onActionFromNote(`Act upon recorded deduction: "${note.content}"`);
                       onClose();
                     }}
-                    className="text-[11px] font-mono text-amber-300 hover:text-amber-200 underline decoration-amber-500/30 block pt-1"
+                    className="block pt-1 font-mono text-[11px] text-amber-700 underline decoration-amber-300 hover:text-amber-900"
                   >
                     Translate into active action →
                   </button>
@@ -99,7 +99,7 @@ export const NotesDrawer: React.FC<NotesDrawerProps> = ({
               </div>
             ))
           ) : (
-            <div className="text-center py-10 text-xs text-slate-500 font-mono">
+            <div className="py-10 text-center font-mono text-xs text-zinc-400">
               No deductions recorded. Use this scratchpad to track suspicions, goals, and secret observations.
             </div>
           )}
