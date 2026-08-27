@@ -7,6 +7,7 @@ export interface UIBlockProps {
   onAction?: (actionPrompt: string) => void;
   onAddNote?: (content: string) => void;
   onSelectEntity?: (entityType: string, id: string) => void;
+  onOpenVisualStudio?: (target?: { type: 'character' | 'location' | 'evidence' | 'event'; id?: string }) => void;
 }
 
 export interface UIBlockDescriptor {

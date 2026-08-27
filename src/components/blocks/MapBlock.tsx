@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { UIBlockProps } from '../../ui/types';
-import { MapPin, Navigation, Shield, Compass, Eye, AlertCircle } from 'lucide-react';
+import { MapPin, Navigation, Shield, Compass, Eye, AlertCircle, Sparkles, Camera, Image as ImageIcon } from 'lucide-react';
 import { WorldLocation } from '../../world/types';
 
-export const MapBlock: React.FC<UIBlockProps> = ({ block, world, onAction }) => {
+export const MapBlock: React.FC<UIBlockProps> = ({ block, world, onAction, onOpenVisualStudio }) => {
   const [selectedLocation, setSelectedLocation] = useState<WorldLocation | null>(
     world.locations[0] || null
   );
 
   return (
-    <div id="block-map-view" className="relative bg-[#0d101a] border border-white/10 rounded-xl overflow-hidden flex flex-col h-[480px]">
+    <div id="block-map-view" className="relative bg-[#0d101a] border border-white/10 rounded-xl overflow-hidden flex flex-col h-[520px]">
       {/* Header */}
       <div className="px-4 py-3 bg-white/[0.02] border-b border-white/5 flex items-center justify-between">
         <div className="flex items-center space-x-2">
@@ -17,6 +17,15 @@ export const MapBlock: React.FC<UIBlockProps> = ({ block, world, onAction }) => 
           <h3 className="text-sm font-medium tracking-wider uppercase text-slate-200">{block.title || 'Spatial & Tactical Map'}</h3>
         </div>
         <div className="flex items-center space-x-3 text-xs text-slate-400">
+          {onOpenVisualStudio && (
+            <button
+              onClick={() => onOpenVisualStudio({ type: 'location', id: selectedLocation?.id })}
+              className="flex items-center space-x-1 px-2.5 py-1 rounded bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs transition-colors"
+            >
+              <Camera className="w-3.5 h-3.5" />
+              <span>Scene Art Studio</span>
+            </button>
+          )}
           <span className="flex items-center space-x-1">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <span>Live Sector Scan</span>

@@ -1,20 +1,31 @@
 import React, { useState } from 'react';
 import { UIBlockProps } from '../../ui/types';
-import { Users, User, ShieldAlert, MessageSquare, Sparkles, ChevronRight } from 'lucide-react';
+import { Users, User, ShieldAlert, MessageSquare, Sparkles, ChevronRight, Camera, Image as ImageIcon } from 'lucide-react';
 import { Character } from '../../world/types';
 
-export const CharacterBlock: React.FC<UIBlockProps> = ({ block, world, onAction }) => {
+export const CharacterBlock: React.FC<UIBlockProps> = ({ block, world, onAction, onOpenVisualStudio }) => {
   const [selectedChar, setSelectedChar] = useState<Character | null>(world.characters[0] || null);
 
   return (
-    <div id="block-characters-view" className="bg-[#0d101a] border border-white/10 rounded-xl overflow-hidden flex flex-col h-[480px]">
+    <div id="block-characters-view" className="bg-[#0d101a] border border-white/10 rounded-xl overflow-hidden flex flex-col h-[520px]">
       {/* Header */}
       <div className="px-4 py-3 bg-white/[0.02] border-b border-white/5 flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <Users className="w-4 h-4 text-indigo-400" />
           <h3 className="text-sm font-medium tracking-wider uppercase text-slate-200">{block.title || 'Characters & Cabinet'}</h3>
         </div>
-        <span className="text-xs font-mono text-slate-400">{world.characters.length} Key Personas</span>
+        <div className="flex items-center space-x-2">
+          {onOpenVisualStudio && (
+            <button
+              onClick={() => onOpenVisualStudio({ type: 'character', id: selectedChar?.id })}
+              className="flex items-center space-x-1 px-2.5 py-1 rounded bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs transition-colors"
+            >
+              <Camera className="w-3.5 h-3.5" />
+              <span>Portrait Studio</span>
+            </button>
+          )}
+          <span className="text-xs font-mono text-slate-400">{world.characters.length} Key Personas</span>
+        </div>
       </div>
 
       {/* Grid Layout */}
@@ -41,9 +52,18 @@ export const CharacterBlock: React.FC<UIBlockProps> = ({ block, world, onAction 
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center space-x-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-900/40 to-slate-800 border border-white/10 flex items-center justify-center text-slate-300 font-serif font-bold text-sm">
-                      {char.name.charAt(0)}
-                    </div>
+                    {char.imageUrl || char.avatar ? (
+                      <img
+                        src={char.imageUrl || char.avatar}
+                        alt={char.name}
+                        referrerPolicy="no-referrer"
+                        className="w-8 h-8 rounded-lg object-cover border border-indigo-500/30 shadow-sm"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-900/40 to-slate-800 border border-white/10 flex items-center justify-center text-slate-300 font-serif font-bold text-sm">
+                        {char.name.charAt(0)}
+                      </div>
+                    )}
                     <div>
                       <h4 className="text-sm font-medium text-slate-100 leading-tight">{char.name}</h4>
                       <p className="text-[11px] text-slate-400 mt-0.5">{char.role}</p>
@@ -69,17 +89,57 @@ export const CharacterBlock: React.FC<UIBlockProps> = ({ block, world, onAction 
           {selectedChar ? (
             <div>
               <div className="flex items-center space-x-3 pb-3 border-b border-white/5">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-indigo-950 via-slate-800 to-indigo-900 border border-indigo-500/20 flex items-center justify-center text-xl font-serif text-indigo-200">
-                  {selectedChar.name.charAt(0)}
-                </div>
+                {selectedChar.imageUrl || selectedChar.avatar ? (
+                  <div className="relative group/avatar">
+                    <img
+                      src={selectedChar.imageUrl || selectedChar.avatar}
+                      alt={selectedChar.name}
+                      referrerPolicy="no-referrer"
+                      className="w-14 h-14 rounded-xl object-cover border border-indigo-500/40 shadow-md"
+                    />
+                    {onOpenVisualStudio && (
+                      <button
+                        onClick={() => onOpenVisualStudio({ type: 'character', id: selectedChar.id })}
+                        className="absolute inset-0 bg-black/60 opacity-0 group-hover/avatar:opacity-100 transition-opacity rounded-xl flex items-center justify-center text-white"
+                        title="Regenerate Portrait"
+                      >
+                        <Sparkles className="w-4 h-4 text-cyan-400" />
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-tr from-indigo-950 via-slate-800 to-indigo-900 border border-indigo-500/20 flex flex-col items-center justify-center text-xl font-serif text-indigo-200 relative group/avatar">
+                    <span>{selectedChar.name.charAt(0)}</span>
+                    {onOpenVisualStudio && (
+                      <button
+                        onClick={() => onOpenVisualStudio({ type: 'character', id: selectedChar.id })}
+                        className="absolute inset-0 bg-black/70 opacity-0 group-hover/avatar:opacity-100 transition-opacity rounded-xl flex flex-col items-center justify-center text-[10px] text-cyan-300 font-sans"
+                      >
+                        <Camera className="w-3.5 h-3.5 mb-0.5" />
+                        <span>Generate</span>
+                      </button>
+                    )}
+                  </div>
+                )}
                 <div>
                   <h4 className="text-base font-serif font-semibold text-slate-100">{selectedChar.name}</h4>
                   <p className="text-xs text-indigo-300/80">{selectedChar.role}</p>
-                  {selectedChar.faction && (
-                    <span className="inline-block mt-1 text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-slate-400 font-mono">
-                      {selectedChar.faction}
-                    </span>
-                  )}
+                  <div className="flex items-center space-x-2 mt-1">
+                    {selectedChar.faction && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-slate-400 font-mono">
+                        {selectedChar.faction}
+                      </span>
+                    )}
+                    {onOpenVisualStudio && (
+                      <button
+                        onClick={() => onOpenVisualStudio({ type: 'character', id: selectedChar.id })}
+                        className="text-[10px] text-cyan-400 hover:text-cyan-300 flex items-center space-x-1"
+                      >
+                        <Sparkles className="w-3 h-3" />
+                        <span>{selectedChar.imageUrl ? 'Redraw Portrait' : 'Generate Portrait'}</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 

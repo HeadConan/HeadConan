@@ -37,6 +37,7 @@ export interface Character {
   status: string;
   loyalty: number; // 0 - 100
   avatar?: string;
+  imageUrl?: string;
   summary: string;
   secretAgenda?: string;
   motive?: string;
@@ -59,6 +60,7 @@ export interface WorldLocation {
   controllingFaction?: string;
   cluesFound?: string[];
   restricted?: boolean;
+  imageUrl?: string;
 }
 
 export interface Faction {
@@ -79,6 +81,7 @@ export interface WorldEvent {
   description: string;
   urgency: UrgencyLevel;
   relatedEntityId?: string;
+  imageUrl?: string;
 }
 
 export interface TimelineEvent {
@@ -141,6 +144,7 @@ export interface ClueItem {
   status: 'unsolved' | 'connected' | 'refuted';
   connectedTo?: string[]; // IDs of related clues or suspects
   coordinates?: { x: number; y: number }; // For evidence corkboard layout
+  imageUrl?: string;
 }
 
 export interface RuleAxiom {
