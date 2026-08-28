@@ -321,39 +321,20 @@ body.entered .door { min-height: auto; padding: 96px 24px 56px; }
 }
 .portal-situation { font-weight: 600; font-size: 1.05rem; margin-bottom: 20px; flex: 1; }
 
-.portal-visual { height: 140px; border: var(--border); background: var(--paper); margin-bottom: 20px; position: relative; overflow: hidden; display: flex; }
-.portal-visual-spy { background: var(--white); }
-.pv-img { width: 50%; height: 100%; object-fit: cover; display: block; border-right: 3px solid var(--ink); }
-.pv-img:last-child { border-right: none; }
-
-.portal-visual-imperium { background: var(--yellow); }
-.pv-map {
-  position: absolute; inset: 18px;
-  border: 3px solid var(--ink);
-  background:
-    linear-gradient(var(--ink), var(--ink)) no-repeat 20% 20% / 22% 22%,
-    linear-gradient(var(--ink), var(--ink)) no-repeat 60% 40% / 26% 20%,
-    linear-gradient(var(--ink), var(--ink)) no-repeat 30% 70% / 20% 18%,
-    var(--paper);
+.portal-visual {
+  aspect-ratio: 3 / 4;
+  border: var(--border);
+  box-shadow: var(--shadow-sm);
+  background: var(--paper);
+  margin-bottom: 20px;
+  overflow: hidden;
 }
-
-.portal-visual-campus { background: var(--green); }
-.pv-cal {
-  position: absolute; left: 50%; top: 50%;
-  transform: translate(-50%, -50%);
-  width: 70px; height: 76px;
-  border: 3px solid var(--ink);
-  background: var(--white);
-  box-shadow: 5px 5px 0 var(--ink);
-}
-.pv-cal::before {
-  content: ''; position: absolute; top: 14px; left: 0; right: 0;
-  height: 3px; background: var(--ink);
-}
-.pv-cal::after {
-  content: '7:30'; position: absolute; top: 28px; left: 0; right: 0;
-  text-align: center;
-  font-family: var(--mono); font-weight: 700; font-size: 0.9rem;
+.pv-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: contrast(1.04) saturate(1.08);
 }
 
 /* ============================================================
@@ -509,8 +490,20 @@ body.entered .door { min-height: auto; padding: 96px 24px 56px; }
   display: none;
 }
 .persp-panel.is-visible { display: block; animation: pop-in 0.25s ease; }
+.persp-panel.is-visible.persp-host { display: grid; grid-template-columns: 120px 1fr; gap: 20px; align-items: start; }
 .persp-player { border-top: 10px solid var(--blue); }
 .persp-host { border-top: 10px solid var(--yellow); }
+
+.persp-poster {
+  grid-row: 1 / 4;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: center 18%;
+  display: block;
+  border: 3px solid var(--ink);
+  box-shadow: var(--shadow-sm);
+}
 
 .persp-obs { font-family: var(--display); font-size: 1.6rem; text-transform: uppercase; margin-bottom: 18px; line-height: 1.1; }
 

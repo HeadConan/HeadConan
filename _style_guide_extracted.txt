@@ -1,0 +1,2148 @@
+=== PAGE 1 ===
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+.894118 .894118 .905882 RG
+.6 w
+n 51.02362 802.2047 m 544.252 802.2047 l S
+BT /F1 7.5 Tf 9 TL ET
+.443137 .443137 .478431 rg
+BT 1 0 0 1 51.02362 806.4567 Tm (Lemma AI \227 UI Style Replication Guide) Tj T* ET
+BT 1 0 0 1 473.3845 806.4567 Tm (Confidential / Internal) Tj T* ET
+n 51.02362 39.68504 m 544.252 39.68504 l S
+BT 1 0 0 1 51.02362 28.34646 Tm (Replicate the Lemma AI design language in any React project) Tj T* ET
+BT 1 0 0 1 520.4845 28.34646 Tm (Page 1) Tj T* ET
+Q
+q
+1 0 0 1 57.02362 767.8583 cm
+Q
+q
+1 0 0 1 57.02362 737.8583 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 4 Tm /F2 26 Tf 30 TL (UI Style Replication Guide) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 715.8583 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 4 Tm /F1 12 Tf 16 TL (How to faithfully recreate the Lemma AI interface in a new project) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 703.3543 cm
+Q
+q
+1 0 0 1 57.02362 698.7543 cm
+q
+.6 w
+1 J
+.894118 .894118 .905882 RG
+n 0 0 m 481.2283 0 l S
+Q
+Q
+q
+1 0 0 1 57.02362 618.2543 cm
+q
+BT 1 0 0 1 0 62.7 Tm 14.5 TL /F1 9.8 Tf .247059 .247059 .27451 rg (This guide documents the complete visual and interaction language of the Lemma AI front end so it can be) Tj T* (reproduced in another codebase. The aesthetic is a ) Tj /F2 9.8 Tf (monochrome neutral \(zinc\) system) Tj /F1 9.8 Tf (: light-gray canvases) Tj T* (with floating white panels, near-black primary actions, generous 14) Tj (\226) Tj (18) Tj ( ) Tj (px corner radii, the Inter typeface, and) Tj T* (lucide line icons drawn at a refined 1.75 stroke weight. The stack is ) Tj /F2 9.8 Tf (React 19 + Vite + TypeScript + Tailwind) Tj T* (CSS v4 + shadcn/ui \(new-york, neutral\)) Tj /F1 9.8 Tf (.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 606.585 cm
+Q
+q
+1 0 0 1 57.02362 580.585 cm
+q
+.247059 .247059 .27451 rg
+BT 1 0 0 1 0 3.5 Tm /F2 12.5 Tf 16 TL (At a glance) Tj T* ET
+Q
+Q
+q
+1 0 0 1 68.0315 342.585 cm
+q
+.956863 .956863 .960784 rg
+n 0 234 459.2126 -18 re f*
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 4 219 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Aspect) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 219 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Summary) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 201 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Design language) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 201 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (Monochrome neutral \(zinc\). Floating white panels on a zinc-100 canvas.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 183 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Primary action color) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 183 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (Near-black \(zinc-900\), not a saturated brand hue.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 165 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Framework) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 165 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (React 19, Vite 8, TypeScript 5.9.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 147 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Styling) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 147 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (Tailwind CSS v4 \(CSS-first @theme, no JS config\).) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 129 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Components) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 129 cm
+q
+BT 1 0 0 1 0 3.5 Tm 12 TL /F1 8.5 Tf .443137 .443137 .478431 rg (shadcn/ui \227 style: new-york, baseColor: neutral, CSS variables on.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 111 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Primitives) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 111 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (Radix UI \(via the radix-ui meta package + Slot\).) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 93 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Class helper) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 93 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (cn\(\) = clsx + tailwind-merge; variants via class-variance-authority \(cva\).) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 75 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Typeface) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 75 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (Inter \(falls back to system UI sans-serif\).) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 57 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Icons) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 57 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (lucide-react; size 18px in nav, strokeWidth 1.75.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 39 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Data / state) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 39 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (TanStack Query v5 for server state; Zustand for UI state.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 21 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (i18n) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 21 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (i18next + react-i18next; default en, zh secondary, flat keyed namespaces.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 3 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Motion) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 3 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (tw-animate-css + small custom CSS keyframes; hidden/fade scrollbars.) Tj T* ET
+Q
+Q
+q
+1 J
+1 j
+.894118 .894118 .905882 RG
+.4 w
+n 0 216 m 459.2126 216 l S
+n 0 198 m 459.2126 198 l S
+n 0 180 m 459.2126 180 l S
+n 0 162 m 459.2126 162 l S
+n 0 144 m 459.2126 144 l S
+n 0 126 m 459.2126 126 l S
+n 0 108 m 459.2126 108 l S
+n 0 90 m 459.2126 90 l S
+n 0 72 m 459.2126 72 l S
+n 0 54 m 459.2126 54 l S
+n 0 36 m 459.2126 36 l S
+n 0 18 m 459.2126 18 l S
+n 0 0 m 459.2126 0 l S
+Q
+Q
+Q
+ 
+
+=== PAGE 2 ===
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+.894118 .894118 .905882 RG
+.6 w
+n 51.02362 802.2047 m 544.252 802.2047 l S
+BT /F1 7.5 Tf 9 TL ET
+.443137 .443137 .478431 rg
+BT 1 0 0 1 51.02362 806.4567 Tm (Lemma AI \227 UI Style Replication Guide) Tj T* ET
+BT 1 0 0 1 473.3845 806.4567 Tm (Confidential / Internal) Tj T* ET
+n 51.02362 39.68504 m 544.252 39.68504 l S
+BT 1 0 0 1 51.02362 28.34646 Tm (Replicate the Lemma AI design language in any React project) Tj T* ET
+BT 1 0 0 1 520.4845 28.34646 Tm (Page 2) Tj T* ET
+Q
+q
+1 0 0 1 57.02362 764.8661 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 4 Tm /F2 16 Tf 20 TL (1. Project scaffolding) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 729.8661 cm
+q
+.247059 .247059 .27451 rg
+BT 1 0 0 1 0 19.2 Tm /F1 9.8 Tf 14.5 TL (Create a Vite React-TS app and install the dependency set that produces this look. Versions are the ones in) Tj T* (use; pin to them to guarantee identical behavior.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 68.0315 453.8661 cm
+q
+.956863 .956863 .960784 rg
+n 0 270 459.2126 -18 re f*
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 4 255 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Package) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 255 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Version / note) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 237 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (react / react-dom) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 237 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (^19.2) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 219 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (vite) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 219 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (^8.0) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 201 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (typescript) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 201 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (~5.9) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 183 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (tailwindcss) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 183 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (^4.2 \(+ @tailwindcss/vite\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 165 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (tw-animate-css) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 165 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (^1.4) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 147 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (class-variance-authority) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 147 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (^0.7) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 129 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (clsx + tailwind-merge) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 129 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (^2.1 / ^3.5) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 111 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (radix-ui) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 111 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (^1.5 \(meta package\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 93 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (lucide-react) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 93 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (^0.577) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 75 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (@tanstack/react-query) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 75 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (^5.91) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 57 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (zustand) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 57 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (^5.0) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 39 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (i18next + react-i18next) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 39 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (^26 / ^17) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 21 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (sonner) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 21 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (^2.0 \(toasts\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 3 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (inter font) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 3 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (@fontsource/inter or Google Fonts) Tj T* ET
+Q
+Q
+q
+1 J
+1 j
+.894118 .894118 .905882 RG
+.4 w
+n 0 252 m 459.2126 252 l S
+n 0 234 m 459.2126 234 l S
+n 0 216 m 459.2126 216 l S
+n 0 198 m 459.2126 198 l S
+n 0 180 m 459.2126 180 l S
+n 0 162 m 459.2126 162 l S
+n 0 144 m 459.2126 144 l S
+n 0 126 m 459.2126 126 l S
+n 0 108 m 459.2126 108 l S
+n 0 90 m 459.2126 90 l S
+n 0 72 m 459.2126 72 l S
+n 0 54 m 459.2126 54 l S
+n 0 36 m 459.2126 36 l S
+n 0 18 m 459.2126 18 l S
+n 0 0 m 459.2126 0 l S
+Q
+Q
+Q
+q
+1 0 0 1 57.02362 448.1969 cm
+Q
+q
+1 0 0 1 57.02362 422.1969 cm
+q
+.247059 .247059 .27451 rg
+BT 1 0 0 1 0 3.5 Tm /F2 12.5 Tf 16 TL (Path aliases) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 389.1969 cm
+q
+BT 1 0 0 1 0 19.2 Tm 14.5 TL /F1 9.8 Tf .247059 .247059 .27451 rg (The whole code base uses the ) Tj /F3 9.8 Tf (@/*) Tj /F1 9.8 Tf ( alias pointing at ) Tj /F3 9.8 Tf (src) Tj /F1 9.8 Tf (. Configure it in both ) Tj /F3 9.8 Tf (tsconfig) Tj /F1 9.8 Tf ( and) Tj T* /F3 9.8 Tf (vite.config.ts) Tj /F1 9.8 Tf ( so imports resolve identically.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 371.1969 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 2 Tm /F2 8 Tf 10 TL (vite.config.ts) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 237.1969 cm
+%PreformattedPara
+.094118 .094118 .105882 rg
+BT 1 0 0 1 2 123.8 Tm /F3 8.2 Tf 11 TL (// vite.config.ts) Tj T* (import { defineConfig } from 'vite') Tj T* (import react from '@vitejs/plugin-react') Tj T* (import tailwindcss from '@tailwindcss/vite') Tj T* (import path from 'node:path') Tj T*  T* (export default defineConfig\({) Tj T* (  plugins: [react\(\), tailwindcss\(\)],) Tj T* (  resolve: {) Tj T* (    alias: { '@': path.resolve\(__dirname, './src'\) },) Tj T* (  },) Tj T* (}\)) Tj T* ET
+Q
+q
+1 0 0 1 57.02362 201.1969 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 4 Tm /F2 16 Tf 20 TL (2. Design tokens \(the heart of the look\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 151.6969 cm
+q
+BT 1 0 0 1 0 33.7 Tm 14.5 TL /F1 9.8 Tf .247059 .247059 .27451 rg (Tailwind v4 keeps all tokens in CSS via ) Tj /F3 9.8 Tf (@theme) Tj /F1 9.8 Tf ( and light/dark variable blocks. Copy ) Tj /F3 9.8 Tf (src/index.css) Tj /F1 9.8 Tf  T* (verbatim; the values below are exactly what ships. The radius base is ) Tj /F2 9.8 Tf (0.875rem \(14px\)) Tj /F1 9.8 Tf (, which yields a) Tj T* (four-step ladder used consistently across the app.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 125.6969 cm
+q
+.247059 .247059 .27451 rg
+BT 1 0 0 1 0 3.5 Tm /F2 12.5 Tf 16 TL (2.1 Color tokens \(light / dark\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 68.0315 65.85433 cm
+q
+.956863 .956863 .960784 rg
+n 0 55.84252 459.2126 -30 re f*
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 28.84252 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 15.5 Tm /F2 8.5 Tf 12 TL (Swatc) Tj T* (h) Tj T* ET
+Q
+Q
+q
+1 0 0 1 45.68504 34.84252 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Token / Value) Tj T* ET
+Q
+Q
+q
+1 0 0 1 193.0866 34.84252 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Usage) Tj T* ET
+Q
+Q
+q
+1 0 0 1 6 3 cm
+q
+1 1 1 rg
+n 0 19.84252 28.34646 -19.84252 re f*
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 6 5 Tm  T* ET
+q
+1 J
+1 j
+.894118 .894118 .905882 RG
+.5 w
+n 0 19.84252 m 28.34646 19.84252 l S
+n 0 0 m 28.34646 0 l S
+n 0 0 m 0 19.84252 l S
+n 28.34646 0 m 28.34646 19.84252 l S
+Q
+Q
+Q
+q
+1 0 0 1 45.68504 6.92126 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 4 Tm /F3 8 Tf 12 TL (--background \(0 0% 100%\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 193.0866 6.92126 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (Page canvas in panels; app canvas is zinc-100 \(see 3.1\).) Tj T* ET
+Q
+Q
+q
+1 J
+1 j
+.894118 .894118 .905882 RG
+.4 w
+n 0 25.84252 m 459.2126 25.84252 l S
+n 0 0 m 459.2126 0 l S
+Q
+Q
+Q
+ 
+
+=== PAGE 3 ===
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+.894118 .894118 .905882 RG
+.6 w
+n 51.02362 802.2047 m 544.252 802.2047 l S
+BT /F1 7.5 Tf 9 TL ET
+.443137 .443137 .478431 rg
+BT 1 0 0 1 51.02362 806.4567 Tm (Lemma AI \227 UI Style Replication Guide) Tj T* ET
+BT 1 0 0 1 473.3845 806.4567 Tm (Confidential / Internal) Tj T* ET
+n 51.02362 39.68504 m 544.252 39.68504 l S
+BT 1 0 0 1 51.02362 28.34646 Tm (Replicate the Lemma AI design language in any React project) Tj T* ET
+BT 1 0 0 1 520.4845 28.34646 Tm (Page 3) Tj T* ET
+Q
+q
+1 0 0 1 68.0315 599.811 cm
+q
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 6 162.2126 cm
+q
+.035294 .035294 .043137 rg
+n 0 19.84252 28.34646 -19.84252 re f*
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 6 5 Tm  T* ET
+q
+1 J
+1 j
+.894118 .894118 .905882 RG
+.5 w
+n 0 19.84252 m 28.34646 19.84252 l S
+n 0 0 m 28.34646 0 l S
+n 0 0 m 0 19.84252 l S
+n 28.34646 0 m 28.34646 19.84252 l S
+Q
+Q
+Q
+q
+1 0 0 1 45.68504 166.1339 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 4 Tm /F3 8 Tf 12 TL (--foreground \(224 71% 4%\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 193.0866 166.1339 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (Body text \(near-black\).) Tj T* ET
+Q
+Q
+q
+1 0 0 1 6 136.3701 cm
+q
+.086275 .094118 .113725 rg
+n 0 19.84252 28.34646 -19.84252 re f*
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 6 5 Tm  T* ET
+q
+1 J
+1 j
+.894118 .894118 .905882 RG
+.5 w
+n 0 19.84252 m 28.34646 19.84252 l S
+n 0 0 m 28.34646 0 l S
+n 0 0 m 0 19.84252 l S
+n 28.34646 0 m 28.34646 19.84252 l S
+Q
+Q
+Q
+q
+1 0 0 1 45.68504 140.2913 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 4 Tm /F3 8 Tf 12 TL (--primary \(220 13% 14%\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 193.0866 140.2913 cm
+q
+BT 1 0 0 1 0 3.5 Tm 12 TL /F1 8.5 Tf .443137 .443137 .478431 rg (Buttons / primary actions \227 near-black, not colored.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 6 110.5276 cm
+q
+.956863 .956863 .960784 rg
+n 0 19.84252 28.34646 -19.84252 re f*
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 6 5 Tm  T* ET
+q
+1 J
+1 j
+.894118 .894118 .905882 RG
+.5 w
+n 0 19.84252 m 28.34646 19.84252 l S
+n 0 0 m 28.34646 0 l S
+n 0 0 m 0 19.84252 l S
+n 28.34646 0 m 28.34646 19.84252 l S
+Q
+Q
+Q
+q
+1 0 0 1 45.68504 114.4488 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 4 Tm /F3 8 Tf 12 TL (--secondary \(220 14% 96%\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 193.0866 114.4488 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (Secondary surfaces, hover fills.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 6 84.68504 cm
+q
+.894118 .894118 .905882 rg
+n 0 19.84252 28.34646 -19.84252 re f*
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 6 5 Tm  T* ET
+q
+1 J
+1 j
+.894118 .894118 .905882 RG
+.5 w
+n 0 19.84252 m 28.34646 19.84252 l S
+n 0 0 m 28.34646 0 l S
+n 0 0 m 0 19.84252 l S
+n 28.34646 0 m 28.34646 19.84252 l S
+Q
+Q
+Q
+q
+1 0 0 1 45.68504 88.6063 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 4 Tm /F3 8 Tf 12 TL (--border \(220 13% 91%\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 193.0866 88.6063 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (1px borders everywhere.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 6 56.76378 cm
+q
+.443137 .443137 .478431 rg
+n 0 19.84252 28.34646 -19.84252 re f*
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 6 5 Tm  T* ET
+q
+1 J
+1 j
+.894118 .894118 .905882 RG
+.5 w
+n 0 19.84252 m 28.34646 19.84252 l S
+n 0 0 m 28.34646 0 l S
+n 0 0 m 0 19.84252 l S
+n 28.34646 0 m 28.34646 19.84252 l S
+Q
+Q
+Q
+q
+1 0 0 1 45.68504 54.68504 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 16 Tm /F3 8 Tf 12 TL (--muted-foreground \(220 9%) Tj T* (46%\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 193.0866 60.68504 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (Hint / secondary text.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 6 28.84252 cm
+q
+.862745 .14902 .14902 rg
+n 0 19.84252 28.34646 -19.84252 re f*
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 6 5 Tm  T* ET
+q
+1 J
+1 j
+.894118 .894118 .905882 RG
+.5 w
+n 0 19.84252 m 28.34646 19.84252 l S
+n 0 0 m 28.34646 0 l S
+n 0 0 m 0 19.84252 l S
+n 28.34646 0 m 28.34646 19.84252 l S
+Q
+Q
+Q
+q
+1 0 0 1 45.68504 32.76378 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 4 Tm /F3 8 Tf 12 TL (--destructive \(0 72% 51%\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 193.0866 32.76378 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (Errors / destructive actions.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 6 3 cm
+q
+.956863 .956863 .960784 rg
+n 0 19.84252 28.34646 -19.84252 re f*
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 6 5 Tm  T* ET
+q
+1 J
+1 j
+.894118 .894118 .905882 RG
+.5 w
+n 0 19.84252 m 28.34646 19.84252 l S
+n 0 0 m 28.34646 0 l S
+n 0 0 m 0 19.84252 l S
+n 28.34646 0 m 28.34646 19.84252 l S
+Q
+Q
+Q
+q
+1 0 0 1 45.68504 6.92126 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 4 Tm /F3 8 Tf 12 TL (--sidebar \(220 14% 96%\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 193.0866 6.92126 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (Sidebar background \(zinc-100\).) Tj T* ET
+Q
+Q
+q
+1 J
+1 j
+.894118 .894118 .905882 RG
+.4 w
+n 0 185.0551 m 459.2126 185.0551 l S
+n 0 159.2126 m 459.2126 159.2126 l S
+n 0 133.3701 m 459.2126 133.3701 l S
+n 0 107.5276 m 459.2126 107.5276 l S
+n 0 81.68504 m 459.2126 81.68504 l S
+n 0 51.68504 m 459.2126 51.68504 l S
+n 0 25.84252 m 459.2126 25.84252 l S
+n 0 0 m 459.2126 0 l S
+Q
+Q
+Q
+q
+1 0 0 1 57.02362 594.1417 cm
+Q
+q
+1 0 0 1 57.02362 568.1417 cm
+q
+.247059 .247059 .27451 rg
+BT 1 0 0 1 0 3.5 Tm /F2 12.5 Tf 16 TL (2.2 Radius ladder) Tj T* ET
+Q
+Q
+q
+1 0 0 1 68.0315 456.1417 cm
+q
+.956863 .956863 .960784 rg
+n 0 108 459.2126 -18 re f*
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 4 93 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Token) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 93 cm
+q
+BT 1 0 0 1 0 3.5 Tm 12 TL /F2 8.5 Tf .443137 .443137 .478431 rg (Value & where it is used) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 75 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (--radius-sm) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 75 cm
+q
+BT 1 0 0 1 0 3.5 Tm 12 TL /F1 8.5 Tf .443137 .443137 .478431 rg (10px \(--radius - 4px\) ) Tj /F4 8.5 Tf 12 TL (\256) Tj /F1 8.5 Tf 12 TL ( sidebar items, chips) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 57 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (--radius-md) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 57 cm
+q
+BT 1 0 0 1 0 3.5 Tm 12 TL /F1 8.5 Tf .443137 .443137 .478431 rg (12px \(--radius - 2px\) ) Tj /F4 8.5 Tf 12 TL (\256) Tj /F1 8.5 Tf 12 TL ( buttons) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 39 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (--radius-lg) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 39 cm
+q
+BT 1 0 0 1 0 3.5 Tm 12 TL /F1 8.5 Tf .443137 .443137 .478431 rg (14px \(--radius\) ) Tj /F4 8.5 Tf 12 TL (\256) Tj /F1 8.5 Tf 12 TL ( default radius) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 21 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (--radius-xl) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 21 cm
+q
+BT 1 0 0 1 0 3.5 Tm 12 TL /F1 8.5 Tf .443137 .443137 .478431 rg (18px \(--radius + 4px\) ) Tj /F4 8.5 Tf 12 TL (\256) Tj /F1 8.5 Tf 12 TL ( cards, panels) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 3 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (--radius-2xl) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 3 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (22px \(dialogs / modals\)) Tj T* ET
+Q
+Q
+q
+1 J
+1 j
+.894118 .894118 .905882 RG
+.4 w
+n 0 90 m 459.2126 90 l S
+n 0 72 m 459.2126 72 l S
+n 0 54 m 459.2126 54 l S
+n 0 36 m 459.2126 36 l S
+n 0 18 m 459.2126 18 l S
+n 0 0 m 459.2126 0 l S
+Q
+Q
+Q
+q
+1 0 0 1 57.02362 450.4724 cm
+Q
+q
+1 0 0 1 57.02362 424.4724 cm
+q
+.247059 .247059 .27451 rg
+BT 1 0 0 1 0 3.5 Tm /F2 12.5 Tf 16 TL (2.3 The full token block \(paste into src/index.css\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 406.4724 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 2 Tm /F2 8 Tf 10 TL (src/index.css \(tokens only\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 63.47244 cm
+%PreformattedPara
+.094118 .094118 .105882 rg
+BT 1 0 0 1 2 332.8 Tm /F3 8.2 Tf 11 TL (@import "tailwindcss";) Tj T* (@import "tw-animate-css";) Tj T*  T* (@custom-variant dark \(&:is\(.dark *\)\);) Tj T*  T* (:root {) Tj T* (  --background: 0 0% 100%;) Tj T* (  --foreground: 224 71% 4%;) Tj T* (  --card: 0 0% 100%;) Tj T* (  --card-foreground: 224 71% 4%;) Tj T* (  --popover: 0 0% 100%;) Tj T* (  --popover-foreground: 224 71% 4%;) Tj T* (  --primary: 220 13% 14%;) Tj T* (  --primary-foreground: 210 20% 98%;) Tj T* (  --secondary: 220 14% 96%;) Tj T* (  --secondary-foreground: 220 13% 14%;) Tj T* (  --muted: 220 14% 96%;) Tj T* (  --muted-foreground: 220 9% 46%;) Tj T* (  --accent: 220 14% 96%;) Tj T* (  --accent-foreground: 220 13% 14%;) Tj T* (  --destructive: 0 72% 51%;) Tj T* (  --destructive-foreground: 210 20% 98%;) Tj T* (  --border: 220 13% 91%;) Tj T* (  --input: 220 13% 91%;) Tj T* (  --ring: 220 13% 14%;) Tj T* (  --sidebar: 220 14% 96%;) Tj T* (  --sidebar-foreground: 220 13% 14%;) Tj T* (  --sidebar-border: 220 13% 91%;) Tj T* (  --radius: 0.875rem;) Tj T* (  color-scheme: light;) Tj T* (}) Tj T* ET
+Q
+ 
+
+=== PAGE 4 ===
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+.894118 .894118 .905882 RG
+.6 w
+n 51.02362 802.2047 m 544.252 802.2047 l S
+BT /F1 7.5 Tf 9 TL ET
+.443137 .443137 .478431 rg
+BT 1 0 0 1 51.02362 806.4567 Tm (Lemma AI \227 UI Style Replication Guide) Tj T* ET
+BT 1 0 0 1 473.3845 806.4567 Tm (Confidential / Internal) Tj T* ET
+n 51.02362 39.68504 m 544.252 39.68504 l S
+BT 1 0 0 1 51.02362 28.34646 Tm (Replicate the Lemma AI design language in any React project) Tj T* ET
+BT 1 0 0 1 520.4845 28.34646 Tm (Page 4) Tj T* ET
+Q
+q
+1 0 0 1 57.02362 333.8661 cm
+%PreformattedPara
+.094118 .094118 .105882 rg
+BT 1 0 0 1 2 442.8 Tm /F3 8.2 Tf 11 TL (.dark {) Tj T* (  --background: 224 71% 4%;) Tj T* (  --foreground: 210 20% 98%;) Tj T* (  --card: 224 71% 6%;) Tj T* (  --popover: 224 71% 6%;) Tj T* (  --primary: 210 20% 98%;) Tj T* (  --primary-foreground: 220 13% 14%;) Tj T* (  --secondary: 217 33% 17%;) Tj T* (  --muted: 217 33% 17%;) Tj T* (  --muted-foreground: 215 20% 65%;) Tj T* (  --accent: 217 33% 17%;) Tj T* (  --border: 217 33% 17%;) Tj T* (  --input: 217 33% 17%;) Tj T* (  --ring: 213 27% 84%;) Tj T* (  --sidebar: 217 33% 17%;) Tj T* (  --sidebar-foreground: 210 20% 98%;) Tj T* (  --sidebar-border: 217 33% 22%;) Tj T* (  color-scheme: dark;) Tj T* (}) Tj T*  T* (@theme inline {) Tj T* (  --color-background: hsl\(var\(--background\)\);) Tj T* (  --color-foreground: hsl\(var\(--foreground\)\);) Tj T* (  --color-card: hsl\(var\(--card\)\);) Tj T* (  --color-primary: hsl\(var\(--primary\)\);) Tj T* (  --color-secondary: hsl\(var\(--secondary\)\);) Tj T* (  --color-muted: hsl\(var\(--muted\)\);) Tj T* (  --color-muted-foreground: hsl\(var\(--muted-foreground\)\);) Tj T* (  --color-accent: hsl\(var\(--accent\)\);) Tj T* (  --color-destructive: hsl\(var\(--destructive\)\);) Tj T* (  --color-border: hsl\(var\(--border\)\);) Tj T* (  --color-input: hsl\(var\(--input\)\);) Tj T* (  --color-ring: hsl\(var\(--ring\)\);) Tj T* (  --color-sidebar: hsl\(var\(--sidebar\)\);) Tj T* (  --color-sidebar-foreground: hsl\(var\(--sidebar-foreground\)\);) Tj T* (  --color-sidebar-border: hsl\(var\(--sidebar-border\)\);) Tj T* (  --radius-sm: calc\(var\(--radius\) - 4px\);) Tj T* (  --radius-md: calc\(var\(--radius\) - 2px\);) Tj T* (  --radius-lg: var\(--radius\);) Tj T* (  --radius-xl: calc\(var\(--radius\) + 4px\);) Tj T* (}) Tj T* ET
+Q
+ 
+
+=== PAGE 5 ===
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+.894118 .894118 .905882 RG
+.6 w
+n 51.02362 802.2047 m 544.252 802.2047 l S
+BT /F1 7.5 Tf 9 TL ET
+.443137 .443137 .478431 rg
+BT 1 0 0 1 51.02362 806.4567 Tm (Lemma AI \227 UI Style Replication Guide) Tj T* ET
+BT 1 0 0 1 473.3845 806.4567 Tm (Confidential / Internal) Tj T* ET
+n 51.02362 39.68504 m 544.252 39.68504 l S
+BT 1 0 0 1 51.02362 28.34646 Tm (Replicate the Lemma AI design language in any React project) Tj T* ET
+BT 1 0 0 1 520.4845 28.34646 Tm (Page 5) Tj T* ET
+Q
+q
+1 0 0 1 57.02362 764.8661 cm
+q
+BT 1 0 0 1 0 4 Tm 20 TL /F2 16 Tf .094118 .094118 .105882 rg (3. Surfaces & color conventions) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 738.8661 cm
+q
+.247059 .247059 .27451 rg
+BT 1 0 0 1 0 3.5 Tm /F2 12.5 Tf 16 TL (3.1 The canvas is gray, panels are white) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 676.8661 cm
+q
+BT 1 0 0 1 0 48.2 Tm 14.5 TL /F1 9.8 Tf .247059 .247059 .27451 rg (The signature look is ) Tj /F2 9.8 Tf (floating panels on a light-gray canvas) Tj /F1 9.8 Tf (. The app shell sets ) Tj /F3 9.8 Tf (bg-zinc-100 p-2) Tj /F1 9.8 Tf ( and) Tj T* -0.009228 Tw (stacks a 240px sidebar next to a white content area. Individual content panels use ) Tj /F3 9.8 Tf (bg-white / bg-zinc-50) Tj /F1 9.8 Tf  T* 0 Tw (with a 1px ) Tj /F3 9.8 Tf (border-zinc-200) Tj /F1 9.8 Tf ( and ) Tj /F3 9.8 Tf (shadow-sm) Tj /F1 9.8 Tf (. Do not make the whole page white \227 that flattens the depth) Tj T* (that defines the style.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 658.8661 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 2 Tm /F2 8 Tf 10 TL (AppLayout shell \(verbatim pattern\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 568.8661 cm
+%PreformattedPara
+.094118 .094118 .105882 rg
+BT 1 0 0 1 2 79.8 Tm /F3 8.2 Tf 11 TL (<div className="flex h-screen gap-2 overflow-hidden bg-zinc-100 p-2 text-zinc-950">) Tj T* (  <aside className="w-[var\(--sidebar-width\)] ..."> ... </aside>) Tj T* (  <main className="relative min-w-0 flex-1 overflow-hidden">) Tj T* (    <div className="h-full overflow-y-auto rounded-xl border border-zinc-200/80 bg-zinc-50">) Tj T* (      {/* white cards float here */}) Tj T* (    </div>) Tj T* (  </main>) Tj T* (</div>) Tj T* ET
+Q
+q
+1 0 0 1 57.02362 542.8661 cm
+q
+.247059 .247059 .27451 rg
+BT 1 0 0 1 0 3.5 Tm /F2 12.5 Tf 16 TL (3.2 Semantic accents are used sparingly) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 495.3661 cm
+q
+.247059 .247059 .27451 rg
+BT 1 0 0 1 0 33.7 Tm /F1 9.8 Tf 14.5 TL (Reserve color for meaning, not decoration. Success uses emerald-50/200, errors and low-balance warnings) Tj T* (use red-50/200, everything else stays zinc. The low-credits badge is the canonical example of conditional) Tj T* (accent coloring.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 477.3661 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 2 Tm /F2 8 Tf 10 TL (Conditional accent \(credits badge\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 409.3661 cm
+%PreformattedPara
+.094118 .094118 .105882 rg
+BT 1 0 0 1 2 57.8 Tm /F3 8.2 Tf 11 TL (<Badge variant="outline" className={cn\() Tj T* (  'px-1.5 py-0 text-[10px] font-medium tabular-nums',) Tj T* (  isLow ? 'bg-red-50 text-red-600 border-red-200') Tj T* (        : 'bg-zinc-50 text-zinc-600 border-zinc-200'\)}>) Tj T* (  {balance}) Tj T* (</Badge>) Tj T* ET
+Q
+q
+1 0 0 1 57.02362 373.3661 cm
+q
+BT 1 0 0 1 0 4 Tm 20 TL /F2 16 Tf .094118 .094118 .105882 rg (4. The class helper & variant pattern) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 338.3661 cm
+q
+BT 1 0 0 1 0 19.2 Tm 14.5 TL /F1 9.8 Tf .247059 .247059 .27451 rg (Every component composes classes through ) Tj /F3 9.8 Tf (cn\(\)) Tj /F1 9.8 Tf ( \(clsx + tailwind-merge\) and expresses variants with ) Tj /F3 9.8 Tf (cva) Tj /F1 9.8 Tf (.) Tj T* (This is what makes shadcn components themeable and conflict-free. Re-create ) Tj /F3 9.8 Tf (src/lib/utils.ts) Tj /F1 9.8 Tf ( exactly.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 320.3661 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 2 Tm /F2 8 Tf 10 TL (src/lib/utils.ts) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 241.3661 cm
+%PreformattedPara
+.094118 .094118 .105882 rg
+BT 1 0 0 1 2 68.8 Tm /F3 8.2 Tf 11 TL (// src/lib/utils.ts) Tj T* (import { type ClassValue, clsx } from 'clsx') Tj T* (import { twMerge } from 'tailwind-merge') Tj T*  T* (export function cn\(...inputs: ClassValue[]\) {) Tj T* (  return twMerge\(clsx\(inputs\)\)) Tj T* (}) Tj T* ET
+Q
+q
+1 0 0 1 57.02362 197.8661 cm
+q
+BT 1 0 0 1 0 33.7 Tm 14.5 TL /F1 9.8 Tf .247059 .247059 .27451 rg (Buttons follow the shadcn new-york contract: a default \(near-black\) variant, plus outline / secondary / ghost /) Tj T* (link, and a size scale \(xs, sm, default, lg, icon*\). Note buttons use ) Tj /F3 9.8 Tf (rounded-md) Tj /F1 9.8 Tf ( \(12px\) while cards use) Tj T* /F3 9.8 Tf (rounded-xl) Tj /F1 9.8 Tf ( \(18px\).) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 161.8661 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 4 Tm /F2 16 Tf 20 TL (5. Component library) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 135.8661 cm
+q
+.247059 .247059 .27451 rg
+BT 1 0 0 1 0 3.5 Tm /F2 12.5 Tf 16 TL (5.1 Initialize shadcn/ui with these exact settings) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 102.8661 cm
+q
+BT 1 0 0 1 0 19.2 Tm 14.5 TL /F1 9.8 Tf .247059 .247059 .27451 rg (The ) Tj /F3 9.8 Tf (components.json) Tj /F1 9.8 Tf ( drives every generator run. Match it so future ) Tj /F3 9.8 Tf (npx shadcn add) Tj /F1 9.8 Tf ( commands stay) Tj T* (consistent.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 84.86614 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 2 Tm /F2 8 Tf 10 TL (components.json) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 60.86614 cm
+%PreformattedPara
+.094118 .094118 .105882 rg
+BT 1 0 0 1 2 13.8 Tm /F3 8.2 Tf 11 TL ({) Tj T* (  "style": "new-york",) Tj T* ET
+Q
+ 
+
+=== PAGE 6 ===
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+.894118 .894118 .905882 RG
+.6 w
+n 51.02362 802.2047 m 544.252 802.2047 l S
+BT /F1 7.5 Tf 9 TL ET
+.443137 .443137 .478431 rg
+BT 1 0 0 1 51.02362 806.4567 Tm (Lemma AI \227 UI Style Replication Guide) Tj T* ET
+BT 1 0 0 1 473.3845 806.4567 Tm (Confidential / Internal) Tj T* ET
+n 51.02362 39.68504 m 544.252 39.68504 l S
+BT 1 0 0 1 51.02362 28.34646 Tm (Replicate the Lemma AI design language in any React project) Tj T* ET
+BT 1 0 0 1 520.4845 28.34646 Tm (Page 6) Tj T* ET
+Q
+q
+1 0 0 1 57.02362 696.8661 cm
+%PreformattedPara
+.094118 .094118 .105882 rg
+BT 1 0 0 1 2 79.8 Tm /F3 8.2 Tf 11 TL (  "rsc": false,) Tj T* (  "tsx": true,) Tj T* (  "tailwind": { "config": "", "css": "src/index.css",) Tj T* (                 "baseColor": "neutral", "cssVariables": true, "prefix": "" },) Tj T* (  "aliases": { "components": "@/components", "ui": "@/components/ui",) Tj T* (                "hooks": "@/hooks", "lib": "@/lib", "utils": "@/lib/utils" },) Tj T* (  "iconLibrary": "lucide") Tj T* (}) Tj T* ET
+Q
+q
+1 0 0 1 57.02362 670.8661 cm
+q
+.247059 .247059 .27451 rg
+BT 1 0 0 1 0 3.5 Tm /F2 12.5 Tf 16 TL (5.2 Installed component inventory) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 637.8661 cm
+q
+BT 1 0 0 1 0 19.2 Tm 14.5 TL /F1 9.8 Tf .247059 .247059 .27451 rg (These are the primitives in ) Tj /F3 9.8 Tf (src/components/ui) Tj /F1 9.8 Tf (. Re-add them with the CLI rather than hand-writing, to) Tj T* (inherit the new-york neutral styling.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 68.0315 541.8661 cm
+q
+.956863 .956863 .960784 rg
+n 0 90 459.2126 -18 re f*
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 4 75 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Group) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 75 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Components) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 57 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Layout / display) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 57 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (card, badge, avatar, separator, skeleton, spinner, sheet, collapsible, sidebar) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 39 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Forms) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 39 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (button, input, textarea, label, field, select, switch, radio-group, tabs, progress) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 21 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Overlay) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 21 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (tooltip, \(dialogs via radix-ui where needed\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 3 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (AI-specific) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 3 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (ai-elements/chain-of-thought \(custom markdown/thought stream\)) Tj T* ET
+Q
+Q
+q
+1 J
+1 j
+.894118 .894118 .905882 RG
+.4 w
+n 0 72 m 459.2126 72 l S
+n 0 54 m 459.2126 54 l S
+n 0 36 m 459.2126 36 l S
+n 0 18 m 459.2126 18 l S
+n 0 0 m 459.2126 0 l S
+Q
+Q
+Q
+ 
+
+=== PAGE 7 ===
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+.894118 .894118 .905882 RG
+.6 w
+n 51.02362 802.2047 m 544.252 802.2047 l S
+BT /F1 7.5 Tf 9 TL ET
+.443137 .443137 .478431 rg
+BT 1 0 0 1 51.02362 806.4567 Tm (Lemma AI \227 UI Style Replication Guide) Tj T* ET
+BT 1 0 0 1 473.3845 806.4567 Tm (Confidential / Internal) Tj T* ET
+n 51.02362 39.68504 m 544.252 39.68504 l S
+BT 1 0 0 1 51.02362 28.34646 Tm (Replicate the Lemma AI design language in any React project) Tj T* ET
+BT 1 0 0 1 520.4845 28.34646 Tm (Page 7) Tj T* ET
+Q
+q
+1 0 0 1 57.02362 764.8661 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 4 Tm /F2 16 Tf 20 TL (6. Typography) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 715.3661 cm
+q
+BT 1 0 0 1 0 33.7 Tm 14.5 TL /F1 9.8 Tf .247059 .247059 .27451 rg (Body uses Inter with antialiasing. The base text color is zinc-950 on the zinc-100 canvas and zinc-900 inside) Tj T* (white panels. Headings are ) Tj /F3 9.8 Tf (font-semibold) Tj /F1 9.8 Tf ( with tight leading; descriptions and hints use) Tj T* /F3 9.8 Tf (text-muted-foreground) Tj /F1 9.8 Tf (.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 697.3661 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 2 Tm /F2 8 Tf 10 TL (Global typography \(index.css\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 629.3661 cm
+%PreformattedPara
+.094118 .094118 .105882 rg
+BT 1 0 0 1 2 57.8 Tm /F3 8.2 Tf 11 TL (body {) Tj T* (  @apply bg-background text-foreground antialiased;) Tj T* (  font-family: Inter, ui-sans-serif, system-ui, -apple-system,) Tj T* (                BlinkMacSystemFont, "Segoe UI", sans-serif;) Tj T* (  margin: 0;) Tj T* (}) Tj T* ET
+Q
+q
+1 0 0 1 68.0315 503.3661 cm
+q
+.956863 .956863 .960784 rg
+n 0 126 459.2126 -18 re f*
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 4 111 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Rule) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 111 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Value) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 93 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Typeface) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 93 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (Inter \(weights 400/500/600; load via @fontsource/inter or Google Fonts\).) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 75 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Base size) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 75 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (14px body \(text-sm on controls\), 16px comfortable reading blocks.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 57 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Headings) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 57 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (font-semibold, leading-none / tight.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 39 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Buttons) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 39 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (text-sm font-medium.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 21 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Numbers) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 21 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (tabular-nums for balances, counters, metrics.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 3 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Muted text) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 3 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (text-zinc-400 / 500 / 600 \(= --muted-foreground\).) Tj T* ET
+Q
+Q
+q
+1 J
+1 j
+.894118 .894118 .905882 RG
+.4 w
+n 0 108 m 459.2126 108 l S
+n 0 90 m 459.2126 90 l S
+n 0 72 m 459.2126 72 l S
+n 0 54 m 459.2126 54 l S
+n 0 36 m 459.2126 36 l S
+n 0 18 m 459.2126 18 l S
+n 0 0 m 459.2126 0 l S
+Q
+Q
+Q
+q
+1 0 0 1 57.02362 467.3661 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 4 Tm /F2 16 Tf 20 TL (7. Layout shell) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 441.3661 cm
+q
+.247059 .247059 .27451 rg
+BT 1 0 0 1 0 3.5 Tm /F2 12.5 Tf 16 TL (7.1 Sidebar) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 379.3661 cm
+q
+BT 1 0 0 1 0 48.2 Tm 14.5 TL /F1 9.8 Tf .247059 .247059 .27451 rg (The left nav is a fixed 240px column on zinc-100. Items are 36px tall, ) Tj /F3 9.8 Tf (rounded-sm) Tj /F1 9.8 Tf (, with an 18px lucide icon at) Tj T* /F3 9.8 Tf (strokeWidth 1.75) Tj /F1 9.8 Tf (. Active state is ) Tj /F3 9.8 Tf (bg-zinc-200/80 text-black) Tj /F1 9.8 Tf (; inactive is ) Tj /F3 9.8 Tf (text-black) Tj T* (hover:bg-zinc-200/70) Tj /F1 9.8 Tf (. Note labels are pure black \() Tj /F3 9.8 Tf (text-black) Tj /F1 9.8 Tf (\), not the muted foreground \227 this keeps) Tj T* (the nav legible and crisp.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 361.3661 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 2 Tm /F2 8 Tf 10 TL (SidebarItem \(verbatim\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 304.3661 cm
+%PreformattedPara
+.094118 .094118 .105882 rg
+BT 1 0 0 1 2 46.8 Tm /F3 8.2 Tf 11 TL (const classes = \(isActive: boolean\) => cn\() Tj T* (  'flex h-9 w-full items-center gap-2 rounded-sm px-3 text-sm transition-colors',) Tj T* (  isActive ? 'bg-zinc-200/80 text-black' : 'text-black hover:bg-zinc-200/70'\)) Tj T* (// icon:) Tj T* (<Icon className="size-[18px] shrink-0" strokeWidth={1.75} />) Tj T* ET
+Q
+q
+1 0 0 1 57.02362 278.3661 cm
+q
+.247059 .247059 .27451 rg
+BT 1 0 0 1 0 3.5 Tm /F2 12.5 Tf 16 TL (7.2 Sticky header with scroll-aware divider) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 230.8661 cm
+q
+BT 1 0 0 1 0 33.7 Tm 14.5 TL /F1 9.8 Tf .247059 .247059 .27451 rg (The 56px \() Tj /F3 9.8 Tf (h-14) Tj /F1 9.8 Tf (\) sticky header sits on zinc-100. A 1px hairline with a soft shadow fades in only after the nav) Tj T* (scrolls away from the top \() Tj /F3 9.8 Tf (opacity) Tj /F1 9.8 Tf ( toggled by a scroll listener\). This subtle detail is part of the polish \227) Tj T* (replicate it rather than always showing a border.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 194.8661 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 4 Tm /F2 16 Tf 20 TL (8. Iconography) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 145.3661 cm
+q
+BT 1 0 0 1 0 33.7 Tm 14.5 TL /F1 9.8 Tf .247059 .247059 .27451 rg (Use ) Tj /F2 9.8 Tf (lucide-react) Tj /F1 9.8 Tf ( exclusively. The house style is thin, precise line icons: ) Tj /F3 9.8 Tf (size-[18px]) Tj /F1 9.8 Tf ( in navigation, ) Tj /F3 9.8 Tf (size-4) Tj /F1 9.8 Tf  T* (inline with buttons, and a consistent ) Tj /F3 9.8 Tf (strokeWidth 1.75) Tj /F1 9.8 Tf ( \(slightly thinner than the default 2\) for nav icons.) Tj T* (Buttons automatically size their icons via ) Tj /F3 9.8 Tf ([) Tj (&) Tj (_svg:not\([class*='size-']\)]:size-4) Tj /F1 9.8 Tf (.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 68.0315 67.36614 cm
+q
+.956863 .956863 .960784 rg
+n 0 72 459.2126 -18 re f*
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 4 57 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Context) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 57 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Spec) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 39 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Nav icons) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 39 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (size-[18px], strokeWidth 1.75) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 21 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Inline / button icons) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 21 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (size-4 \(16px\), default stroke) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 3 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Tiny controls) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 3 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (size-3.5 \(e.g. the sidebar switcher\)) Tj T* ET
+Q
+Q
+q
+1 J
+1 j
+.894118 .894118 .905882 RG
+.4 w
+n 0 54 m 459.2126 54 l S
+n 0 36 m 459.2126 36 l S
+n 0 18 m 459.2126 18 l S
+n 0 0 m 459.2126 0 l S
+Q
+Q
+Q
+ 
+
+=== PAGE 8 ===
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+.894118 .894118 .905882 RG
+.6 w
+n 51.02362 802.2047 m 544.252 802.2047 l S
+BT /F1 7.5 Tf 9 TL ET
+.443137 .443137 .478431 rg
+BT 1 0 0 1 51.02362 806.4567 Tm (Lemma AI \227 UI Style Replication Guide) Tj T* ET
+BT 1 0 0 1 473.3845 806.4567 Tm (Confidential / Internal) Tj T* ET
+n 51.02362 39.68504 m 544.252 39.68504 l S
+BT 1 0 0 1 51.02362 28.34646 Tm (Replicate the Lemma AI design language in any React project) Tj T* ET
+BT 1 0 0 1 520.4845 28.34646 Tm (Page 8) Tj T* ET
+Q
+q
+1 0 0 1 68.0315 766.8661 cm
+q
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 4 3 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Brand mark) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 3 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (Keep monochrome; avoid colorful glyphs.) Tj T* ET
+Q
+Q
+q
+1 J
+1 j
+.894118 .894118 .905882 RG
+.4 w
+n 0 18 m 459.2126 18 l S
+n 0 0 m 459.2126 0 l S
+Q
+Q
+Q
+q
+1 0 0 1 57.02362 730.8661 cm
+q
+BT 1 0 0 1 0 4 Tm 20 TL /F2 16 Tf .094118 .094118 .105882 rg (9. Cards & panels) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 681.3661 cm
+q
+BT 1 0 0 1 0 33.7 Tm 14.5 TL /F1 9.8 Tf .247059 .247059 .27451 rg (Cards use ) Tj /F3 9.8 Tf (rounded-xl border bg-card shadow-sm) Tj /F1 9.8 Tf ( with 24px horizontal padding \() Tj /F3 9.8 Tf (px-6) Tj /F1 9.8 Tf (\) and 24px) Tj T* (vertical rhythm \() Tj /F3 9.8 Tf (py-6) Tj /F1 9.8 Tf (, ) Tj /F3 9.8 Tf (gap-6) Tj /F1 9.8 Tf (\). The shadcn Card ships header / title / description / action / content / footer) Tj T* (sub-components \227 use them rather than ad-hoc divs so spacing stays uniform.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 663.3661 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 2 Tm /F2 8 Tf 10 TL (Card usage) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 584.3661 cm
+%PreformattedPara
+.094118 .094118 .105882 rg
+BT 1 0 0 1 2 68.8 Tm /F3 8.2 Tf 11 TL (<Card>) Tj T* (  <CardHeader>) Tj T* (    <CardTitle>Plan</CardTitle>) Tj T* (    <CardDescription>Choose a tier</CardDescription>) Tj T* (  </CardHeader>) Tj T* (  <CardContent> ... </CardContent>) Tj T* (</Card>) Tj T* ET
+Q
+q
+1 0 0 1 57.02362 555.3661 cm
+q
+BT 1 0 0 1 0 19.2 Tm -0.043164 Tw 14.5 TL /F1 9.8 Tf .247059 .247059 .27451 rg (Entrance motion for stacked cards uses a pure-CSS keyframe \() Tj /F3 9.8 Tf (pay-fade-up) Tj /F1 9.8 Tf (\) with a soft cubic-bezier ease \227) Tj T* 0 Tw (reuse it for any card grid so panels rise into place instead of popping.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 519.3661 cm
+q
+BT 1 0 0 1 0 4 Tm 20 TL /F2 16 Tf .094118 .094118 .105882 rg (10. State, data & internationalization) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 493.3661 cm
+q
+.247059 .247059 .27451 rg
+BT 1 0 0 1 0 3.5 Tm /F2 12.5 Tf 16 TL (10.1 Server state) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 445.8661 cm
+q
+BT 1 0 0 1 0 33.7 Tm 14.5 TL /F1 9.8 Tf .247059 .247059 .27451 rg (Wrap the app in ) Tj /F3 9.8 Tf (QueryClientProvider) Tj /F1 9.8 Tf ( and centralize keys in ) Tj /F3 9.8 Tf (queryKeys.ts) Tj /F1 9.8 Tf (. Components call) Tj T* /F3 9.8 Tf (useXxxQuery) Tj /F1 9.8 Tf ( hooks; loading states render ) Tj /F3 9.8 Tf (<) Tj (Skeleton/) Tj (>) Tj /F1 9.8 Tf (, error states render a muted ) Tj /F3 9.8 Tf (text-zinc-400) Tj /F1 9.8 Tf  T* (message. This loading/error discipline is part of the visual consistency.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 419.8661 cm
+q
+.247059 .247059 .27451 rg
+BT 1 0 0 1 0 3.5 Tm /F2 12.5 Tf 16 TL (10.2 UI state) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 386.8661 cm
+q
+BT 1 0 0 1 0 19.2 Tm 14.5 TL /F1 9.8 Tf .247059 .247059 .27451 rg (Ephemeral UI state \(dialogs, toggles, local panels\) lives in ) Tj /F2 9.8 Tf (Zustand) Tj /F1 9.8 Tf ( stores under ) Tj /F3 9.8 Tf (src/stores) Tj /F1 9.8 Tf (. Keep it out of) Tj T* (React Query.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 360.8661 cm
+q
+.247059 .247059 .27451 rg
+BT 1 0 0 1 0 3.5 Tm /F2 12.5 Tf 16 TL (10.3 i18n) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 298.8661 cm
+q
+BT 1 0 0 1 0 48.2 Tm 14.5 TL /F1 9.8 Tf .247059 .247059 .27451 rg (Default language is ) Tj /F2 9.8 Tf (English) Tj /F1 9.8 Tf ( \(global product\). Chinese is the secondary locale. Language is persisted in) Tj T* /F3 9.8 Tf (localStorage['lemma-lang']) Tj /F1 9.8 Tf (, detected from storage then navigator, and synced to ) Tj /F3 9.8 Tf (<) Tj (html lang) Tj (>) Tj /F1 9.8 Tf (. Keys) Tj T* (are flat and feature-prefixed \() Tj /F3 9.8 Tf (nav.*) Tj /F1 9.8 Tf (, ) Tj /F3 9.8 Tf (auth.*) Tj /F1 9.8 Tf (, ) Tj /F3 9.8 Tf (learnSpace.*) Tj /F1 9.8 Tf (\). Copy the i18n bootstrap so language labels) Tj T* (render in their own tongue \(English / Chinese \(Simplified\)\).) Tj T* ET
+Q
+Q
+ 
+
+=== PAGE 9 ===
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+.894118 .894118 .905882 RG
+.6 w
+n 51.02362 802.2047 m 544.252 802.2047 l S
+BT /F1 7.5 Tf 9 TL ET
+.443137 .443137 .478431 rg
+BT 1 0 0 1 51.02362 806.4567 Tm (Lemma AI \227 UI Style Replication Guide) Tj T* ET
+BT 1 0 0 1 473.3845 806.4567 Tm (Confidential / Internal) Tj T* ET
+n 51.02362 39.68504 m 544.252 39.68504 l S
+BT 1 0 0 1 51.02362 28.34646 Tm (Replicate the Lemma AI design language in any React project) Tj T* ET
+BT 1 0 0 1 520.4845 28.34646 Tm (Page 9) Tj T* ET
+Q
+q
+1 0 0 1 57.02362 764.8661 cm
+q
+BT 1 0 0 1 0 4 Tm 20 TL /F2 16 Tf .094118 .094118 .105882 rg (11. Motion & micro-polish) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 715.3661 cm
+q
+BT 1 0 0 1 0 33.7 Tm -0.107038 Tw 14.5 TL /F1 9.8 Tf .247059 .247059 .27451 rg (Motion is restrained. Animations come from ) Tj /F2 9.8 Tf (tw-animate-css) Tj /F1 9.8 Tf ( \(the Tailwind v4 successor to tailwindcss-animate\)) Tj T* 0 Tw (plus a few hand-written keyframes. Two custom scrollbar utilities are part of the signature feel and should be) Tj T* (carried over.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 689.3661 cm
+q
+.247059 .247059 .27451 rg
+BT 1 0 0 1 0 3.5 Tm /F2 12.5 Tf 16 TL (11.1 Custom utilities \(paste into index.css\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 671.3661 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 2 Tm /F2 8 Tf 10 TL (Scrollbar utilities) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 515.3661 cm
+%PreformattedPara
+.094118 .094118 .105882 rg
+BT 1 0 0 1 2 145.8 Tm /F3 8.2 Tf 11 TL (@utility scrollbar-hidden {) Tj T* (  scrollbar-width: none;) Tj T* (  -ms-overflow-style: none;) Tj T* (  &::-webkit-scrollbar { display: none; }) Tj T* (}) Tj T*  T* (@utility scrollbar-fade {) Tj T* (  scrollbar-width: thin;) Tj T* (  scrollbar-color: transparent transparent;) Tj T* (  &:hover, &:focus-within {) Tj T* (    scrollbar-color: hsl\(var\(--muted-foreground\) / 0.45\) transparent;) Tj T* (  }) Tj T* (  /* thumb hidden until hover, then a thin zinc track */) Tj T* (}) Tj T* ET
+Q
+q
+1 0 0 1 57.02362 489.3661 cm
+q
+.247059 .247059 .27451 rg
+BT 1 0 0 1 0 3.5 Tm /F2 12.5 Tf 16 TL (11.2 Entrance keyframe) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 471.3661 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 2 Tm /F2 8 Tf 10 TL (pay-fade-up) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 392.3661 cm
+%PreformattedPara
+.094118 .094118 .105882 rg
+BT 1 0 0 1 2 68.8 Tm /F3 8.2 Tf 11 TL (@keyframes pay-fade-up {) Tj T* (  from { opacity: 0; transform: translateY\(10px\); }) Tj T* (  to   { opacity: 1; transform: translateY\(0\);   }) Tj T* (}) Tj T* (.pay-fade-up {) Tj T* (  animation: pay-fade-up 0.5s cubic-bezier\(0.16, 1, 0.3, 1\) both;) Tj T* (}) Tj T* ET
+Q
+q
+1 0 0 1 57.02362 356.3661 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 4 Tm /F2 16 Tf 20 TL (12. Special surfaces \(copy the integration, not just styling\)) Tj T* ET
+Q
+Q
+q
+1 0 0 1 68.0315 206.3661 cm
+q
+.956863 .956863 .960784 rg
+n 0 144 459.2126 -18 re f*
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 4 129 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Surface) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 129 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Implementation note) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 111 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Infinite canvas) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 111 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (tldraw v5 embedded as a feature surface \(whiteboard / board\).) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 93 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Course video) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 81 cm
+q
+BT 1 0 0 1 0 15.5 Tm 12 TL /F1 8.5 Tf .443137 .443137 .478431 rg (@vidstack/react player themed via [data-slot="course-video-player"] CSS variables \227) Tj T* (black bg, white controls, pill buttons.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 63 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Markdown / AI output) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 51 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 15.5 Tm /F1 8.5 Tf 12 TL (streamdown with CJK, code, math \(KaTeX\) and mermaid extensions; override sticky) Tj T* (code-block actions to scroll with content.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 33 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Rich text notes) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 21 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 15.5 Tm /F1 8.5 Tf 12 TL (Tiptap 3 \(StarterKit + Link + Placeholder\), 14-item toolbar, Ctrl/Cmd+S dirty-check,) Tj T* (fail-open editor.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 3 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Toasts) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 3 cm
+q
+BT 1 0 0 1 0 3.5 Tm 12 TL /F1 8.5 Tf .443137 .443137 .478431 rg (sonner mounted once at app root.) Tj T* ET
+Q
+Q
+q
+1 J
+1 j
+.894118 .894118 .905882 RG
+.4 w
+n 0 126 m 459.2126 126 l S
+n 0 108 m 459.2126 108 l S
+n 0 78 m 459.2126 78 l S
+n 0 48 m 459.2126 48 l S
+n 0 18 m 459.2126 18 l S
+n 0 0 m 459.2126 0 l S
+Q
+Q
+Q
+q
+1 0 0 1 57.02362 170.3661 cm
+q
+BT 1 0 0 1 0 4 Tm 20 TL /F2 16 Tf .094118 .094118 .105882 rg (13. Build & tooling parity) Tj T* ET
+Q
+Q
+q
+1 0 0 1 68.0315 74.36614 cm
+q
+.956863 .956863 .960784 rg
+n 0 90 459.2126 -18 re f*
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 4 75 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Tool) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 75 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Setting) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 57 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Bundler) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 57 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (Vite 8, @vitejs/plugin-react 6.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 39 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (CSS) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 39 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (@tailwindcss/vite \(no PostCSS config needed\).) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 21 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Lint) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 21 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (ESLint 9 flat config; react-hooks + react-refresh plugins.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 3 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Tests) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 3 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (Vitest 3 \(component + hook tests\).) Tj T* ET
+Q
+Q
+q
+1 J
+1 j
+.894118 .894118 .905882 RG
+.4 w
+n 0 72 m 459.2126 72 l S
+n 0 54 m 459.2126 54 l S
+n 0 36 m 459.2126 36 l S
+n 0 18 m 459.2126 18 l S
+n 0 0 m 459.2126 0 l S
+Q
+Q
+Q
+ 
+
+=== PAGE 10 ===
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+q
+.894118 .894118 .905882 RG
+.6 w
+n 51.02362 802.2047 m 544.252 802.2047 l S
+BT /F1 7.5 Tf 9 TL ET
+.443137 .443137 .478431 rg
+BT 1 0 0 1 51.02362 806.4567 Tm (Lemma AI \227 UI Style Replication Guide) Tj T* ET
+BT 1 0 0 1 473.3845 806.4567 Tm (Confidential / Internal) Tj T* ET
+n 51.02362 39.68504 m 544.252 39.68504 l S
+BT 1 0 0 1 51.02362 28.34646 Tm (Replicate the Lemma AI design language in any React project) Tj T* ET
+BT 1 0 0 1 516.3145 28.34646 Tm (Page 10) Tj T* ET
+Q
+q
+1 0 0 1 68.0315 748.8661 cm
+q
+0 0 0 rg
+BT /F1 10 Tf 12 TL ET
+q
+1 0 0 1 4 21 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Type check) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 21 cm
+q
+BT 1 0 0 1 0 3.5 Tm 12 TL /F1 8.5 Tf .443137 .443137 .478431 rg (tsc -b &) Tj (& vite build in the build script.) Tj T* ET
+Q
+Q
+q
+1 0 0 1 4 3 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 3.5 Tm /F2 8.5 Tf 12 TL (Aliases) Tj T* ET
+Q
+Q
+q
+1 0 0 1 123.0551 3 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 3.5 Tm /F1 8.5 Tf 12 TL (@/* -> src/* in both tsconfig and vite.) Tj T* ET
+Q
+Q
+q
+1 J
+1 j
+.894118 .894118 .905882 RG
+.4 w
+n 0 36 m 459.2126 36 l S
+n 0 18 m 459.2126 18 l S
+n 0 0 m 459.2126 0 l S
+Q
+Q
+Q
+q
+1 0 0 1 57.02362 712.8661 cm
+q
+.094118 .094118 .105882 rg
+BT 1 0 0 1 0 4 Tm /F2 16 Tf 20 TL (14. File-by-file replication checklist) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 692.3661 cm
+q
+.247059 .247059 .27451 rg
+BT 1 0 0 1 0 4.7 Tm /F1 9.8 Tf 14.5 TL (Carry these files / settings over to the new project in order:) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 674.3661 cm
+q
+.443137 .443137 .478431 rg
+BT 1 0 0 1 0 2 Tm /F2 8 Tf 10 TL (Checklist) Tj T* ET
+Q
+Q
+q
+1 0 0 1 57.02362 540.3661 cm
+%PreformattedPara
+.094118 .094118 .105882 rg
+BT 1 0 0 1 2 123.8 Tm /F3 8.2 Tf 11 TL (1. package.json        -> install the dependency set \(Section 1\)) Tj T* (2. vite.config.ts      -> react\(\) + tailwindcss\(\); '@' alias) Tj T* (3. tsconfig*.json      -> path alias '@/*') Tj T* (4. components.json      -> new-york / neutral / cssVariables \(Section 5.1\)) Tj T* (5. src/index.css        -> tokens + utilities + base typography \(Section 2.3, 11\)) Tj T* (6. src/lib/utils.ts     -> cn\(\) helper \(Section 4\)) Tj T* (7. src/components/ui/*   -> npx shadcn add <list> \(Section 5.2\)) Tj T* (8. src/layouts/AppLayout.tsx -> shell + sidebar \(Sections 3.1, 7\)) Tj T* (9. src/components/SidebarItem.tsx -> nav item spec \(Section 7.1\)) Tj T* (10. src/i18n/*          -> i18next bootstrap, en default \(Section 10.3\)) Tj T* (11. src/lib/queryClient.ts + queryKeys.ts -> TanStack setup \(Section 10.1\)) Tj T* (12. src/stores/*        -> Zustand UI stores \(Section 10.2\)) Tj T* ET
+Q
+q
+1 0 0 1 57.02362 531.8622 cm
+Q
+q
+1 0 0 1 57.02362 527.2622 cm
+q
+.6 w
+1 J
+.894118 .894118 .905882 RG
+n 0 0 m 481.2283 0 l S
+Q
+Q
+q
+1 0 0 1 57.02362 475.7622 cm
+q
+BT 1 0 0 1 0 33.7 Tm 14.5 TL /F1 9.8 Tf .247059 .247059 .27451 rg (Golden rule: keep the canvas gray, the panels white, the primary near-black, the radii generous \(14) Tj (\226) Tj (18px\), the) Tj T* (icons thin \(1.75\), and the motion subtle. Match those six properties and any React app will read as the same) Tj T* (design language.) Tj T* ET
+Q
+Q
+ 
