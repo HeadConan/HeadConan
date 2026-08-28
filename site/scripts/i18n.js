@@ -12,20 +12,20 @@
 window.I18N = {
   en: {
     meta: {
-      title: 'HEADCONAN — Some worlds never leave your head',
-      desc: 'HeadConan is a portal into the worlds already living in your head. This website is an interactive demonstration.'
+      title: 'HEADCONAN — worlds you step into, not chat with',
+      desc: 'A world engine, demonstrated. You act inside a world and the world answers back — no chat box, no menu. (The demo scene is scripted, not generated.)'
     },
     door: {
       skip: 'Skip to content',
-      stamp: 'A PORTAL INTO IMAGINED WORLDS',
-      tagline: 'Some worlds never leave your head.',
+      stamp: 'A WORLD ENGINE',
+      tagline: 'The worlds in your head. Now you can walk into them.',
       enter: 'ENTER',
       hint: '— move your cursor. the fragments follow —'
     },
     gate: {
       kicker: '01 / THE GATE',
       title: 'WHERE WOULD YOU GO?',
-      sub: 'Desires, not features. Pick one and watch what it demands from an interface.',
+      sub: 'Pick a want. The world shapes itself to fit.',
       desires: {
         ruler: 'BECOME A RULER',
         murder: 'SOLVE A MURDER',
@@ -35,20 +35,20 @@ window.I18N = {
         impossible: 'LIVE SOMEWHERE IMPOSSIBLE'
       },
       desireDetail: {
-        ruler: { line: 'An empire is fracturing. The interface you need is a war room.', chips: ['MAP', 'FACTIONS', 'MESSAGES', 'POWER', 'CONFLICT', 'DECREE'] },
-        murder: { line: 'A locked room. A deadline. The interface you need is a case board.', chips: ['EVIDENCE', 'SUSPECTS', 'TIMELINE', 'CASE FILES', 'ALIBIS'] },
-        school: { line: 'You are already late. The interface you need is a semester.', chips: ['CLASSROOM', 'MESSAGES', 'SCHEDULE', 'PEOPLE', 'DEADLINES'] },
-        org: { line: 'Nothing you say to anyone is safe. The interface you need hides in plain sight.', chips: ['COVER IDENTITY', 'DROP POINTS', 'CODES', 'WATCH LIST', 'EXFIL'] },
-        love: { line: 'Small talk, stolen glances, one wrong word. The interface you need is a conversation.', chips: ['DIALOGUE', 'SUBTEXT', 'MEMORIES', 'GIFTS', 'PROMISES'] },
-        impossible: { line: 'A city that should not exist. The interface you need is a map that lies.', chips: ['MAP', 'ANOMALIES', 'EXPEDITION LOG', 'CURFEW', 'RUMORS'] }
+        ruler: { line: 'An empire is falling apart. The screen becomes a war room — maps, factions, decrees.', chips: ['MAP', 'FACTIONS', 'MESSAGES', 'POWER', 'CONFLICT', 'DECREE'] },
+        murder: { line: 'A body in a locked room. The screen becomes a case board — evidence, suspects, a timeline.', chips: ['EVIDENCE', 'SUSPECTS', 'TIMELINE', 'CASE FILES', 'ALIBIS'] },
+        school: { line: 'You are late on the first day. The screen becomes a semester — classes, a schedule, people.', chips: ['CLASSROOM', 'MESSAGES', 'SCHEDULE', 'PEOPLE', 'DEADLINES'] },
+        org: { line: 'Every word you say is a risk. The screen becomes a cover kit — a false name, drop points, codes.', chips: ['COVER IDENTITY', 'DROP POINTS', 'CODES', 'WATCH LIST', 'EXFIL'] },
+        love: { line: 'One wrong sentence ends it. The screen becomes a conversation — subtext, memories, gifts.', chips: ['DIALOGUE', 'SUBTEXT', 'MEMORIES', 'GIFTS', 'PROMISES'] },
+        impossible: { line: 'A city that breaks geography. The screen becomes a map that lies — anomalies, an expedition log.', chips: ['MAP', 'ANOMALIES', 'EXPEDITION LOG', 'CURFEW', 'RUMORS'] }
       },
-      revealEmpty: 'Choose a desire.<br>The interface it needs will appear here.',
-      footnote: 'Different worlds demand different interfaces.<br>HeadConan renders them — it does not explain them.'
+      revealEmpty: 'Pick one.<br>The world will hand you its tools.',
+      footnote: 'No two worlds use the same screen.<br>That is the point.'
     },
     portals: {
       kicker: '02 / THE WORLDS',
       title: 'WORLDS',
-      sub: 'Every portal is a situation, not a description. Choose one to enter.',
+      sub: 'Three doors. Each drops you into the middle of a story already moving.',
       situations: {
         spy: 'Anya is waiting for you.',
         imperium: 'Your empire is becoming unstable.',
@@ -59,7 +59,7 @@ window.I18N = {
     demo: {
       kicker: '03 / THE DEMO',
       title: 'ENTER A WORLD',
-      sub: 'SPY × FAMILY, 7:30 AM. This is a deterministic demo — no AI is running. Everything you see is state, and every action changes it.',
+      sub: 'SPY × FAMILY, 7:30 AM. This scene is hand-written, not generated. Press a button and the story shifts.',
       clock: '07:30 — FORGER HOUSEHOLD',
       stageEmpty: 'THE ROOM IS EMPTY NOW.',
       stageRoom: 'YOR IS IN THE ROOM.',
@@ -75,7 +75,7 @@ window.I18N = {
         fine: 'A surveillance file surfaces in the household records.'
       },
       actions: { ask: 'ASK YOR SOMETHING', tell: 'TELL HER A SECRET', observe: 'OBSERVE', leave: 'LEAVE', reset: 'RESET DEMO' },
-      fine: 'Simulated locally, deterministically. No server, no API key, no real world engine. The actual HeadConan runtime is separate.',
+      fine: 'Runs on your device. The scene is scripted, not a live model — but the real engine behaves the same way.',
       initial: {
         yorLine: 'She is pouring tea. She looks up and smiles.',
         loidLine: 'You are a spy. She does not know. You do not know what she is.',
@@ -106,7 +106,7 @@ window.I18N = {
     persp: {
       kicker: '04 / THE PERSPECTIVE',
       title: 'ONE WORLD. TWO VIEWS.',
-      sub: 'The world has one truth. What you are allowed to see depends on who you are.',
+      sub: 'Same room, same morning. You and the host are shown different facts — because you know different secrets.',
       player: 'PLAYER',
       host: 'HOST',
       playerObs: 'Yor looks nervous.',
@@ -118,7 +118,7 @@ window.I18N = {
       rowLoid: 'Loid',
       rowYor: 'Yor',
       rowAnya: 'Anya',
-      note: 'Same simulation. Different projection. Nothing else changes.',
+      note: 'One scene. Two sets of eyes. That is all that changes.',
       playerList: [
         '<li><span class="know-yes">✔</span> Yor works at City Hall</li>',
         '<li><span class="know-no">✘</span> Yor is Thorn Princess <em>(unknown to you)</em></li>',
@@ -133,23 +133,23 @@ window.I18N = {
     nc: {
       kicker: '05 / THE DIFFERENCE',
       title: 'NOT A CHATBOT',
-      sub: 'One responds to words. The other responds to actions — and remembers what happened.',
+      sub: 'A chatbot waits for your sentence. This waits for your move — and the move sticks.',
       chat: 'CHATBOT',
       headconan: 'HEADCONAN',
       roles: { you: 'YOU', it: 'IT', world: 'WORLD' },
       chatSteps: ['You say something.', 'It responds.'],
       headconanSteps: [
         'You act.',
-        'Something happens.',
+        'The world reacts.',
         'Someone notices.',
-        'The world changes.',
-        'You continue from the new situation.'
+        'It changes.',
+        'You pick up where it left off.'
       ]
     },
     wui: {
       kicker: '06 / THE INTERFACES',
-      title: 'WORLDS WEAR DIFFERENT CLOTHES',
-      sub: 'A classroom, a crime scene and a throne room do not share a layout. Concept demo — these panels are mockups.',
+      title: 'NO TWO WORLDS SHARE A SCREEN',
+      sub: 'A classroom, a murder, a throne room — each gets the tools it needs, not a generic menu. (Mockups.)',
       tabs: { school: 'SCHOOL', invest: 'INVESTIGATION', empire: 'EMPIRE' },
       schoolSched: '<h5>SCHEDULE</h5><ul><li>08:30 LECTURE — CHEM 201</li><li>10:00 LAB — BIOLOGY</li><li>14:00 SEMINAR</li><li>17:00 CLUB MEETING</li></ul>',
       schoolMsg: '<h5>MESSAGES</h5><ul><li>Prof. Kim: "Where is your lab report?"</li><li>Min: "You missed the study group!!"</li><li>You: "On my way."</li></ul>',
@@ -163,7 +163,7 @@ window.I18N = {
     },
     principle: {
       title: 'You already have the worlds.',
-      line: 'HeadConan lets you enter them.',
+      line: 'HeadConan is the door in.',
       world: 'WORLD',
       chars: 'CHARACTERS',
       mem: 'MEMORY',
@@ -174,31 +174,31 @@ window.I18N = {
       title: 'THE NEXT WORLD IS YOURS.',
       enter: 'ENTER HEADCONAN',
       view: 'VIEW ON GITHUB',
-      fine: 'The runtime is an early research prototype. This site is its public face — an honest, simulated demo.'
+      fine: 'The engine behind this is an early prototype. Everything here runs in your browser.'
     },
     foot: {
-      line1: 'HEADCONAN — an experiment in inhabiting imagined worlds.',
-      line2: 'This website runs entirely in your browser. Nothing is fake-misrepresented; the demo is deliberately deterministic.'
+      line1: 'HEADCONAN — worlds you can actually stand inside.',
+      line2: 'Everything here runs in your browser. The demo is scripted on purpose: what you see is exactly what the code does.'
     },
     toggle: { toZh: '中文', toEn: 'EN' }
   },
 
   zh: {
     meta: {
-      title: 'HEADCONAN — 有些世界永远不会离开你的脑海',
-      desc: 'HeadConan 是一扇通往那些早已活在你脑海中的世界的入口。本网站是一个交互式演示。'
+      title: 'HEADCONAN — 走进去的世界，不是用来聊的',
+      desc: '一个世界引擎的演示。你在一个世界里行动，世界随即回应——没有聊天框，没有菜单。（演示场景为手写的，并非生成式 AI。）'
     },
     door: {
       skip: '跳到正文',
-      stamp: '通往想象世界的入口',
-      tagline: '有些世界永远不会离开你的脑海。',
+      stamp: '一个世界引擎',
+      tagline: '那些活在你脑海里的世界。现在你可以走进去。',
       enter: '进入',
       hint: '— 移动光标，碎片随你而动 —'
     },
     gate: {
       kicker: '01 / 之门',
       title: '你想去哪里？',
-      sub: '是欲望，不是功能。选一个，看看它需要怎样的界面。',
+      sub: '选一个欲望。世界会按它重塑自己。',
       desires: {
         ruler: '成为统治者',
         murder: '侦破一桩谋杀',
@@ -208,20 +208,20 @@ window.I18N = {
         impossible: '栖身于不可能之地'
       },
       desireDetail: {
-        ruler: { line: '一个帝国正在崩裂。你需要的界面是一间作战室。', chips: ['地图', '派系', '消息', '权力', '冲突', '敕令'] },
-        murder: { line: '一间密室。一个期限。你需要的界面是一块案情板。', chips: ['证据', '嫌疑人', '时间线', '案卷', '不在场证明'] },
-        school: { line: '你已经迟到了。你需要的界面是一个学期。', chips: ['教室', '消息', '日程', '人物', '截止日期'] },
-        org: { line: '你对任何人说的话都不安全。你需要的界面藏在显眼处。', chips: ['伪装身份', '投放点', '暗号', '监视名单', '撤离'] },
-        love: { line: '闲聊、偷瞄、一句错话。你需要的界面是一场对话。', chips: ['对话', '潜台词', '回忆', '礼物', '承诺'] },
-        impossible: { line: '一座不该存在的城市。你需要的界面是一张会撒谎的地图。', chips: ['地图', '异常', '远征日志', '宵禁', '谣言'] }
+        ruler: { line: '一个帝国正在崩塌。屏幕变成一间作战室——地图、派系、敕令。', chips: ['地图', '派系', '消息', '权力', '冲突', '敕令'] },
+        murder: { line: '密室里一具尸体。屏幕变成一块案情板——证据、嫌疑人、时间线。', chips: ['证据', '嫌疑人', '时间线', '案卷', '不在场证明'] },
+        school: { line: '开学第一天你就迟到了。屏幕变成一个学期——课程、日程、人物。', chips: ['教室', '消息', '日程', '人物', '截止日期'] },
+        org: { line: '你说的每个字都是风险。屏幕变成一套伪装工具——假身份、投放点、暗号。', chips: ['伪装身份', '投放点', '暗号', '监视名单', '撤离'] },
+        love: { line: '一句错话就完了。屏幕变成一场对话——潜台词、回忆、礼物。', chips: ['对话', '潜台词', '回忆', '礼物', '承诺'] },
+        impossible: { line: '一座违背地理规律的城市。屏幕变成一张会撒谎的地图——异常、远征日志。', chips: ['地图', '异常', '远征日志', '宵禁', '谣言'] }
       },
-      revealEmpty: '选择一个欲望。<br>它所需的界面将在此显现。',
-      footnote: '不同的世界需要不同的界面。<br>HeadConan 只是呈现它们——而非解释。'
+      revealEmpty: '选一个。<br>世界会把它的工具交到你手上。',
+      footnote: '没有两个世界共用同一块屏幕。<br>这才是重点。'
     },
     portals: {
       kicker: '02 / 世界',
       title: '世界',
-      sub: '每个传送门都是一种情境，而非一段描述。选一个进入。',
+      sub: '三扇门。每一扇都把你丢进一个已经在运转的故事中段。',
       situations: {
         spy: '阿尼亚在等你。',
         imperium: '你的帝国开始动荡。',
@@ -232,7 +232,7 @@ window.I18N = {
     demo: {
       kicker: '03 / 演示',
       title: '进入一个世界',
-      sub: '《间谍过家家》，早上 7:30。这是一个确定性的演示——没有运行任何 AI。你看到的一切都是状态，每个动作都会改变它。',
+      sub: '《间谍过家家》，早上 7:30。这个场景是手写的，不是生成的。按下一个按钮，故事就偏移。',
       clock: '07:30 — 福杰家',
       stageEmpty: '房间现在空了。',
       stageRoom: '约尔在房间里。',
@@ -248,7 +248,7 @@ window.I18N = {
         fine: '一份监视档案出现在了家庭记录中。'
       },
       actions: { ask: '问约尔点什么', tell: '告诉她一个秘密', observe: '观察', leave: '离开', reset: '重置演示' },
-      fine: '本地确定性模拟。无服务器、无 API 密钥、无真实世界引擎。真正的 HeadConan 运行时是独立的。',
+      fine: '在你的设备上运行。场景是写好的，不是实时模型——但真正的引擎运作方式与此相同。',
       initial: {
         yorLine: '她正在倒茶。她抬起头，微笑。',
         loidLine: '你是个间谍。她不知道。你也不知道她是谁。',
@@ -279,7 +279,7 @@ window.I18N = {
     persp: {
       kicker: '04 / 视角',
       title: '同一个世界。两种视角。',
-      sub: '世界只有一种真相。你被允许看到的，取决于你是谁。',
+      sub: '同一个房间，同一个早晨。你和主持人看到的事实不同——因为你们知道的秘密不同。',
       player: '玩家',
       host: '主持人',
       playerObs: '约尔看起来很紧张。',
@@ -291,7 +291,7 @@ window.I18N = {
       rowLoid: '劳埃德',
       rowYor: '约尔',
       rowAnya: '阿尼亚',
-      note: '同样的模拟。不同的投射。其余一切不变。',
+      note: '同一个场景。两双眼睛。改变的仅此而已。',
       playerList: [
         '<li><span class="know-yes">✔</span> 约尔在市政厅工作</li>',
         '<li><span class="know-no">✘</span> 约尔是荆棘公主 <em>（你还不知道）</em></li>',
@@ -306,23 +306,23 @@ window.I18N = {
     nc: {
       kicker: '05 / 区别',
       title: '不是聊天机器人',
-      sub: '一个回应言语。另一个回应行动——并记得发生过什么。',
+      sub: '聊天机器人等你说出一句话。这里等你迈出一步——而且这一步会留下痕迹。',
       chat: '聊天机器人',
       headconan: 'HEADCONAN',
       roles: { you: '你', it: '它', world: '世界' },
       chatSteps: ['你说点什么。', '它回应。'],
       headconanSteps: [
         '你行动。',
-        '发生了什么事。',
+        '世界回应。',
         '有人注意到了。',
-        '世界改变了。',
-        '你从新的情境继续。'
+        '它变了。',
+        '你从它停下的地方接着走。'
       ]
     },
     wui: {
       kicker: '06 / 界面',
-      title: '世界穿着不同的外衣',
-      sub: '教室、犯罪现场与御座厅不共用一种布局。概念演示——这些面板只是模型。',
+      title: '没有两个世界共用一块屏幕',
+      sub: '教室、凶案、御座厅——各自拿到自己需要的工具，而不是一个通用菜单。（模型图。）',
       tabs: { school: '校园', invest: '调查', empire: '帝国' },
       schoolSched: '<h5>日程</h5><ul><li>08:30 讲座 — 化学 201</li><li>10:00 实验 — 生物</li><li>14:00 研讨课</li><li>17:00 社团会议</li></ul>',
       schoolMsg: '<h5>消息</h5><ul><li>金教授：“你的实验报告呢？”</li><li>敏：“你错过了学习小组！！”</li><li>你：“马上到。”</li></ul>',
@@ -336,7 +336,7 @@ window.I18N = {
     },
     principle: {
       title: '你早已拥有那些世界。',
-      line: 'HeadConan 让你进入它们。',
+      line: 'HeadConan 就是那扇门。',
       world: '世界',
       chars: '角色',
       mem: '记忆',
@@ -347,11 +347,11 @@ window.I18N = {
       title: '下一个世界属于你。',
       enter: '进入 HEADCONAN',
       view: '在 GITHUB 查看',
-      fine: '该运行时还只是早期研究原型。本网站是它的门面——一个诚实的、模拟的演示。'
+      fine: '背后的引擎还是早期原型。这里的一切都在你的浏览器里运行。'
     },
     foot: {
-      line1: 'HEADCONAN——一场栖居于想象世界的实验。',
-      line2: '本网站完全在你的浏览器中运行。没有任何虚假误导；这个演示是有意确定性的。'
+      line1: 'HEADCONAN——你能真正站进去的世界。',
+      line2: '这里的一切都在浏览器里运行。演示是刻意写好的：你看到的，就是代码实际做的。'
     },
     toggle: { toZh: '中文', toEn: 'EN' }
   }
