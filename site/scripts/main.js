@@ -101,16 +101,22 @@
       b.classList.toggle('is-active', b.dataset.desire === id);
     });
     $('reveal-empty').hidden = true;
-    $('reveal-body').hidden = false;
+    var body = $('reveal-body');
+    body.hidden = false;
     $('reveal-title').textContent = t('gate.desires.' + id);
     $('reveal-line').textContent = d.line;
     var chips = $('reveal-chips');
     chips.innerHTML = '';
-    d.chips.forEach(function (c) {
+    d.chips.forEach(function (c, idx) {
       var s = document.createElement('span');
       s.textContent = c;
+      s.style.setProperty('--i', idx);
       chips.appendChild(s);
     });
+    // restart the entrance animation on every selection
+    body.classList.remove('is-in');
+    void body.offsetWidth;
+    body.classList.add('is-in');
   }
 
   document.querySelectorAll('.desire').forEach(function (b) {
@@ -227,6 +233,22 @@
   $('lang-toggle').addEventListener('click', function () {
     setLang(lang === 'en' ? 'zh' : 'en');
   });
+
+  /* ================= SCROLL REVEAL (silky entrance) ================= */
+  var revealEls = document.querySelectorAll('.reveal, .reveal-fade');
+  if (reduceMotion || !('IntersectionObserver' in window)) {
+    revealEls.forEach(function (el) { el.classList.add('is-in'); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          en.target.classList.add('is-in');
+          io.unobserve(en.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+    revealEls.forEach(function (el) { io.observe(el); });
+  }
 
   /* ---------- init ---------- */
   applyI18n();

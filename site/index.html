@@ -26,10 +26,10 @@
   </div>
 
   <div class="door-core">
-    <p class="stamp" data-i18n="door.stamp">A PORTAL INTO IMAGINED WORLDS</p>
-    <h1 class="wordmark">HEADCONAN</h1>
-    <p class="tagline" data-i18n="door.tagline">Some worlds never leave your head.</p>
-    <button class="btn btn-yellow btn-xl" id="enter-btn" type="button" data-i18n="door.enter">ENTER</button>
+    <p class="stamp reveal" style="--i:0" data-i18n="door.stamp">A PORTAL INTO IMAGINED WORLDS</p>
+    <h1 class="wordmark reveal" style="--i:1">HEADCONAN</h1>
+    <p class="tagline reveal" style="--i:2" data-i18n="door.tagline">Some worlds never leave your head.</p>
+    <button class="btn btn-yellow btn-xl reveal-fade" id="enter-btn" type="button" data-i18n="door.enter">ENTER</button>
   </div>
 
   <p class="door-hint" data-i18n="door.hint">— move your cursor. the fragments follow —</p>
@@ -37,13 +37,13 @@
 
 <!-- ======================= 02 GATE ======================= -->
 <section class="gate" id="gate" aria-labelledby="gate-title">
-  <header class="sec-head">
+  <header class="sec-head reveal">
     <p class="sec-kicker kicker-blue" data-i18n="gate.kicker">01 / THE GATE</p>
     <h2 class="sec-title" id="gate-title" data-i18n="gate.title">WHERE WOULD YOU GO?</h2>
     <p class="sec-sub" data-i18n="gate.sub">Desires, not features. Pick one and watch what it demands from an interface.</p>
   </header>
 
-  <div class="gate-layout">
+  <div class="gate-layout reveal" style="--i:1">
     <div class="gate-options" role="listbox" aria-label="Possible desires">
       <button class="desire desire-ruler" data-desire="ruler" type="button" role="option">
         <span class="desire-num">01</span><span class="desire-label" data-i18n="gate.desires.ruler">BECOME A RULER</span>
@@ -83,14 +83,14 @@
 
 <!-- ======================= 03 PORTALS ======================= -->
 <section class="portals" id="portals" aria-labelledby="portals-title">
-  <header class="sec-head">
+  <header class="sec-head reveal">
     <p class="sec-kicker kicker-red" data-i18n="portals.kicker">02 / THE WORLDS</p>
     <h2 class="sec-title" id="portals-title" data-i18n="portals.title">WORLDS</h2>
     <p class="sec-sub" data-i18n="portals.sub">Every portal is a situation, not a description. Choose one to enter.</p>
   </header>
 
   <div class="portal-row">
-    <article class="portal portal-spy">
+    <article class="portal portal-spy reveal" style="--i:0">
       <div class="portal-tag">SPY × FAMILY</div>
       <p class="portal-situation" data-i18n="portals.situations.spy">Anya is waiting for you.</p>
       <div class="portal-visual portal-visual-spy" aria-hidden="true">
@@ -99,7 +99,7 @@
       <button class="btn btn-white portal-enter" data-jump="demo" type="button" data-i18n="portals.enter">ENTER</button>
     </article>
 
-    <article class="portal portal-imperium">
+    <article class="portal portal-imperium reveal" style="--i:1">
       <div class="portal-tag">SOVEREIGN IMPERIUM</div>
       <p class="portal-situation" data-i18n="portals.situations.imperium">Your empire is becoming unstable.</p>
       <div class="portal-visual portal-visual-imperium" aria-hidden="true">
@@ -108,7 +108,7 @@
       <button class="btn btn-white portal-enter" data-jump="demo" type="button" data-i18n="portals.enter">ENTER</button>
     </article>
 
-    <article class="portal portal-campus">
+    <article class="portal portal-campus reveal" style="--i:2">
       <div class="portal-tag">CAMPUS LIFE</div>
       <p class="portal-situation" data-i18n="portals.situations.campus">You are already late for class.</p>
       <div class="portal-visual portal-visual-campus" aria-hidden="true">
@@ -121,13 +121,13 @@
 
 <!-- ======================= 04 DEMO ======================= -->
 <section class="demo" id="demo" aria-labelledby="demo-title">
-  <header class="sec-head">
+  <header class="sec-head reveal">
     <p class="sec-kicker kicker-red" data-i18n="demo.kicker">03 / THE DEMO</p>
     <h2 class="sec-title" id="demo-title" data-i18n="demo.title">ENTER A WORLD</h2>
     <p class="sec-sub" data-i18n="demo.sub">SPY × FAMILY, 7:30 AM. This is a deterministic demo — no AI is running. Everything you see is state, and every action changes it.</p>
   </header>
 
-  <div class="demo-frame" id="demo-frame">
+  <div class="demo-frame reveal" id="demo-frame">
     <div class="demo-stage" aria-label="Yor is in the room">
       <div class="stage-head">
         <h3 class="stage-title" id="stage-title">YOR IS IN THE ROOM.</h3>
@@ -192,7 +192,7 @@
 
 <!-- ======================= 05 PERSPECTIVE ======================= -->
 <section class="perspective" id="perspective" aria-labelledby="persp-title">
-  <header class="sec-head">
+  <header class="sec-head reveal">
     <p class="sec-kicker kicker-blue" data-i18n="persp.kicker">04 / THE PERSPECTIVE</p>
     <h2 class="sec-title" id="persp-title" data-i18n="persp.title">ONE WORLD. TWO VIEWS.</h2>
     <p class="sec-sub" data-i18n="persp.sub">The world has one truth. What you are allowed to see depends on who you are.</p>
@@ -203,7 +203,7 @@
     <button class="btn btn-white persp-toggle" data-persp="host" type="button" aria-pressed="false" data-i18n="persp.host">HOST</button>
   </div>
 
-  <div class="persp-panels">
+  <div class="persp-panels reveal">
     <div class="persp-panel persp-player is-visible" id="persp-player">
       <p class="persp-obs" data-i18n="persp.playerObs">Yor looks nervous.</p>
       <ul class="persp-knows" data-i18n-html="persp.playerList">
@@ -237,7 +237,7 @@
 
 <!-- ======================= 06 NOT A CHATBOT ======================= -->
 <section class="notchat" id="notchat" aria-labelledby="notchat-title">
-  <header class="sec-head">
+  <header class="sec-head reveal">
     <p class="sec-kicker kicker-green" data-i18n="nc.kicker">05 / THE DIFFERENCE</p>
     <h2 class="sec-title" id="notchat-title" data-i18n="nc.title">NOT A CHATBOT</h2>
     <p class="sec-sub" data-i18n="nc.sub">One responds to words. The other responds to actions — and remembers what happened.</p>
@@ -253,7 +253,7 @@
 
 <!-- ======================= 07 WORLD-SPECIFIC UI ======================= -->
 <section class="worldui" id="worldui" aria-labelledby="worldui-title">
-  <header class="sec-head">
+  <header class="sec-head reveal">
     <p class="sec-kicker kicker-green" data-i18n="wui.kicker">06 / THE INTERFACES</p>
     <h2 class="sec-title" id="worldui-title" data-i18n="wui.title">WORLDS WEAR DIFFERENT CLOTHES</h2>
     <p class="sec-sub" data-i18n="wui.sub">A classroom, a crime scene and a throne room do not share a layout. Concept demo — these panels are mockups.</p>
@@ -265,7 +265,7 @@
     <button class="btn btn-white wui-tab" id="tab-empire" role="tab" aria-selected="false" data-tab="empire" type="button" data-i18n="wui.tabs.empire">EMPIRE</button>
   </div>
 
-  <div class="wui-panels">
+  <div class="wui-panels reveal">
     <div class="wui-panel is-visible" id="wui-school" role="tabpanel" aria-labelledby="tab-school" data-i18n-html="wui.schoolSched">
       <div class="mini mini-sched"><h5>SCHEDULE</h5><ul><li>08:30 LECTURE — CHEM 201</li><li>10:00 LAB — BIOLOGY</li><li>14:00 SEMINAR</li><li>17:00 CLUB MEETING</li></ul></div>
       <div class="mini mini-msg" data-i18n-html="wui.schoolMsg"><h5>MESSAGES</h5><ul><li>Prof. Kim: "Where is your lab report?"</li><li>Min: "You missed the study group!!"</li><li>You: "On my way."</li></ul></div>
@@ -288,32 +288,32 @@
 
 <!-- ======================= 08 PRINCIPLE ======================= -->
 <section class="principle" id="principle" aria-labelledby="principle-title">
-  <h2 class="principle-title" id="principle-title" data-i18n="principle.title">You already have the worlds.</h2>
-  <p class="principle-line" data-i18n="principle.line">HeadConan lets you enter them.</p>
+  <h2 class="principle-title reveal" id="principle-title" style="--i:0" data-i18n="principle.title">You already have the worlds.</h2>
+  <p class="principle-line reveal" style="--i:1" data-i18n="principle.line">HeadConan lets you enter them.</p>
   <div class="principle-blocks">
-    <div class="pblock pblock-world" data-i18n="principle.world">WORLD</div>
-    <span class="pblock-plus">+</span>
-    <div class="pblock pblock-chars" data-i18n="principle.chars">CHARACTERS</div>
-    <span class="pblock-plus">+</span>
-    <div class="pblock pblock-mem" data-i18n="principle.mem">MEMORY</div>
-    <span class="pblock-plus">+</span>
-    <div class="pblock pblock-act" data-i18n="principle.act">ACTION</div>
-    <span class="pblock-plus">+</span>
-    <div class="pblock pblock-conseq" data-i18n="principle.conseq">CONSEQUENCE</div>
+    <div class="pblock pblock-world reveal" style="--i:2" data-i18n="principle.world">WORLD</div>
+    <span class="pblock-plus reveal" style="--i:3">+</span>
+    <div class="pblock pblock-chars reveal" style="--i:4" data-i18n="principle.chars">CHARACTERS</div>
+    <span class="pblock-plus reveal" style="--i:5">+</span>
+    <div class="pblock pblock-mem reveal" style="--i:6" data-i18n="principle.mem">MEMORY</div>
+    <span class="pblock-plus reveal" style="--i:7">+</span>
+    <div class="pblock pblock-act reveal" style="--i:8" data-i18n="principle.act">ACTION</div>
+    <span class="pblock-plus reveal" style="--i:9">+</span>
+    <div class="pblock pblock-conseq reveal" style="--i:10" data-i18n="principle.conseq">CONSEQUENCE</div>
   </div>
 </section>
 
 <!-- ======================= 09 CTA ======================= -->
 <section class="cta" id="cta" aria-labelledby="cta-title">
-  <h2 class="cta-title" id="cta-title" data-i18n="cta.title">THE NEXT WORLD IS YOURS.</h2>
-  <div class="cta-actions">
+  <h2 class="cta-title reveal" id="cta-title" style="--i:0" data-i18n="cta.title">THE NEXT WORLD IS YOURS.</h2>
+  <div class="cta-actions reveal-fade">
     <a class="btn btn-yellow btn-xl" href="https://github.com/HeadConan/HeadConan" target="_blank" rel="noopener noreferrer" data-i18n="cta.enter">ENTER HEADCONAN</a>
     <a class="btn btn-white btn-xl" href="https://github.com/HeadConan/HeadConan" target="_blank" rel="noopener noreferrer" data-i18n="cta.view">VIEW ON GITHUB</a>
   </div>
-  <p class="cta-fine" data-i18n="cta.fine">The runtime is an early research prototype. This site is its public face — an honest, simulated demo.</p>
+  <p class="cta-fine reveal" style="--i:1" data-i18n="cta.fine">The runtime is an early research prototype. This site is its public face — an honest, simulated demo.</p>
 </section>
 
-<footer class="foot">
+<footer class="foot reveal">
   <span data-i18n="foot.line1">HEADCONAN — an experiment in inhabiting imagined worlds.</span>
   <span data-i18n="foot.line2">This website runs entirely in your browser. Nothing is fake-misrepresented; the demo is deliberately deterministic.</span>
 </footer>
