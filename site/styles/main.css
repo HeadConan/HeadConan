@@ -686,3 +686,33 @@ body.entered .door { min-height: auto; padding: 96px 24px 56px; }
   .frag { transition: none; }
   body.entered .door-fragments { display: none; }
 }
+
+/* ============================================================
+   LANGUAGE TOGGLE
+   ============================================================ */
+.lang-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 50;
+  min-width: 52px;
+  padding: 9px 14px;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  background: var(--yellow);
+  border: var(--border);
+  border-radius: 0;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+.lang-toggle:hover { transform: translate(1px, 1px); box-shadow: 2px 2px 0 var(--ink); }
+.lang-toggle:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ink); }
+.lang-toggle:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+@media (max-width: 560px) {
+  .lang-toggle { top: 10px; right: 10px; padding: 7px 11px; font-size: 0.74rem; min-width: 44px; }
+}

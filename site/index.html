@@ -9,7 +9,8 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2316140F'/%3E%3Crect x='6' y='6' width='20' height='20' fill='%23FFD839' stroke='%2316140F' stroke-width='3'/%3E%3C/svg%3E">
 </head>
 <body>
-<a class="skip-link" href="#gate">Skip to content</a>
+<button class="lang-toggle" id="lang-toggle" type="button" aria-label="Switch language">EN</button>
+<a class="skip-link" href="#gate" data-i18n="door.skip">Skip to content</a>
 
 <!-- ======================= 01 DOOR ======================= -->
 <section class="door" id="door" aria-label="Enter HeadConan">
@@ -25,49 +26,49 @@
   </div>
 
   <div class="door-core">
-    <p class="stamp">A PORTAL INTO IMAGINED WORLDS</p>
+    <p class="stamp" data-i18n="door.stamp">A PORTAL INTO IMAGINED WORLDS</p>
     <h1 class="wordmark">HEADCONAN</h1>
-    <p class="tagline">Some worlds never leave your head.</p>
-    <button class="btn btn-yellow btn-xl" id="enter-btn" type="button">ENTER</button>
+    <p class="tagline" data-i18n="door.tagline">Some worlds never leave your head.</p>
+    <button class="btn btn-yellow btn-xl" id="enter-btn" type="button" data-i18n="door.enter">ENTER</button>
   </div>
 
-  <p class="door-hint">— move your cursor. the fragments follow —</p>
+  <p class="door-hint" data-i18n="door.hint">— move your cursor. the fragments follow —</p>
 </section>
 
 <!-- ======================= 02 GATE ======================= -->
 <section class="gate" id="gate" aria-labelledby="gate-title">
   <header class="sec-head">
-    <p class="sec-kicker kicker-blue">01 / THE GATE</p>
-    <h2 class="sec-title" id="gate-title">WHERE WOULD YOU GO?</h2>
-    <p class="sec-sub">Desires, not features. Pick one and watch what it demands from an interface.</p>
+    <p class="sec-kicker kicker-blue" data-i18n="gate.kicker">01 / THE GATE</p>
+    <h2 class="sec-title" id="gate-title" data-i18n="gate.title">WHERE WOULD YOU GO?</h2>
+    <p class="sec-sub" data-i18n="gate.sub">Desires, not features. Pick one and watch what it demands from an interface.</p>
   </header>
 
   <div class="gate-layout">
     <div class="gate-options" role="listbox" aria-label="Possible desires">
       <button class="desire desire-ruler" data-desire="ruler" type="button" role="option">
-        <span class="desire-num">01</span>BECOME A RULER
+        <span class="desire-num">01</span><span class="desire-label" data-i18n="gate.desires.ruler">BECOME A RULER</span>
       </button>
       <button class="desire desire-murder" data-desire="murder" type="button" role="option">
-        <span class="desire-num">02</span>SOLVE A MURDER
+        <span class="desire-num">02</span><span class="desire-label" data-i18n="gate.desires.murder">SOLVE A MURDER</span>
       </button>
       <button class="desire desire-school" data-desire="school" type="button" role="option">
-        <span class="desire-num">03</span>GO BACK TO SCHOOL
+        <span class="desire-num">03</span><span class="desire-label" data-i18n="gate.desires.school">GO BACK TO SCHOOL</span>
       </button>
       <button class="desire desire-org" data-desire="org" type="button" role="option">
-        <span class="desire-num">04</span>JOIN A SECRET ORGANIZATION
+        <span class="desire-num">04</span><span class="desire-label" data-i18n="gate.desires.org">JOIN A SECRET ORGANIZATION</span>
       </button>
       <button class="desire desire-love" data-desire="love" type="button" role="option">
-        <span class="desire-num">05</span>FALL IN LOVE
+        <span class="desire-num">05</span><span class="desire-label" data-i18n="gate.desires.love">FALL IN LOVE</span>
       </button>
       <button class="desire desire-impossible" data-desire="impossible" type="button" role="option">
-        <span class="desire-num">06</span>LIVE SOMEWHERE IMPOSSIBLE
+        <span class="desire-num">06</span><span class="desire-label" data-i18n="gate.desires.impossible">LIVE SOMEWHERE IMPOSSIBLE</span>
       </button>
     </div>
 
     <div class="gate-reveal" id="gate-reveal" aria-live="polite">
-      <div class="reveal-empty" id="reveal-empty">
+      <div class="reveal-empty" id="reveal-empty" data-i18n-html="gate.revealEmpty">
         <span class="reveal-big">?</span>
-        <p>Choose a desire.<br>The interface it needs will appear here.</p>
+        Choose a desire.<br>The interface it needs will appear here.
       </div>
       <div class="reveal-body" id="reveal-body" hidden>
         <h3 class="reveal-title" id="reveal-title">BECOME A RULER</h3>
@@ -77,43 +78,43 @@
     </div>
   </div>
 
-  <p class="gate-footnote">Different worlds demand different interfaces.<br>HeadConan renders them — it does not explain them.</p>
+  <p class="gate-footnote" data-i18n-html="gate.footnote">Different worlds demand different interfaces.<br>HeadConan renders them — it does not explain them.</p>
 </section>
 
 <!-- ======================= 03 PORTALS ======================= -->
 <section class="portals" id="portals" aria-labelledby="portals-title">
   <header class="sec-head">
-    <p class="sec-kicker kicker-red">02 / THE WORLDS</p>
-    <h2 class="sec-title" id="portals-title">WORLDS</h2>
-    <p class="sec-sub">Every portal is a situation, not a description. Choose one to enter.</p>
+    <p class="sec-kicker kicker-red" data-i18n="portals.kicker">02 / THE WORLDS</p>
+    <h2 class="sec-title" id="portals-title" data-i18n="portals.title">WORLDS</h2>
+    <p class="sec-sub" data-i18n="portals.sub">Every portal is a situation, not a description. Choose one to enter.</p>
   </header>
 
   <div class="portal-row">
     <article class="portal portal-spy">
       <div class="portal-tag">SPY × FAMILY</div>
-      <p class="portal-situation">Anya is waiting for you.</p>
+      <p class="portal-situation" data-i18n="portals.situations.spy">Anya is waiting for you.</p>
       <div class="portal-visual portal-visual-spy" aria-hidden="true">
         <img class="pv-img" src="assets/worlds/spy-family/poster.jpg" alt="Cold-war family apartment at dusk — stylized poster" loading="lazy">
       </div>
-      <button class="btn btn-white portal-enter" data-jump="demo" type="button">ENTER</button>
+      <button class="btn btn-white portal-enter" data-jump="demo" type="button" data-i18n="portals.enter">ENTER</button>
     </article>
 
     <article class="portal portal-imperium">
       <div class="portal-tag">SOVEREIGN IMPERIUM</div>
-      <p class="portal-situation">Your empire is becoming unstable.</p>
+      <p class="portal-situation" data-i18n="portals.situations.imperium">Your empire is becoming unstable.</p>
       <div class="portal-visual portal-visual-imperium" aria-hidden="true">
         <img class="pv-img" src="assets/worlds/imperium/poster.jpg" alt="Imperial throne room — stylized poster" loading="lazy">
       </div>
-      <button class="btn btn-white portal-enter" data-jump="demo" type="button">ENTER</button>
+      <button class="btn btn-white portal-enter" data-jump="demo" type="button" data-i18n="portals.enter">ENTER</button>
     </article>
 
     <article class="portal portal-campus">
       <div class="portal-tag">CAMPUS LIFE</div>
-      <p class="portal-situation">You are already late for class.</p>
+      <p class="portal-situation" data-i18n="portals.situations.campus">You are already late for class.</p>
       <div class="portal-visual portal-visual-campus" aria-hidden="true">
         <img class="pv-img" src="assets/worlds/campus/poster.jpg" alt="Autumn university campus — stylized poster" loading="lazy">
       </div>
-      <button class="btn btn-white portal-enter" data-jump="demo" type="button">ENTER</button>
+      <button class="btn btn-white portal-enter" data-jump="demo" type="button" data-i18n="portals.enter">ENTER</button>
     </article>
   </div>
 </section>
@@ -121,16 +122,16 @@
 <!-- ======================= 04 DEMO ======================= -->
 <section class="demo" id="demo" aria-labelledby="demo-title">
   <header class="sec-head">
-    <p class="sec-kicker kicker-red">03 / THE DEMO</p>
-    <h2 class="sec-title" id="demo-title">ENTER A WORLD</h2>
-    <p class="sec-sub">SPY × FAMILY, 7:30 AM. This is a deterministic demo — no AI is running. Everything you see is state, and every action changes it.</p>
+    <p class="sec-kicker kicker-red" data-i18n="demo.kicker">03 / THE DEMO</p>
+    <h2 class="sec-title" id="demo-title" data-i18n="demo.title">ENTER A WORLD</h2>
+    <p class="sec-sub" data-i18n="demo.sub">SPY × FAMILY, 7:30 AM. This is a deterministic demo — no AI is running. Everything you see is state, and every action changes it.</p>
   </header>
 
   <div class="demo-frame" id="demo-frame">
     <div class="demo-stage" aria-label="Yor is in the room">
       <div class="stage-head">
         <h3 class="stage-title" id="stage-title">YOR IS IN THE ROOM.</h3>
-        <span class="stage-clock">07:30 — FORGER HOUSEHOLD</span>
+        <span class="stage-clock" data-i18n="demo.clock">07:30 — FORGER HOUSEHOLD</span>
       </div>
 
       <div class="stage-body">
@@ -139,74 +140,73 @@
           <div class="char-card" id="yor-card">
             <img class="char-poster" src="assets/worlds/spy-family/yor.png" data-fallback="assets/worlds/spy-family/yor.svg" alt="Yor Forger — stylized poster" loading="lazy">
             <div class="char-top">
-              <span class="char-name">YOR</span>
+              <span class="char-name" data-i18n="demo.charNames.yor">YOR</span>
               <span class="char-state" id="yor-state">calm</span>
             </div>
             <p class="char-line" id="yor-line">She is pouring tea. She looks up and smiles.</p>
-            <div class="char-meter"><span class="meter-label">TRUST</span><div class="meter-bar"><span class="meter-fill" id="yor-trust" style="width:40%"></span></div></div>
+            <div class="char-meter"><span class="meter-label" data-i18n="demo.meter.trust">TRUST</span><div class="meter-bar"><span class="meter-fill" id="yor-trust" style="width:40%"></span></div></div>
           </div>
 
           <div class="char-card" id="loid-card">
             <img class="char-poster" src="assets/worlds/spy-family/loid.png" data-fallback="assets/worlds/spy-family/loid.svg" alt="Loid Forger — stylized poster" loading="lazy">
             <div class="char-top">
-              <span class="char-name">YOU (LOID)</span>
+              <span class="char-name" data-i18n="demo.charNames.loid">YOU (LOID)</span>
               <span class="char-state" id="loid-state">covering</span>
             </div>
             <p class="char-line" id="loid-line">You are a spy. She does not know. You do not know what she is.</p>
-            <div class="char-meter"><span class="meter-label">SUSPICION</span><div class="meter-bar"><span class="meter-fill meter-fill-red" id="loid-suspicion" style="width:0%"></span></div></div>
-          </div>
+            <div class="char-meter"><span class="meter-label" data-i18n="demo.meter.suspicion">SUSPICION</span><div class="meter-bar"><span class="meter-fill meter-fill-red" id="loid-suspicion" style="width:0%"></span></div></div></div>
         </div>
 
         <!-- Relationship strip -->
         <div class="rel-strip">
-          <span class="rel-label">RELATIONSHIP</span>
+          <span class="rel-label" data-i18n="demo.rel">RELATIONSHIP</span>
           <span class="rel-pips" id="rel-pips" aria-label="Relationship affinity"></span>
         </div>
 
         <!-- World event feed -->
         <div class="feed" aria-live="polite">
-          <h4 class="feed-title">WORLD EVENT FEED</h4>
+          <h4 class="feed-title" data-i18n="demo.feedTitle">WORLD EVENT FEED</h4>
           <ol class="feed-list" id="feed-list"></ol>
         </div>
 
         <!-- Secret doc (hidden until revealed) -->
         <div class="secret-doc" id="secret-doc" hidden>
-          <h4>WORLD EVENT — SECRET REVEALED</h4>
-          <p>YOR IS THORN PRINCESS.<br>YOU KNOW NOW.</p>
-          <p class="secret-fine">A surveillance file surfaces in the household records.</p>
+          <h4 data-i18n="demo.secret.title">WORLD EVENT — SECRET REVEALED</h4>
+          <p data-i18n-html="demo.secret.body">YOR IS THORN PRINCESS.<br>YOU KNOW NOW.</p>
+          <p class="secret-fine" data-i18n="demo.secret.fine">A surveillance file surfaces in the household records.</p>
         </div>
       </div>
 
       <div class="stage-actions">
-        <button class="btn btn-white" data-demo="ask" type="button">ASK YOR SOMETHING</button>
-        <button class="btn btn-red" data-demo="tell" type="button">TELL HER A SECRET</button>
-        <button class="btn btn-white" data-demo="observe" type="button">OBSERVE</button>
-        <button class="btn btn-yellow" data-demo="leave" type="button">LEAVE</button>
+        <button class="btn btn-white" data-demo="ask" type="button" data-i18n="demo.actions.ask">ASK YOR SOMETHING</button>
+        <button class="btn btn-red" data-demo="tell" type="button" data-i18n="demo.actions.tell">TELL HER A SECRET</button>
+        <button class="btn btn-white" data-demo="observe" type="button" data-i18n="demo.actions.observe">OBSERVE</button>
+        <button class="btn btn-yellow" data-demo="leave" type="button" data-i18n="demo.actions.leave">LEAVE</button>
       </div>
-      <button class="btn btn-ghost demo-reset" data-demo="reset" type="button">RESET DEMO</button>
+      <button class="btn btn-ghost demo-reset" data-demo="reset" type="button" data-i18n="demo.actions.reset">RESET DEMO</button>
     </div>
   </div>
 
-  <p class="demo-fineprint">Simulated locally, deterministically. No server, no API key, no real world engine. The actual HeadConan runtime is separate.</p>
+  <p class="demo-fineprint" data-i18n="demo.fine">Simulated locally, deterministically. No server, no API key, no real world engine. The actual HeadConan runtime is separate.</p>
 </section>
 
 <!-- ======================= 05 PERSPECTIVE ======================= -->
 <section class="perspective" id="perspective" aria-labelledby="persp-title">
   <header class="sec-head">
-    <p class="sec-kicker kicker-blue">04 / THE PERSPECTIVE</p>
-    <h2 class="sec-title" id="persp-title">ONE WORLD. TWO VIEWS.</h2>
-    <p class="sec-sub">The world has one truth. What you are allowed to see depends on who you are.</p>
+    <p class="sec-kicker kicker-blue" data-i18n="persp.kicker">04 / THE PERSPECTIVE</p>
+    <h2 class="sec-title" id="persp-title" data-i18n="persp.title">ONE WORLD. TWO VIEWS.</h2>
+    <p class="sec-sub" data-i18n="persp.sub">The world has one truth. What you are allowed to see depends on who you are.</p>
   </header>
 
   <div class="persp-switch" role="group" aria-label="Switch perspective">
-    <button class="btn btn-white persp-toggle is-active" data-persp="player" type="button" aria-pressed="true">PLAYER</button>
-    <button class="btn btn-white persp-toggle" data-persp="host" type="button" aria-pressed="false">HOST</button>
+    <button class="btn btn-white persp-toggle is-active" data-persp="player" type="button" aria-pressed="true" data-i18n="persp.player">PLAYER</button>
+    <button class="btn btn-white persp-toggle" data-persp="host" type="button" aria-pressed="false" data-i18n="persp.host">HOST</button>
   </div>
 
   <div class="persp-panels">
     <div class="persp-panel persp-player is-visible" id="persp-player">
-      <p class="persp-obs">Yor looks nervous.</p>
-      <ul class="persp-knows">
+      <p class="persp-obs" data-i18n="persp.playerObs">Yor looks nervous.</p>
+      <ul class="persp-knows" data-i18n-html="persp.playerList">
         <li><span class="know-yes">✔</span> Yor works at City Hall</li>
         <li><span class="know-no">✘</span> Yor is Thorn Princess <em>(unknown to you)</em></li>
         <li><span class="know-no">✘</span> Anya can read minds <em>(unknown to you)</em></li>
@@ -215,22 +215,22 @@
 
     <div class="persp-panel persp-host" id="persp-host">
       <img class="persp-poster" src="assets/worlds/spy-family/anya.png" data-fallback="assets/worlds/spy-family/anya.svg" alt="Anya — stylized poster" loading="lazy">
-      <p class="persp-obs">Yor knows that you discovered her secret.</p>
-      <ul class="persp-knows">
+      <p class="persp-obs" data-i18n="persp.hostObs">Yor knows that you discovered her secret.</p>
+      <ul class="persp-knows" data-i18n-html="persp.hostList">
         <li><span class="know-yes">✔</span> Yor is Thorn Princess</li>
         <li><span class="know-yes">✔</span> Loid is a spy named Twilight</li>
         <li><span class="know-yes">✔</span> Anya is a telepath — and she knows everything</li>
       </ul>
       <table class="know-matrix">
-        <caption class="visually-hidden">Who knows which secret</caption>
-        <thead><tr><th></th><th>YOR IS THORN</th><th>LOID IS TWILIGHT</th><th>ANYA IS TELEPATH</th></tr></thead>
+        <caption class="visually-hidden" data-i18n="persp.knowCaption">Who knows which secret</caption>
+        <thead><tr><th></th><th data-i18n="persp.colThorn">YOR IS THORN</th><th data-i18n="persp.colTwilight">LOID IS TWILIGHT</th><th data-i18n="persp.colTelepath">ANYA IS TELEPATH</th></tr></thead>
         <tbody>
-          <tr><th>Loid</th><td class="cell-no">✘</td><td class="cell-yes">✔</td><td class="cell-no">✘</td></tr>
-          <tr><th>Yor</th><td class="cell-yes">✔</td><td class="cell-no">✘</td><td class="cell-no">✘</td></tr>
-          <tr><th>Anya</th><td class="cell-yes">✔</td><td class="cell-yes">✔</td><td class="cell-yes">✔</td></tr>
+          <tr><th data-i18n="persp.rowLoid">Loid</th><td class="cell-no">✘</td><td class="cell-yes">✔</td><td class="cell-no">✘</td></tr>
+          <tr><th data-i18n="persp.rowYor">Yor</th><td class="cell-yes">✔</td><td class="cell-no">✘</td><td class="cell-no">✘</td></tr>
+          <tr><th data-i18n="persp.rowAnya">Anya</th><td class="cell-yes">✔</td><td class="cell-yes">✔</td><td class="cell-yes">✔</td></tr>
         </tbody>
       </table>
-      <p class="persp-note">Same simulation. Different projection. Nothing else changes.</p>
+      <p class="persp-note" data-i18n="persp.note">Same simulation. Different projection. Nothing else changes.</p>
     </div>
   </div>
 </section>
@@ -238,14 +238,14 @@
 <!-- ======================= 06 NOT A CHATBOT ======================= -->
 <section class="notchat" id="notchat" aria-labelledby="notchat-title">
   <header class="sec-head">
-    <p class="sec-kicker kicker-green">05 / THE DIFFERENCE</p>
-    <h2 class="sec-title" id="notchat-title">NOT A CHATBOT</h2>
-    <p class="sec-sub">One responds to words. The other responds to actions — and remembers what happened.</p>
+    <p class="sec-kicker kicker-green" data-i18n="nc.kicker">05 / THE DIFFERENCE</p>
+    <h2 class="sec-title" id="notchat-title" data-i18n="nc.title">NOT A CHATBOT</h2>
+    <p class="sec-sub" data-i18n="nc.sub">One responds to words. The other responds to actions — and remembers what happened.</p>
   </header>
 
   <div class="nc-switch" role="group" aria-label="Compare chatbot and HeadConan">
-    <button class="btn btn-white nc-toggle is-active" data-nc="chat" type="button" aria-pressed="true">CHATBOT</button>
-    <button class="btn btn-red nc-toggle" data-nc="headconan" type="button" aria-pressed="false">HEADCONAN</button>
+    <button class="btn btn-white nc-toggle is-active" data-nc="chat" type="button" aria-pressed="true" data-i18n="nc.chat">CHATBOT</button>
+    <button class="btn btn-red nc-toggle" data-nc="headconan" type="button" aria-pressed="false" data-i18n="nc.headconan">HEADCONAN</button>
   </div>
 
   <div class="nc-diagram" id="nc-diagram" aria-live="polite"></div>
@@ -254,70 +254,71 @@
 <!-- ======================= 07 WORLD-SPECIFIC UI ======================= -->
 <section class="worldui" id="worldui" aria-labelledby="worldui-title">
   <header class="sec-head">
-    <p class="sec-kicker kicker-green">06 / THE INTERFACES</p>
-    <h2 class="sec-title" id="worldui-title">WORLDS WEAR DIFFERENT CLOTHES</h2>
-    <p class="sec-sub">A classroom, a crime scene and a throne room do not share a layout. Concept demo — these panels are mockups.</p>
+    <p class="sec-kicker kicker-green" data-i18n="wui.kicker">06 / THE INTERFACES</p>
+    <h2 class="sec-title" id="worldui-title" data-i18n="wui.title">WORLDS WEAR DIFFERENT CLOTHES</h2>
+    <p class="sec-sub" data-i18n="wui.sub">A classroom, a crime scene and a throne room do not share a layout. Concept demo — these panels are mockups.</p>
   </header>
 
   <div class="wui-tabs" role="tablist" aria-label="Interface examples">
-    <button class="btn btn-white wui-tab is-active" id="tab-school" role="tab" aria-selected="true" data-tab="school" type="button">SCHOOL</button>
-    <button class="btn btn-white wui-tab" id="tab-invest" role="tab" aria-selected="false" data-tab="invest" type="button">INVESTIGATION</button>
-    <button class="btn btn-white wui-tab" id="tab-empire" role="tab" aria-selected="false" data-tab="empire" type="button">EMPIRE</button>
+    <button class="btn btn-white wui-tab is-active" id="tab-school" role="tab" aria-selected="true" data-tab="school" type="button" data-i18n="wui.tabs.school">SCHOOL</button>
+    <button class="btn btn-white wui-tab" id="tab-invest" role="tab" aria-selected="false" data-tab="invest" type="button" data-i18n="wui.tabs.invest">INVESTIGATION</button>
+    <button class="btn btn-white wui-tab" id="tab-empire" role="tab" aria-selected="false" data-tab="empire" type="button" data-i18n="wui.tabs.empire">EMPIRE</button>
   </div>
 
   <div class="wui-panels">
-    <div class="wui-panel is-visible" id="wui-school" role="tabpanel" aria-labelledby="tab-school">
+    <div class="wui-panel is-visible" id="wui-school" role="tabpanel" aria-labelledby="tab-school" data-i18n-html="wui.schoolSched">
       <div class="mini mini-sched"><h5>SCHEDULE</h5><ul><li>08:30 LECTURE — CHEM 201</li><li>10:00 LAB — BIOLOGY</li><li>14:00 SEMINAR</li><li>17:00 CLUB MEETING</li></ul></div>
-      <div class="mini mini-msg"><h5>MESSAGES</h5><ul><li>Prof. Kim: "Where is your lab report?"</li><li>Min: "You missed the study group!!"</li><li>You: "On my way."</li></ul></div>
-      <div class="mini mini-people"><h5>PEOPLE</h5><ul><li>MIN — study partner <em>trust 71</em></li><li>PROF. KIM — advisor <em>trust 55</em></li><li>JAE — dorm rival <em>trust 22</em></li></ul></div>
+      <div class="mini mini-msg" data-i18n-html="wui.schoolMsg"><h5>MESSAGES</h5><ul><li>Prof. Kim: "Where is your lab report?"</li><li>Min: "You missed the study group!!"</li><li>You: "On my way."</li></ul></div>
+      <div class="mini mini-people" data-i18n-html="wui.schoolPeople"><h5>PEOPLE</h5><ul><li>MIN — study partner <em>trust 71</em></li><li>PROF. KIM — advisor <em>trust 55</em></li><li>JAE — dorm rival <em>trust 22</em></li></ul></div>
     </div>
 
-    <div class="wui-panel" id="wui-invest" role="tabpanel" aria-labelledby="tab-invest" hidden>
+    <div class="wui-panel" id="wui-invest" role="tabpanel" aria-labelledby="tab-invest" hidden data-i18n-html="wui.investEvidence">
       <div class="mini mini-evidence"><h5>EVIDENCE</h5><ul><li>■ Bloodstained glove — corridor</li><li>■ Cyanide vial — cellar</li><li>■ Torn letter — fireplace</li></ul></div>
-      <div class="mini mini-suspects"><h5>SUSPECTS</h5><ul><li>BUTLER — motive: inheritance</li><li>COUSIN — alibi: thin</li><li>DRIVER — seen near cellar</li></ul></div>
-      <div class="mini mini-timeline"><h5>TIMELINE</h5><ul><li>21:00 dinner</li><li>21:40 poison</li><li>22:15 body found</li></ul></div>
+      <div class="mini mini-suspects" data-i18n-html="wui.investSuspects"><h5>SUSPECTS</h5><ul><li>BUTLER — motive: inheritance</li><li>COUSIN — alibi: thin</li><li>DRIVER — seen near cellar</li></ul></div>
+      <div class="mini mini-timeline" data-i18n-html="wui.investTimeline"><h5>TIMELINE</h5><ul><li>21:00 dinner</li><li>21:40 poison</li><li>22:15 body found</li></ul></div>
     </div>
 
-    <div class="wui-panel" id="wui-empire" role="tabpanel" aria-labelledby="tab-empire" hidden>
+    <div class="wui-panel" id="wui-empire" role="tabpanel" aria-labelledby="tab-empire" hidden data-i18n-html="wui.empireTerr">
       <div class="mini mini-map"><h5>TERRITORY</h5><div class="map-cells"><span class="cell cell-1"></span><span class="cell cell-2"></span><span class="cell cell-3"></span><span class="cell cell-4"></span></div></div>
-      <div class="mini mini-factions"><h5>FACTIONS</h5><ul><li>MILITARY — influence 78</li><li>OLIGARCHS — influence 64</li><li>OPPOSITION — influence 41</li></ul></div>
-      <div class="mini mini-resources"><h5>RESOURCES</h5><ul><li>TREASURY — 32%</li><li>GRAIN — 58%</li><li>LOYALTY — 61%</li></ul></div>
+      <div class="mini mini-factions" data-i18n-html="wui.empireFactions"><h5>FACTIONS</h5><ul><li>MILITARY — influence 78</li><li>OLIGARCHS — influence 64</li><li>OPPOSITION — influence 41</li></ul></div>
+      <div class="mini mini-resources" data-i18n-html="wui.empireRes"><h5>RESOURCES</h5><ul><li>TREASURY — 32%</li><li>GRAIN — 58%</li><li>LOYALTY — 61%</li></ul></div>
     </div>
   </div>
 </section>
 
 <!-- ======================= 08 PRINCIPLE ======================= -->
 <section class="principle" id="principle" aria-labelledby="principle-title">
-  <h2 class="principle-title" id="principle-title">You already have the worlds.</h2>
-  <p class="principle-line">HeadConan lets you enter them.</p>
+  <h2 class="principle-title" id="principle-title" data-i18n="principle.title">You already have the worlds.</h2>
+  <p class="principle-line" data-i18n="principle.line">HeadConan lets you enter them.</p>
   <div class="principle-blocks">
-    <div class="pblock pblock-world">WORLD</div>
+    <div class="pblock pblock-world" data-i18n="principle.world">WORLD</div>
     <span class="pblock-plus">+</span>
-    <div class="pblock pblock-chars">CHARACTERS</div>
+    <div class="pblock pblock-chars" data-i18n="principle.chars">CHARACTERS</div>
     <span class="pblock-plus">+</span>
-    <div class="pblock pblock-mem">MEMORY</div>
+    <div class="pblock pblock-mem" data-i18n="principle.mem">MEMORY</div>
     <span class="pblock-plus">+</span>
-    <div class="pblock pblock-act">ACTION</div>
+    <div class="pblock pblock-act" data-i18n="principle.act">ACTION</div>
     <span class="pblock-plus">+</span>
-    <div class="pblock pblock-conseq">CONSEQUENCE</div>
+    <div class="pblock pblock-conseq" data-i18n="principle.conseq">CONSEQUENCE</div>
   </div>
 </section>
 
 <!-- ======================= 09 CTA ======================= -->
 <section class="cta" id="cta" aria-labelledby="cta-title">
-  <h2 class="cta-title" id="cta-title">THE NEXT WORLD IS YOURS.</h2>
+  <h2 class="cta-title" id="cta-title" data-i18n="cta.title">THE NEXT WORLD IS YOURS.</h2>
   <div class="cta-actions">
-    <a class="btn btn-yellow btn-xl" href="https://github.com/HeadConan/HeadConan" target="_blank" rel="noopener noreferrer">ENTER HEADCONAN</a>
-    <a class="btn btn-white btn-xl" href="https://github.com/HeadConan/HeadConan" target="_blank" rel="noopener noreferrer">VIEW ON GITHUB</a>
+    <a class="btn btn-yellow btn-xl" href="https://github.com/HeadConan/HeadConan" target="_blank" rel="noopener noreferrer" data-i18n="cta.enter">ENTER HEADCONAN</a>
+    <a class="btn btn-white btn-xl" href="https://github.com/HeadConan/HeadConan" target="_blank" rel="noopener noreferrer" data-i18n="cta.view">VIEW ON GITHUB</a>
   </div>
-  <p class="cta-fine">The runtime is an early research prototype. This site is its public face — an honest, simulated demo.</p>
+  <p class="cta-fine" data-i18n="cta.fine">The runtime is an early research prototype. This site is its public face — an honest, simulated demo.</p>
 </section>
 
 <footer class="foot">
-  <span>HEADCONAN — an experiment in inhabiting imagined worlds.</span>
-  <span>This website runs entirely in your browser. Nothing is fake-misrepresented; the demo is deliberately deterministic.</span>
+  <span data-i18n="foot.line1">HEADCONAN — an experiment in inhabiting imagined worlds.</span>
+  <span data-i18n="foot.line2">This website runs entirely in your browser. Nothing is fake-misrepresented; the demo is deliberately deterministic.</span>
 </footer>
 
+<script src="scripts/i18n.js" defer></script>
 <script src="scripts/demo.js" defer></script>
 <script src="scripts/main.js" defer></script>
 </body>

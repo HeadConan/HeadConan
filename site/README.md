@@ -15,6 +15,7 @@ It is a static, GitHub-Pages-compatible site that demonstrates HeadConan's produ
 - A **perspective toggle** (PLAYER / HOST) demonstrates information asymmetry.
 - A **comparison diagram** (CHATBOT vs HEADCONAN) demonstrates the core difference.
 - A **world-specific UI switch** (SCHOOL / INVESTIGATION / EMPIRE) shows how interfaces differ per world.
+- A **language toggle** (EN / 中文) in the top-right corner — every visible string (including the demo's event feed labels) is translated; the choice persists in `localStorage` and defaults to English.
 
 ## 2. What is simulated vs real
 
@@ -48,8 +49,9 @@ site/
 ├── styles/
 │   └── main.css        # Neubrutalist design system (no preprocessor)
 ├── scripts/
-│   ├── main.js         # page interactions (door, gate, portals, perspective, notchat, worldui, asset-slot fallback)
-│   └── demo.js         # SPY × FAMILY state machine
+│   ├── i18n.js         # bilingual dictionary (en / zh) — single source of truth for every string
+│   ├── main.js         # page interactions + language toggle (door, gate, portals, perspective, notchat, worldui, asset-slot fallback)
+│   └── demo.js         # SPY × FAMILY state machine (reads strings from i18n.js)
 ├── assets/
 │   └── worlds/
 │       └── spy-family/

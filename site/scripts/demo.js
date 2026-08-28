@@ -1,9 +1,15 @@
 /* ============================================================
-   HEADCONAN /site — SPY × FAMILY interactive demo
+   HEADCONAN /site — SPY × FAMILY interactive demo (bilingual)
    ------------------------------------------------------------
    Deterministic local state machine. No AI, no server, no API.
    Every action mutates visible state: emotions, suspicion,
    affinity, world events, and a secret document.
+
+   All user-facing strings are pulled from window.I18N[lang]
+   (see i18n.js). On language switch, main.js dispatches the
+   'hc:langchange' event; this module updates its lang and
+   re-renders. The feed keeps the language captured at the
+   moment each event was pushed (acceptable for a demo).
    ============================================================ */
 
 (function () {
@@ -11,9 +17,16 @@
 
   var $ = function (id) { return document.getElementById(id); };
 
+  function getLang() {
+    try { return localStorage.getItem('hc-lang') || 'en'; }
+    catch (e) { return 'en'; }
+  }
+  var lang = getLang();
+  if (lang !== 'en' && lang !== 'zh') lang = 'en';
+  window.HC_LANG = lang;
+
   var INITIAL = {
     yorEmotion: 'calm',
-    yorLine: 'She is pouring tea. She looks up and smiles.',
     playerKnows: false,      // does the player know Yor is an assassin
     suspicion: 0,            // 0 - 100
     trust: 40,               // 0 - 100, displayed on Yor card
@@ -28,6 +41,7 @@
 
   function reset() {
     state = JSON.parse(JSON.stringify(INITIAL));
+    state.yorLine = I18N[lang].demo.initial.yorLine;
     render();
   }
 
@@ -39,6 +53,7 @@
 
   // ---------- render ----------
   function render() {
+    var T = I18N[lang];
     var yorCard = $('yor-card');
     var yorState = $('yor-state');
     var yorLine = $('yor-line');
@@ -49,21 +64,21 @@
     var stageTitle = $('stage-title');
 
     // Yor card
-    yorState.textContent = state.yorEmotion;
+    yorState.textContent = T.demo.emotion[state.yorEmotion];
     yorLine.textContent = state.yorLine;
     yorCard.classList.toggle('is-alert', state.yorEmotion === 'alert');
     yorCard.classList.toggle('is-noticed', state.yorEmotion === 'noticed');
     trustFill.style.width = state.trust + '%';
 
     // Player card
-    loidState.textContent = state.playerKnows ? 'knows her secret' : 'covering';
+    loidState.textContent = state.playerKnows ? T.demo.loidState.knows : T.demo.loidState.covering;
     loidLine.textContent = state.playerKnows
-      ? 'You know what she is. The room has changed temperature.'
-      : 'You are a spy. She does not know. You do not know what she is.';
+      ? T.demo.initial.loidKnowsLine
+      : T.demo.initial.loidLine;
     suspicionFill.style.width = state.suspicion + '%';
 
     // Stage title
-    stageTitle.textContent = state.left ? 'THE ROOM IS EMPTY NOW.' : 'YOR IS IN THE ROOM.';
+    stageTitle.textContent = state.left ? T.demo.stageEmpty : T.demo.stageRoom;
 
     // Relationship pips
     var pips = $('rel-pips');
@@ -103,20 +118,20 @@
   var ACTIONS = {
     ask: function () {
       state.askCount++;
-      pushEvent('You asked Yor about last night.');
+      pushEvent(I18N[lang].demo.events.ask);
       if (state.askCount === 1) {
         state.yorEmotion = 'cover';
-        state.yorLine = '"City Hall overtime, don\'t worry." She answers a little too fast.';
-        pushEvent('Yor answered with her cover story.');
+        state.yorLine = I18N[lang].demo.lines.ask1;
+        pushEvent(I18N[lang].demo.events.askCover);
       } else if (state.askCount === 2) {
-        state.yorLine = '"Overtime again. It\'s nothing." Her fingers tighten on the cup.';
+        state.yorLine = I18N[lang].demo.lines.ask2;
         state.suspicion = Math.min(100, state.suspicion + 4);
-        pushEvent('Her story is getting shakier.');
+        pushEvent(I18N[lang].demo.events.askShaky);
       } else {
         state.yorEmotion = 'alert';
-        state.yorLine = 'She stops pouring. The silence is loud.';
+        state.yorLine = I18N[lang].demo.lines.ask3;
         state.suspicion = Math.min(100, state.suspicion + 6);
-        pushEvent('She noticed you are pushing.');
+        pushEvent(I18N[lang].demo.events.askPush);
       }
       state.trust = Math.max(0, state.trust - 2);
       state.affinity = Math.max(0, state.affinity - 1);
@@ -126,32 +141,32 @@
       state.playerKnows = true;
       state.secretsExposed = true;
       state.yorEmotion = 'alert';
-      state.yorLine = 'She goes very still. The cup never reaches the table.';
+      state.yorLine = I18N[lang].demo.lines.tell;
       state.suspicion = 100;
       state.trust = 0;
       state.affinity = 1;
-      pushEvent('WORLD EVENT — SECRET REVEALED');
-      pushEvent('Yor knows you know. She is deciding what to do next.');
+      pushEvent(I18N[lang].demo.events.tellReveal);
+      pushEvent(I18N[lang].demo.events.tellKnows);
     },
 
     observe: function () {
       state.suspicion = Math.min(100, state.suspicion + 2);
       if (!state.playerKnows) {
         state.yorEmotion = 'noticed';
-        state.yorLine = 'Her hands are calloused. She notices you noticing and looks away.';
-        pushEvent('Observation: calloused hands, quick eye contact, then nothing.');
+        state.yorLine = I18N[lang].demo.lines.obsNotKnows;
+        pushEvent(I18N[lang].demo.events.obsCallous);
       } else {
-        state.yorLine = 'She is watching you watch her. Neither of you blinks.';
-        pushEvent('Observation: she is watching you back.');
+        state.yorLine = I18N[lang].demo.lines.obsKnows;
+        pushEvent(I18N[lang].demo.events.obsBack);
       }
     },
 
     leave: function () {
       state.left = true;
       state.yorEmotion = 'quiet';
-      state.yorLine = 'You step out. Behind you, the household keeps humming along — unchanged, or so it pretends.';
-      pushEvent('You left the room.');
-      pushEvent('The world continues without your input.');
+      state.yorLine = I18N[lang].demo.lines.leave;
+      pushEvent(I18N[lang].demo.events.left);
+      pushEvent(I18N[lang].demo.events.continues);
     },
 
     reset: function () { reset(); }
@@ -164,9 +179,16 @@
     render();
   }
 
-document.querySelectorAll('[data-demo]').forEach(function (btn) {
-  btn.addEventListener('click', function () { act(btn.dataset.demo); });
-});
+  document.querySelectorAll('[data-demo]').forEach(function (btn) {
+    btn.addEventListener('click', function () { act(btn.dataset.demo); });
+  });
+
+  // re-render in the chosen language when the toggle flips
+  window.addEventListener('hc:langchange', function (e) {
+    lang = (e && e.detail && e.detail.lang) ? e.detail.lang : getLang();
+    window.HC_LANG = lang;
+    render();
+  });
 
   reset();
 })();
