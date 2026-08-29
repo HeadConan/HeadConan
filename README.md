@@ -1,6 +1,11 @@
 # HeadConan
 
-> **"HeadConan turns imagination into interactive worlds through generative UI, narrative, and visual experiences."**
+> **"HeadConan turns the worlds in your head into worlds you can enter."**
+
+HeadConan is an **imagination runtime for interactive worlds**: a system for turning imagination into explorable, stateful, interactive worlds. It is not an AI game, not an AI storyteller, and not a generative-UI product — it is a runtime that can produce all of those as *experiences*. The core formula is **World × Agency × Perspective**; the internal North Star is **make imagination executable**.
+
+> 📄 **Canonical positioning:** see [`docs/VISION.md`](docs/VISION.md) — the source of truth for what HeadConan is.
+> 📄 **Canonical architecture:** see [`docs/ARCHITECTURE_ZERO/ARCHITECTURE.md`](docs/ARCHITECTURE_ZERO/ARCHITECTURE.md) (Architecture Zero).
 
 HeadConan is an experimental research prototype for a new interaction paradigm. Rather than forcing users into static chatbot threads or rigid dashboard templates, HeadConan listens to human imagination, externalizes it into structured world state, and dynamically projects generative UI modules tailored specifically to the scenario.
 
