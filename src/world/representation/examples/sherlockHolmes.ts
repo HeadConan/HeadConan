@@ -609,6 +609,12 @@ export const SHERLOCK_HOLMES_INITIAL_STATE: WorldStateInstance = {
   resourcePools: {
     'scotland_yard_rewards': 500
   },
+  scheduler: {
+    queue: [],
+    budgetPerTurn: 3,
+    seed: 0xc0ffee,
+    nextSeq: 0
+  },
   recentEvents: [],
   eventChronicleLog: []
 };

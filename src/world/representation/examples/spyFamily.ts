@@ -1052,6 +1052,12 @@ export const SPY_FAMILY_INITIAL_STATE: WorldStateInstance = {
     'wise_intel_reserves': 88,
     'garden_contracts': 12
   },
+  scheduler: {
+    queue: [],
+    budgetPerTurn: 3,
+    seed: 0xc0ffee,
+    nextSeq: 0
+  },
   recentEvents: [
     {
       id: 'evt:sf:001',

@@ -20,6 +20,7 @@ import type { WorldStateInstance, EntityStateSnapshot } from '../representation/
 import type { ScenarioSeed } from '../representation/types/scenarios';
 import type { StateEffect } from '../representation/types/dynamics';
 import type { DynamicRelationshipState } from '../representation/types/relationships';
+import { defaultScheduler } from './scheduler';
 
 export interface InstantiateOptions {
   /** 场景种子：初始情境 + 状态突变 + 推荐角色。缺省 = 正典。 */
@@ -116,6 +117,7 @@ export function synthesizeInitialState(world: WorldDefinition): WorldStateInstan
         .map(f => f.id),
     },
     resourcePools: Object.fromEntries(world.resources.map(r => [r.id, r.quantity])),
+    scheduler: defaultScheduler(),
     recentEvents: [],
     eventChronicleLog: [],
   };

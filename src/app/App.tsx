@@ -19,7 +19,7 @@ import { Sparkles } from 'lucide-react';
 import { SPY_FAMILY_MIN, SPY_FAMILY_SCENARIOS, SPYF } from '../world/spyFamily/spyFamilyMin';
 import { spyFamilyRelationResolver, spyFamilyRoleOf, spyFamilyReaction } from '../world/spyFamily/spyFamilyReactions';
 import { instantiate } from '../world/runtime/instantiate';
-import { applyEvent, type KernelOptions, type KernelEvent } from '../world/runtime/kernel2';
+import { applyEvent, tickScheduler, type KernelOptions, type KernelEvent } from '../world/runtime/kernel2';
 import { resolveUserAction, resolveDirectorAction } from '../world/runtime/kernel2Resolver';
 import { projectLegacyWorld } from '../world/runtime/legacyAdapter';
 import type { WorldStateInstance } from '../world/representation/types/state';
@@ -166,6 +166,10 @@ export const App: React.FC = () => {
       if (savedState) {
         const parsed = JSON.parse(savedState);
         if (isWorldStateInstance(parsed)) {
+          // W2.1: 旧 v3 快照无 scheduler 字段 → 补默认，避免恢复后 tickScheduler 崩溃
+          if (!parsed.scheduler) {
+            parsed.scheduler = { queue: [], budgetPerTurn: 3, seed: 0xc0ffee, nextSeq: 0 };
+          }
           setKernelState(parsed);
           if (savedChronicle) setChronicle(JSON.parse(savedChronicle));
           if (savedNotes) setNotes(JSON.parse(savedNotes));
@@ -288,6 +292,15 @@ export const App: React.FC = () => {
           for (const resp of r.responses) parts.push(`${entityName(resp.from)}：${resp.text}`);
           if (r.rejected && r.reason) parts.push(`[世界拒绝] ${r.reason}`);
         }
+      }
+
+      // W2.1：世界自发事件推进（调度器：延迟 once / 周期 periodic / 概率级联到期的 [世界] 事件）
+      const tick = tickScheduler(next, SPY_FAMILY_MIN, KERNEL_OPTS);
+      next = tick.nextState;
+      for (const r of tick.executed) {
+        const last = r.nextState.eventChronicleLog.at(-1);
+        if (last) parts.push(`[世界] ${last.description}`);
+        if (r.rejected && r.reason) parts.push(`[世界拒绝] ${r.reason}`);
       }
 
       setKernelState(next);

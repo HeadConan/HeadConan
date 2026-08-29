@@ -732,6 +732,12 @@ export const GAME_OF_THRONES_INITIAL_STATE: WorldStateInstance = {
     'iron_throne_treasury': -6000000,
     'casterly_rock_gold_reserves': 50000000
   },
+  scheduler: {
+    queue: [],
+    budgetPerTurn: 3,
+    seed: 0xc0ffee,
+    nextSeq: 0
+  },
   recentEvents: [],
   eventChronicleLog: []
 };

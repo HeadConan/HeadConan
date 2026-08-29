@@ -27,6 +27,7 @@ import type { WorldStateInstance } from '../representation/types/state';
 import type { SimulationEvent, StateEffect } from '../representation/types/dynamics';
 import type { EntityId, FactId, ActionId } from '../representation/types/primitives';
 import { applyStateEffect } from './instantiate';
+import { enqueueScheduled, dueEvents, rollChance, type EnqueueInput } from './scheduler';
 
 // ---------------------------------------------------------------------------
 // 事件类型（W1 最小集：action / speech_act / reveal_fact）
@@ -291,18 +292,35 @@ export function applyEvent(
       // 直接效果
       applyEffects(next, def.directEffects, event.actorId, event.targetIds);
 
-      // 级联：确定性级联（triggerProbability === 1）立即应用；其余排队待调度器（W2）
+      // 级联：确定性级联（triggerProbability===1）立即应用；
+      // 概率级联（0<p<1）用 seed RNG 判定（rollChance 推进 state.scheduler.seed，重放一致）；
+      //   命中且有 spawnEvent → 入调度队列（下一 turn 的 once 事件，经内核执行→拒绝即事件）；
+      //   命中且仅 secondaryEffects → W2 简化：立即应用（纯效果，延迟不影响正确性）。
       for (const c of def.potentialConsequences ?? []) {
-        if (c.triggerProbability === 1) {
+        if (c.triggerProbability >= 1) {
           applyEffects(next, c.secondaryEffects ?? [], event.actorId, event.targetIds);
-        } else if (c.spawnEvent) {
-          spawnedEvents.push({
-            type: 'action',
-            actionId: c.spawnEvent.title,
-            actorId: event.actorId,
-            targetIds: event.targetIds,
-            params: { spawnDescription: c.spawnEvent.description, urgency: c.spawnEvent.urgency },
-          });
+        } else if (c.triggerProbability > 0) {
+          const hit = rollChance(next.scheduler, c.triggerProbability);
+          if (hit && c.spawnEvent) {
+            const input: EnqueueInput = {
+              actionId: c.spawnEvent.title as ActionId,
+              actorId: event.actorId,
+              targetIds: event.targetIds,
+              params: { spawnDescription: c.spawnEvent.description, urgency: c.spawnEvent.urgency },
+              dueTurn: next.clock.turnNumber + 1,
+              narrativeLabel: c.spawnEvent.title,
+            };
+            const ev = enqueueScheduled(next, input);
+            spawnedEvents.push({
+              type: 'action',
+              actionId: ev.actionId,
+              actorId: ev.actorId,
+              targetIds: ev.targetIds,
+              params: { scheduledId: ev.id, worldSpawned: true },
+            });
+          } else if (hit) {
+            applyEffects(next, c.secondaryEffects ?? [], event.actorId, event.targetIds);
+          }
         }
       }
       break;
@@ -409,4 +427,78 @@ function buildDescription(world: WorldDefinition, event: KernelEvent): string {
       return `事实「${fact?.statement ?? event.factId}」注入 ${event.targetId} 的认知（来源: ${event.source}）。`;
     }
   }
+}
+
+// ---------------------------------------------------------------------------
+// 调度器执行（W2）：处理全部已到期事件，受预算上限约束
+// ---------------------------------------------------------------------------
+
+export interface TickResult {
+  nextState: WorldStateInstance;
+  executed: ApplyResult[];
+}
+
+/**
+ * 推进调度队列：处理 all dueTurn<=当前 turn 的事件（受 budgetPerTurn 约束）。
+ * 语义：
+ *   - 成功（once）→ 执行并从队列移除；
+ *   - 成功（periodic）→ 按 intervalTurns 重排；
+ *   - 被内核拒绝 → 记 `[rejected]` 日志（applyEvent 已写），attempts+1，未耗尽则顺延下一 turn 重试；
+ *   - 预算超限 → 剩余事件原序放回队列（不丢、不重排）。
+ * 纯函数：克隆输入状态，返回 nextState；不影响调用方状态。
+ */
+export function tickScheduler(
+  state: WorldStateInstance,
+  world: WorldDefinition,
+  opts: KernelOptions = {}
+): TickResult {
+  let working = structuredClone(state);
+  const executed: ApplyResult[] = [];
+  let budget = working.scheduler.budgetPerTurn;
+
+  while (budget > 0) {
+    const due = dueEvents(working);
+    if (due.length === 0) break;
+
+    const overflow: typeof due = [];
+    for (const ev of due) {
+      if (budget <= 0) {
+        overflow.push(ev);
+        continue;
+      }
+      budget -= 1;
+
+      const kernelEv: KernelEvent = {
+        type: 'action',
+        actionId: ev.actionId,
+        actorId: ev.actorId,
+        targetIds: ev.targetIds,
+        params: ev.params,
+      };
+      const r = applyEvent(world, working, kernelEv, opts);
+      working = r.nextState;
+      executed.push(r);
+
+      if (r.rejected) {
+        const retriesLeft = ev.attempts + 1 < ev.maxAttempts;
+        if (retriesLeft) {
+          working.scheduler.queue.unshift({
+            ...ev,
+            attempts: ev.attempts + 1,
+            dueTurn: working.clock.turnNumber + 1,
+          });
+        }
+      } else if (ev.kind === 'periodic') {
+        working.scheduler.queue.push({
+          ...ev,
+          dueTurn: working.clock.turnNumber + ev.intervalTurns,
+        });
+      }
+    }
+    if (overflow.length > 0) {
+      working.scheduler.queue.unshift(...overflow);
+    }
+  }
+
+  return { nextState: working, executed };
 }

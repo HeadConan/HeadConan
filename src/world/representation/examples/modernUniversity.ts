@@ -640,6 +640,12 @@ export const MODERN_UNIVERSITY_INITIAL_STATE: WorldStateInstance = {
   resourcePools: {
     'nsf_grant_pool': 1800000
   },
+  scheduler: {
+    queue: [],
+    budgetPerTurn: 3,
+    seed: 0xc0ffee,
+    nextSeq: 0
+  },
   recentEvents: [],
   eventChronicleLog: []
 };
