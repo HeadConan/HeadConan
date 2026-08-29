@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { WorldState, UIPlanning, UIBlock } from '../world/types';
-import { EMPIRE_SEED_WORLD, UNIVERSITY_SEED_WORLD, MYSTERY_SEED_WORLD, DEMO_PRESETS } from '../data/mockWorlds';
-import { generateWorldFromAI, interactWorldWithAI, AIProviderId } from '../ai/client';
-import { applyWorldMutations } from '../world/mutations';
+import { WorldState, UIPlanning, UserNote } from '../world/types';
+import { DEMO_PRESETS } from '../data/mockWorlds';
+import { AIProviderId } from '../ai/client';
 import { EmptyPromptSpace } from '../components/world/EmptyPromptSpace';
 import { WorldGenesisAnimation } from '../components/world/WorldGenesisAnimation';
 import { Header } from '../components/layout/Header';
@@ -17,6 +16,26 @@ import { computeUIPlan } from '../interface/director';
 import { RoleSlot } from '../roles/model';
 import { Sparkles } from 'lucide-react';
 
+import { SPY_FAMILY_MIN, SPY_FAMILY_SCENARIOS, SPYF } from '../world/spyFamily/spyFamilyMin';
+import { spyFamilyRelationResolver, spyFamilyRoleOf, spyFamilyReaction } from '../world/spyFamily/spyFamilyReactions';
+import { instantiate } from '../world/runtime/instantiate';
+import { applyEvent, type KernelOptions, type KernelEvent } from '../world/runtime/kernel2';
+import { resolveUserAction, resolveDirectorAction } from '../world/runtime/kernel2Resolver';
+import { projectLegacyWorld } from '../world/runtime/legacyAdapter';
+import type { WorldStateInstance } from '../world/representation/types/state';
+import type { EntityId } from '../world/representation/types/primitives';
+
+const KERNEL_OPTS: KernelOptions = {
+  relationResolver: spyFamilyRelationResolver,
+  roleOf: spyFamilyRoleOf,
+  reactions: spyFamilyReaction,
+};
+
+const LS_KERNEL_STATE = 'headconan_kernel_state_v3';
+const LS_CHRONICLE = 'headconan_kernel_chronicle_v3';
+const LS_NOTES = 'headconan_kernel_notes_v3';
+const LS_ROLE = 'headconan_kernel_role_v3';
+
 interface ChronicleEntry {
   turn: number;
   action: string;
@@ -26,12 +45,43 @@ interface ChronicleEntry {
   model?: string;
 }
 
+const DEFAULT_PLAYER_ROLE: RoleSlot = {
+  id: 'role:spyf:loid',
+  name: 'Loid Forger',
+  type: 'PLAYER',
+  title: '洛德·福杰（玩家）',
+  agency: 'character-level',
+  perspective: 'first-person',
+  knowledge: 'limited',
+  permissions: ['talk', 'move', 'decide', 'command'],
+  controlledEntityId: SPYF.loid,
+  avatar: '🧭',
+  description: '扮演洛德·福杰，在伪装家庭与间谍使命之间走钢丝。',
+  suggestedPrompts: [],
+};
+
+function isWorldStateInstance(v: unknown): v is WorldStateInstance {
+  if (!v || typeof v !== 'object') return false;
+  const o = v as Record<string, unknown>;
+  return (
+    typeof o.instanceId === 'string' &&
+    typeof o.definitionId === 'string' &&
+    typeof o.clock === 'object' &&
+    typeof o.entityStates === 'object' &&
+    typeof o.epistemics === 'object'
+  );
+}
+
+function entityName(id: string): string {
+  return SPY_FAMILY_MIN.characters.find(c => c.id === id)?.name ?? id;
+}
+
 export const App: React.FC = () => {
   // App Phase: 'prompt' | 'genesis' | 'workspace'
   const [appPhase, setAppPhase] = useState<'prompt' | 'genesis' | 'workspace'>('prompt');
   const [currentPrompt, setCurrentPrompt] = useState<string>('');
 
-  // Selected AI Engine
+  // Selected AI Engine（W1 内核路径不使用；W3 LLM 提议通道接管）
   const [selectedEngine, setSelectedEngine] = useState<AIProviderId>(() => {
     try {
       const saved = localStorage.getItem('headconan_selected_engine');
@@ -40,8 +90,12 @@ export const App: React.FC = () => {
     return 'auto';
   });
 
-  // World State
-  const [world, setWorld] = useState<WorldState | null>(null);
+  // 内核真相（绞杀者模式：唯一状态源）
+  const [kernelState, setKernelState] = useState<WorldStateInstance | null>(null);
+
+  // 显示层附加状态（内核之外，纯呈现）
+  const [notes, setNotes] = useState<UserNote[]>([]);
+  const [activeRoleId, setActiveRoleId] = useState<string>(DEFAULT_PLAYER_ROLE.id);
 
   // Director Overlay State
   const [isDirectorOverlayOpen, setIsDirectorOverlayOpen] = useState<boolean>(false);
@@ -60,8 +114,20 @@ export const App: React.FC = () => {
   // Sidebar active item
   const [sidebarActive, setSidebarActive] = useState<SidebarItemId>('overview');
 
-  // Temporary container while genesis animation runs
-  const [pendingWorldData, setPendingWorldData] = useState<{ world: WorldState; uiPlanning?: UIPlanning } | null>(null);
+  // 观察者：由当前角色推导（玩家=洛德，导演=全知 null）
+  const observerEntityId: EntityId | null = useMemo(() => {
+    const slot = SPY_FAMILY_MIN.possibilitySpace.availableRoles.find(r => r.id === activeRoleId);
+    return slot?.associatedEntityId ?? null;
+  }, [activeRoleId]);
+
+  // 每帧投影：内核真相 → 外壳可显示的 legacy WorldState（绞杀者模式核心）
+  const displayWorld: WorldState | null = useMemo(() => {
+    if (!kernelState) return null;
+    return projectLegacyWorld(SPY_FAMILY_MIN, kernelState, observerEntityId, {
+      notes,
+      activeRoleId,
+    });
+  }, [kernelState, observerEntityId, notes, activeRoleId]);
 
   // Persist selected engine
   const handleSelectEngine = (engine: AIProviderId) => {
@@ -71,50 +137,41 @@ export const App: React.FC = () => {
     } catch (e) {}
   };
 
-  // Derive Active RoleSlot
+  // Derive Active RoleSlot（来自投影结果，切换角色 → 投影即变）
   const activeRole: RoleSlot = useMemo(() => {
-    if (!world || !world.roles || world.roles.length === 0) {
-      return {
-        id: 'default-player',
-        name: 'Player Inhabitant',
-        type: 'PLAYER',
-        title: 'Observer & Protagonist',
-        agency: 'character-level',
-        perspective: 'first-person',
-        knowledge: 'limited',
-        permissions: ['talk', 'move', 'decide', 'command'],
-        description: 'You inhabit this world as its central protagonist.',
-        suggestedPrompts: []
-      };
+    if (!displayWorld || !displayWorld.roles || displayWorld.roles.length === 0) {
+      return DEFAULT_PLAYER_ROLE;
     }
-    const found = world.roles.find(r => r.id === world.activeRoleId);
-    return found || world.roles[0];
-  }, [world]);
+    return displayWorld.roles.find(r => r.id === activeRoleId) || displayWorld.roles[0];
+  }, [displayWorld, activeRoleId]);
 
-  // Compute UI Plan dynamically from World State + Role Slot + Director Engine
+  // Compute UI Plan dynamically from Projected World State + Role Slot
   const activeUiPlan: UIPlanning = useMemo(() => {
-    if (!world) {
-      return {
-        activeLayout: 'workspace',
-        suggestedInteractions: [],
-        blocks: []
-      };
+    if (!displayWorld) {
+      return { activeLayout: 'workspace', suggestedInteractions: [], blocks: [] };
     }
-    return computeUIPlan(world, {
+    return computeUIPlan(displayWorld, {
       activeRole,
-      isDirectorOverlayActive: isDirectorOverlayOpen
+      isDirectorOverlayActive: isDirectorOverlayOpen,
     });
-  }, [world, activeRole, isDirectorOverlayOpen]);
+  }, [displayWorld, activeRole, isDirectorOverlayOpen]);
 
   // Load initial local storage if present
   useEffect(() => {
     try {
-      const savedWorld = localStorage.getItem('headconan_active_world_v2');
-      const savedChronicle = localStorage.getItem('headconan_active_chronicle_v2');
-      if (savedWorld) {
-        setWorld(JSON.parse(savedWorld));
-        if (savedChronicle) setChronicle(JSON.parse(savedChronicle));
-        setAppPhase('workspace');
+      const savedState = localStorage.getItem(LS_KERNEL_STATE);
+      const savedChronicle = localStorage.getItem(LS_CHRONICLE);
+      const savedNotes = localStorage.getItem(LS_NOTES);
+      const savedRole = localStorage.getItem(LS_ROLE);
+      if (savedState) {
+        const parsed = JSON.parse(savedState);
+        if (isWorldStateInstance(parsed)) {
+          setKernelState(parsed);
+          if (savedChronicle) setChronicle(JSON.parse(savedChronicle));
+          if (savedNotes) setNotes(JSON.parse(savedNotes));
+          if (savedRole) setActiveRoleId(savedRole);
+          setAppPhase('workspace');
+        }
       }
     } catch (e) {
       console.warn('Could not restore cached world state:', e);
@@ -123,67 +180,50 @@ export const App: React.FC = () => {
 
   // Sync to local storage
   useEffect(() => {
-    if (world && appPhase === 'workspace') {
+    if (kernelState && appPhase === 'workspace') {
       try {
-        localStorage.setItem('headconan_active_world_v2', JSON.stringify(world));
-        localStorage.setItem('headconan_active_chronicle_v2', JSON.stringify(chronicle));
+        localStorage.setItem(LS_KERNEL_STATE, JSON.stringify(kernelState));
+        localStorage.setItem(LS_CHRONICLE, JSON.stringify(chronicle));
+        localStorage.setItem(LS_NOTES, JSON.stringify(notes));
+        localStorage.setItem(LS_ROLE, activeRoleId);
       } catch (e) {
         console.warn('Failed to save world to localStorage:', e);
       }
     }
-  }, [world, chronicle, appPhase]);
+  }, [kernelState, chronicle, notes, activeRoleId, appPhase]);
 
-  // Handler: User submits an imaginative prompt
+  // Handler: User submits an imaginative prompt（W1：任何 prompt 都引导至内核演示世界）
   const handleInitiatePrompt = async (prompt: string) => {
     setCurrentPrompt(prompt);
     setAppPhase('genesis');
     setLatestNarrativeOutcome(null);
     setChronicle([]);
+    setNotes([]);
     setIsDirectorOverlayOpen(false);
-
-    // Start generation immediately in parallel with animation using selectedEngine
-    const result = await generateWorldFromAI(prompt, selectedEngine);
-    setPendingWorldData({
-      world: result.world,
-      uiPlanning: result.uiPlanning,
-    });
   };
 
   // Handler: User selects a preset
   const handleSelectPreset = (presetId: string) => {
     const matched = DEMO_PRESETS.find(p => p.id === presetId);
-    if (matched) {
-      if (matched.preset) {
-        setCurrentPrompt(matched.subtitle);
-        setAppPhase('genesis');
-        setLatestNarrativeOutcome(null);
-        setChronicle([]);
-        setIsDirectorOverlayOpen(false);
-        setPendingWorldData(JSON.parse(JSON.stringify(matched.preset)));
-      }
-    }
+    setCurrentPrompt(matched?.subtitle ?? 'SPY×FAMILY 内核演示');
+    setAppPhase('genesis');
+    setLatestNarrativeOutcome(null);
+    setChronicle([]);
+    setNotes([]);
+    setIsDirectorOverlayOpen(false);
   };
 
-  // Handler: Genesis animation completed
+  // Handler: Genesis animation completed → 实例化内核世界
   const handleGenesisComplete = () => {
-    if (pendingWorldData) {
-      setWorld(pendingWorldData.world);
-    } else {
-      setWorld(JSON.parse(JSON.stringify(EMPIRE_SEED_WORLD.world)));
-    }
+    const fresh = instantiate(SPY_FAMILY_MIN, { scenario: SPY_FAMILY_SCENARIOS.breakfast });
+    setKernelState(fresh);
+    setActiveRoleId(SPY_FAMILY_MIN.possibilitySpace.availableRoles[0].id);
     setAppPhase('workspace');
   };
 
-  // Handler: Role Slot Selection (Agency Shift)
+  // Handler: Role Slot Selection（切换角色 = 切换观察者 → 界面内容真的变）
   const handleSelectRole = (roleId: string) => {
-    if (!world) return;
-    setWorld(prev => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        activeRoleId: roleId
-      };
-    });
+    setActiveRoleId(roleId);
   };
 
   // Handler: Sidebar navigation
@@ -215,30 +255,51 @@ export const App: React.FC = () => {
     }
   };
 
-  // Handler: User performs an action
+  // Handler: User performs an action → 确定性解析 → 内核应用（拒绝即事件）
   const handleDispatchAction = async (action: string) => {
-    if (!world || isProcessingAction) return;
+    if (!kernelState || isProcessingAction) return;
 
     setIsProcessingAction(true);
     setLatestNarrativeOutcome(null);
 
     try {
-      const userNotes = world.notes?.map(n => n.content) || [];
-      const interactionResult = await interactWorldWithAI(action, world, userNotes, selectedEngine);
+      const isDirector = observerEntityId === null;
+      const parts: string[] = [];
+      let next = kernelState;
 
-      // Apply mutations
-      const nextWorld = applyWorldMutations(world, interactionResult);
-      setWorld(nextWorld);
+      if (isDirector) {
+        const d = resolveDirectorAction(action, SPY_FAMILY_MIN);
+        if (d.notice) {
+          parts.push(d.notice);
+        } else if (d.event) {
+          const r = applyEvent(SPY_FAMILY_MIN, next, d.event, KERNEL_OPTS);
+          next = r.nextState;
+          const last = next.eventChronicleLog.at(-1);
+          if (last) parts.push(last.description);
+          if (r.rejected && r.reason) parts.push(`[世界拒绝] ${r.reason}`);
+        }
+      } else {
+        const resolved = resolveUserAction(action, SPY_FAMILY_MIN, observerEntityId as EntityId, next);
+        for (const ev of resolved.events) {
+          const r = applyEvent(SPY_FAMILY_MIN, next, ev, KERNEL_OPTS);
+          next = r.nextState;
+          const last = next.eventChronicleLog.at(-1);
+          if (last) parts.push(last.description);
+          for (const resp of r.responses) parts.push(`${entityName(resp.from)}：${resp.text}`);
+          if (r.rejected && r.reason) parts.push(`[世界拒绝] ${r.reason}`);
+        }
+      }
 
-      // Record narrative
-      setLatestNarrativeOutcome(interactionResult.narrativeOutcome);
+      setKernelState(next);
+      const narrative = parts.join('\n');
+      setLatestNarrativeOutcome(narrative);
       const newEntry: ChronicleEntry = {
-        turn: nextWorld.turnCount,
+        turn: next.clock.turnNumber,
         action,
-        narrative: interactionResult.narrativeOutcome,
+        narrative,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        provider: (interactionResult as any).provider,
-        model: (interactionResult as any).model,
+        provider: 'kernel',
+        model: 'deterministic',
       };
       setChronicle(prev => [newEntry, ...prev]);
     } catch (err) {
@@ -248,28 +309,29 @@ export const App: React.FC = () => {
     }
   };
 
-  // Handler: User records a note
+  // Handler: User records a note（显示层状态，不进入内核）
   const handleAddNote = (content: string) => {
-    if (!world) return;
-    const newNote = {
+    const newNote: UserNote = {
       id: `note-${Date.now()}`,
       content,
-      createdAt: `Turn #${world.turnCount || 1}`
+      createdAt: `Turn #${kernelState?.clock.turnNumber ?? 1}`,
     };
-    const nextWorld = {
-      ...world,
-      notes: [newNote, ...(world.notes || [])]
-    };
-    setWorld(nextWorld);
+    setNotes(prev => [newNote, ...prev]);
   };
 
   // Handler: Reset to creative space
   const handleResetToPrompt = () => {
     try {
+      localStorage.removeItem(LS_KERNEL_STATE);
+      localStorage.removeItem(LS_CHRONICLE);
+      localStorage.removeItem(LS_NOTES);
+      localStorage.removeItem(LS_ROLE);
       localStorage.removeItem('headconan_active_world_v2');
       localStorage.removeItem('headconan_active_chronicle_v2');
     } catch (e) {}
-    setWorld(null);
+    setKernelState(null);
+    setNotes([]);
+    setActiveRoleId(DEFAULT_PLAYER_ROLE.id);
     setLatestNarrativeOutcome(null);
     setChronicle([]);
     setIsDirectorOverlayOpen(false);
@@ -311,7 +373,7 @@ export const App: React.FC = () => {
     );
   }
 
-  if (!world) {
+  if (!displayWorld || !kernelState) {
     return null;
   }
 
@@ -321,12 +383,12 @@ export const App: React.FC = () => {
       <AppSidebar
         activeItem={sidebarActive}
         onNavigate={handleSidebarNavigate}
-        noteCount={world.notes?.length || 0}
+        noteCount={notes.length}
         isDirectorOpen={isDirectorOverlayOpen}
         selectedEngine={selectedEngine}
         onSelectEngine={handleSelectEngine}
-        worldName={world.name}
-        turnCount={world.turnCount}
+        worldName={displayWorld.name}
+        turnCount={displayWorld.turnCount}
       />
 
       {/* Main Content Area (floating panel on zinc canvas, §3.1) */}
@@ -334,7 +396,7 @@ export const App: React.FC = () => {
         <div id="main-scroll-container" className="flex h-full flex-col overflow-y-auto scrollbar-fade">
           {/* World Frame (Layer 0) */}
           <Header
-            world={world}
+            world={displayWorld}
             onResetToPrompt={handleResetToPrompt}
             onSelectPreset={handleSelectPreset}
             onOpenFeedModal={() => setShowChronicleModal(true)}
@@ -361,7 +423,7 @@ export const App: React.FC = () => {
                 </div>
                 <button
                   onClick={() => {
-                    const playerRole = world.roles.find(r => r.type === 'PLAYER');
+                    const playerRole = displayWorld.roles.find(r => r.type === 'PLAYER');
                     if (playerRole) handleSelectRole(playerRole.id);
                   }}
                   className="shrink-0 rounded-md border border-zinc-200 bg-white px-2.5 py-1 font-mono text-[11px] text-zinc-700 transition-colors hover:bg-zinc-100"
@@ -381,9 +443,9 @@ export const App: React.FC = () => {
                     </div>
                     <div>
                       <div className="mb-1 text-[11px] font-medium uppercase tracking-wider text-zinc-500">
-                        Consequence & World Reaction // {world.style?.temporalGrammar?.timeDisplayPrefix || 'Turn'} #{world.turnCount}
+                        Consequence & World Reaction // {displayWorld.style?.temporalGrammar?.timeDisplayPrefix || 'Turn'} #{displayWorld.turnCount}
                       </div>
-                      <p className="font-sans text-sm leading-relaxed text-zinc-800">
+                      <p className="whitespace-pre-line font-sans text-sm leading-relaxed text-zinc-800">
                         {latestNarrativeOutcome}
                       </p>
                     </div>
@@ -400,7 +462,7 @@ export const App: React.FC = () => {
 
             {/* Dynamic Composition Surface (World Canvas Renderer) */}
             <WorldCanvasRenderer
-              world={world}
+              world={displayWorld}
               blocks={activeUiPlan.blocks}
               onAction={handleDispatchAction}
               onAddNote={handleAddNote}
@@ -413,7 +475,7 @@ export const App: React.FC = () => {
             onSubmitAction={handleDispatchAction}
             isProcessing={isProcessingAction}
             selectedEngine={selectedEngine}
-            worldStyle={world.style}
+            worldStyle={displayWorld.style}
             activeRole={activeRole}
           />
         </div>
@@ -424,13 +486,13 @@ export const App: React.FC = () => {
         isOpen={showChronicleModal}
         onClose={() => setShowChronicleModal(false)}
         entries={chronicle}
-        world={world}
+        world={displayWorld}
       />
 
       <NotesDrawer
         isOpen={showNotesDrawer}
         onClose={() => setShowNotesDrawer(false)}
-        notes={world.notes || []}
+        notes={notes}
         onAddNote={handleAddNote}
         onActionFromNote={handleDispatchAction}
       />
@@ -445,9 +507,9 @@ export const App: React.FC = () => {
         />
       )}
 
-      {showLayoutLabModal && world && (
+      {showLayoutLabModal && displayWorld && (
         <LayoutLab
-          world={world}
+          world={displayWorld}
           onClose={() => setShowLayoutLabModal(false)}
           onAction={handleDispatchAction}
         />

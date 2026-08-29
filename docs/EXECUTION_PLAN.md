@@ -3,6 +3,7 @@
 > **定位**：本文档是未来一个月的**主执行计划**，把 `MONTH_1_PLAN.md`（时间维度）、`NEXT_BUILD.md`（依赖维度）、`IMPLEMENTATION_ROADMAP.md`（阶段维度）与 `docs/ARCHITECTURE_ZERO/ARCHITECTURE.md`（架构维度）收敛为**单一可执行基线**。
 > 若与其他文档冲突，以本文档 + 愿景（`docs/VISION.md`）为准；其他文档视为证据而非真相。
 > 撰写日期：2026-08-29。基线已验证：`tsc --noEmit` 全绿，`vitest` 21/21 通过。
+> W1 后半（08-29）已结算：App 换用 `WorldStateInstance` 唯一状态源 + 每帧投影（绞杀者模式），`kernel2Resolver`（玩家/导演确定性解析）+ `legacyAdapter`（投影隔离）落地；重新验证 `tsc --noEmit` 零错误，`vitest` 32/32 通过。
 
 ---
 
@@ -61,6 +62,8 @@
 | :--- | :--- | :--- |
 | P0 垂直切片（21/21 测试） | `src/world/p0/world.ts` + `runtime/kernel.ts` + `resolver.ts` + `instantiate.ts` | 证明：NL 动作 → 确定性事件 → 真实状态变化 → 可检查；信息不对称；拒绝语义；主持人通道；确定性重放 |
 | 事件内核（最小版） | `runtime/kernel.ts` | 3 事件类型（speech_act/confront_secret/reveal_fact）；前提 3/7；内联规则；Yor 模板反应；无调度器 |
+| **定义驱动内核（W1）** | `runtime/kernel2.ts` + `kernel2Resolver.ts` | 由 `WorldActionDefinition` 完全数据驱动；前提 7/7；占位符解析；确定性级联；拒绝即事件；玩家/导演确定性解析（`resolveUserAction`/`resolveDirectorAction`）；重放确定性（`evt:{turn}:{seq}:{type}`） |
+| **投影适配器（W1）** | `runtime/legacyAdapter.ts` | 绞杀者模式核心：`WorldStateInstance` → legacy `WorldState` 每帧投影；信息不对称过滤（玩家视角隐藏秘密 / Host 全知）；角色切换 → 界面内容真实变化 |
 | 表示层基础 | `representation/**`（definition/state/dynamics/information/player/relationships/power/experience + validator/projector/evaluator + 4 基准世界） | 强类型、已验证，**未接入运行时** |
 | 服务器网关 | `server.ts` | 多供应商代理 + 回退链，可靠 |
 | UI 外壳与基础件 | `AppSidebar` / `ActionDock` / `ui/*` / `Header` | 真实资产，稳定框架 |
@@ -107,6 +110,8 @@
 │   ③ App 换用 WorldInstance + 每帧投影(projectEpistemicPerspective)│
 │   ✅ 退出门: 切换角色→界面内容真的变(玩家看不到秘密/Host 可见);   │
 │      最小定义在定义驱动内核下可跑 Step 1/2/4                    │
+│   ▶ W1后半(08-29)已完成: ①+③ 落地(kernel2 + resolver +       │
+│     legacyAdapter + App 绞杀者重构, 32/32 测试绿)               │
 └──────────────────────────────┬──────────────────────────────┘
                                ▼
 ┌─────────────────────────────────────────────────────────────┐
