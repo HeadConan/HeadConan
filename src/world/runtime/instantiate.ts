@@ -131,6 +131,20 @@ export function applyStateEffect(state: WorldStateInstance, effect: StateEffect)
     case 'entity': {
       const es = state.entityStates[effect.targetId];
       if (!es) return;
+      // `dynamic.<key>` 前缀 → 写入 dynamicAttributes（运行时可变属性），而非快照顶层字段
+      if (effect.fieldKey.startsWith('dynamic.')) {
+        const key = effect.fieldKey.slice('dynamic.'.length);
+        const cur = es.dynamicAttributes[key];
+        if (effect.mutationType === 'set') {
+          es.dynamicAttributes[key] = effect.payload;
+        } else if ((effect.mutationType === 'increment' || effect.mutationType === 'decrement') && typeof cur === 'number') {
+          const delta = effect.mutationType === 'increment' ? effect.payload : -effect.payload;
+          es.dynamicAttributes[key] = cur + delta;
+        } else if (effect.mutationType === 'increment' || effect.mutationType === 'decrement') {
+          es.dynamicAttributes[key] = (effect.mutationType === 'increment' ? effect.payload : -effect.payload);
+        }
+        break;
+      }
       applyNumericOrSet(es, effect);
       break;
     }
