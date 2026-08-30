@@ -55,6 +55,7 @@ export const WorldAtlasExplorer: React.FC<WorldAtlasExplorerProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'grid' | 'analytics' | 'benchmarks'>('grid');
   const [selectedWorld, setSelectedWorld] = useState<WorldAtlasEntry | null>(null);
+  const [pendingWorld, setPendingWorld] = useState<WorldAtlasEntry | null>(null);
 
   const [filters, setFilters] = useState<AtlasFilters>({
     searchQuery: '',
@@ -197,11 +198,17 @@ export const WorldAtlasExplorer: React.FC<WorldAtlasExplorerProps> = ({
   };
 
   const handleLaunchWorld = (world: WorldAtlasEntry) => {
-    if (onSelectPromptForWorld) {
-      const prompt = `Inhabit ${world.name} (${world.sourceOrOrigin}). Role: ${world.inhabitedExperience.primaryRoleInhabited}. Genre: ${world.genre.join(', ')}. Setting: ${world.setting}. Era: ${world.era}.`;
+    // A3 入口如实化：不直接生成该世界，先弹诚实提示（自定义世界生成 W3 上线）
+    setPendingWorld(world);
+  };
+
+  const confirmLaunchWorld = () => {
+    if (pendingWorld && onSelectPromptForWorld) {
+      const prompt = `Inhabit ${pendingWorld.name} (${pendingWorld.sourceOrOrigin}). Role: ${pendingWorld.inhabitedExperience.primaryRoleInhabited}. Genre: ${pendingWorld.genre.join(', ')}. Setting: ${pendingWorld.setting}. Era: ${pendingWorld.era}.`;
       onSelectPromptForWorld(prompt);
       if (onClose) onClose();
     }
+    setPendingWorld(null);
   };
 
   return (
@@ -1092,6 +1099,47 @@ export const WorldAtlasExplorer: React.FC<WorldAtlasExplorerProps> = ({
                   Launch Inhabited World Experience
                 </button>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* A3 诚实提示 modal：自定义世界生成将于 W3 上线 */}
+      {pendingWorld && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-zinc-900/40 p-6 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-2xl">
+            <div className="mb-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-600">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <h3 className="text-sm font-bold text-zinc-900">即将上线</h3>
+              </div>
+              <button
+                onClick={() => setPendingWorld(null)}
+                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors"
+                aria-label="关闭"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="mb-1 text-xs font-semibold text-zinc-800">{pendingWorld.name}</p>
+            <p className="mb-5 text-[13px] leading-relaxed text-zinc-500">
+              自定义世界生成将于 W3 上线。当前可将「{pendingWorld.name}」作为灵感，进入 SPY×FAMILY 内核演示。
+            </p>
+            <div className="flex gap-2.5">
+              <button
+                onClick={() => setPendingWorld(null)}
+                className="flex-1 rounded-lg border border-zinc-200 bg-white px-4 py-2 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-50"
+              >
+                取消
+              </button>
+              <button
+                onClick={confirmLaunchWorld}
+                className="flex-1 rounded-lg bg-zinc-900 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-zinc-800"
+              >
+                进入演示
+              </button>
             </div>
           </div>
         </div>

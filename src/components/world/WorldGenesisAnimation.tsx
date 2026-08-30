@@ -9,10 +9,10 @@ interface WorldGenesisAnimationProps {
 }
 
 const STAGES = [
-  { text: 'Interpreting premise & user role...', icon: Eye, delay: 600 },
-  { text: 'Constructing spatial locations & state equilibrium...', icon: Compass, delay: 1200 },
-  { text: 'Mapping factions, loyalties & covert tensions...', icon: Shield, delay: 1800 },
-  { text: 'Synthesizing generative UI blocks & opening world...', icon: Sparkles, delay: 2400 },
+  { text: '加载 SPY×FAMILY 世界定义…', icon: Eye, delay: 150 },
+  { text: '实例化内核状态（角色·地点·事实）…', icon: Compass, delay: 300 },
+  { text: '构建信息不对称投影与界面区块…', icon: Shield, delay: 500 },
+  { text: '演示世界就绪', icon: Sparkles, delay: 700 },
 ];
 
 export const WorldGenesisAnimation: React.FC<WorldGenesisAnimationProps> = ({
@@ -31,7 +31,7 @@ export const WorldGenesisAnimation: React.FC<WorldGenesisAnimationProps> = ({
         if (idx === STAGES.length - 1) {
           const completeTimer = setTimeout(() => {
             onComplete();
-          }, 800);
+          }, 500);
           timers.push(completeTimer);
         }
       }, stage.delay);
