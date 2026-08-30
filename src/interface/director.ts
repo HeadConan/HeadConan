@@ -1,5 +1,6 @@
 import { WorldState, UIBlock, UIPlanning } from '../world/types';
 import { RoleSlot } from '../roles/model';
+import { DIRECTOR_REVEAL_DIRECTIVES } from '../world/spyFamily/spyFamilyMin';
 
 export interface UIDirectorOptions {
   activeRole: RoleSlot;
@@ -158,12 +159,7 @@ export function computeUIPlan(
   let suggestedInteractions = style.interactionGrammar?.defaultActions || [];
 
   if (activeRole.type === 'DIRECTOR') {
-    suggestedInteractions = [
-      'Spawn an unexpected crisis: Border communication blackout',
-      'Inject a mysterious coded telegram from the conspirators',
-      'Reduce Chancellor Vance loyalty by 20% due to an overheard insult',
-      'Trigger sudden severe midnight storm across all sectors'
-    ];
+    suggestedInteractions = DIRECTOR_REVEAL_DIRECTIVES.map((d) => d.command);
   } else if (activeRole.type === 'ARCHITECT') {
     suggestedInteractions = [
       'Rewrite axiom: Prohibit all direct telegraph communications',

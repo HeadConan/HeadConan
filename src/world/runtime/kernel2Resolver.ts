@@ -209,10 +209,33 @@ export function resolveUserAction(
 // 导演解析（全知主持人；W1 仅支持 reveal_fact 注入）
 // ---------------------------------------------------------------------------
 
+/** 解析导演指令的揭示目标：优先语法位置（"透露给 Y" / "让 Y 知道"），回退全文本 */
+function resolveDirectorTarget(text: string): EntityId | undefined {
+  const revealTo = text.match(/透露给\s*([^，。！？\s]+)/);
+  if (revealTo) return resolveTarget(revealTo[1], KNOWN_CHARACTERS);
+  const letKnow = text.match(/让\s*([^，。！？\s]+?)\s*知道/);
+  if (letKnow) return resolveTarget(letKnow[1], KNOWN_CHARACTERS);
+  const giveTo = text.match(/给\s*([^，。！？\s]+)/);
+  if (giveTo) return resolveTarget(giveTo[1], KNOWN_CHARACTERS);
+  return resolveTarget(text, KNOWN_CHARACTERS);
+}
+
+/** 剔除目标角色名的别名，避免"让洛德知道钢笔是窃听器"误匹配洛德身份事实 */
+function stripTargetAliases(text: string, targetId: EntityId | undefined): string {
+  if (!targetId) return text;
+  const target = KNOWN_CHARACTERS.find(c => c.id === targetId);
+  if (!target) return text;
+  return target.aliases.reduce((acc, a) => acc.split(a.toLowerCase()).join(''), text);
+}
+
 export function resolveDirectorAction(text: string, worldDef: WorldDefinition): ResolvedDirectorAction {
   const lower = text.toLowerCase();
 
-  // 事实匹配：从文本中找秘密
+  // 目标：reveal 到谁？（语法优先，回退默认玩家=洛德）
+  const targetId = resolveDirectorTarget(lower) ?? SPYF.loid;
+
+  // 事实匹配：先剔除目标角色名，避免目标名被误判为事实关键词
+  const factText = stripTargetAliases(lower, targetId);
   const factMatch: Array<[RegExp, string]> = [
     [/(约尔|yor|杀手|荆棘)/i, SPYF.factYorAssassin],
     [/(洛德|loid|黄昏|twilight|间谍)/i, SPYF.factLoidTwilight],
@@ -220,11 +243,7 @@ export function resolveDirectorAction(text: string, worldDef: WorldDefinition): 
     [/(钢笔|pen|窃听)/i, SPYF.factPenSurveillance],
     [/(伪装家庭|fake family)/i, SPYF.factFakeFamily],
   ];
-  const matched = factMatch.find(([re]) => re.test(lower));
-
-  // 目标：reveal 到谁？默认玩家（洛德）
-  const targetChar = resolveTarget(lower, KNOWN_CHARACTERS);
-  const targetId = targetChar ?? SPYF.loid;
+  const matched = factMatch.find(([re]) => re.test(factText));
 
   if (/(reveal|注入|透露|揭晓|让.*知道|泄露|declassify)/i.test(lower) && matched) {
     return {

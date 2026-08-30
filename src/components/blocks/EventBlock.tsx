@@ -1,8 +1,8 @@
 import React from 'react';
 import { UIBlockProps } from '../../ui/types';
-import { Radio, AlertTriangle, Info, Zap, Sparkles } from 'lucide-react';
+import { Radio } from 'lucide-react';
 
-export const EventBlock: React.FC<UIBlockProps> = ({ block, world, onAction }) => {
+export const EventBlock: React.FC<UIBlockProps> = ({ block, world }) => {
   return (
     <div id="block-events-view" className="flex h-[480px] flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-card">
       {/* Header */}
@@ -46,17 +46,6 @@ export const EventBlock: React.FC<UIBlockProps> = ({ block, world, onAction }) =
 
               <h4 className="text-xs font-semibold leading-snug text-zinc-900">{evt.title}</h4>
               <p className="mt-1 text-[11px] leading-relaxed text-zinc-500">{evt.description}</p>
-
-              {onAction && (
-                <button
-                  id={`act-event-${evt.id}`}
-                  onClick={() => onAction(`Respond immediately to alert: "${evt.title}"`)}
-                  className="mt-2.5 flex w-full items-center justify-between rounded-md border border-zinc-200 bg-white px-2.5 py-1 text-left text-[11px] font-medium text-zinc-700 transition-colors hover:bg-zinc-100"
-                >
-                  <span>Dispatch Response Directive</span>
-                  <Zap className="size-3 text-amber-600" strokeWidth={1.75} />
-                </button>
-              )}
             </div>
           );
         })}

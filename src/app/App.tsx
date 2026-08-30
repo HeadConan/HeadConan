@@ -267,7 +267,7 @@ export const App: React.FC = () => {
     setLatestNarrativeOutcome(null);
 
     try {
-      const isDirector = observerEntityId === null;
+      const isDirector = observerEntityId === null || isDirectorOverlayOpen;
       const parts: string[] = [];
       let next = kernelState;
 
@@ -284,6 +284,9 @@ export const App: React.FC = () => {
         }
       } else {
         const resolved = resolveUserAction(action, SPY_FAMILY_MIN, observerEntityId as EntityId, next);
+        if (resolved.confidence < 0.85) {
+          parts.push('（未识别为具体指令，已当作对约尔的一句闲聊）');
+        }
         for (const ev of resolved.events) {
           const r = applyEvent(SPY_FAMILY_MIN, next, ev, KERNEL_OPTS);
           next = r.nextState;

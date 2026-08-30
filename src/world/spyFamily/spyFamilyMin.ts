@@ -63,6 +63,44 @@ export const SPYF = {
 } as const;
 
 // ---------------------------------------------------------------------------
+// 导演真实指令（单一来源：DirectorConsoleBlock / ActionDock 导演 chips 共用）
+// ---------------------------------------------------------------------------
+
+export interface DirectorRevealDirective {
+  id: string;
+  label: string;
+  description: string;
+  command: string;
+}
+
+export const DIRECTOR_REVEAL_DIRECTIVES: DirectorRevealDirective[] = [
+  {
+    id: 'reveal-yor-secret',
+    label: '透露约尔的秘密',
+    description: '让洛德知道约尔是杀手「荆棘公主」。',
+    command: '把约尔的秘密透露给洛德',
+  },
+  {
+    id: 'reveal-pen-surveillance',
+    label: '揭示钢笔窃听',
+    description: '让洛德知道那支钢笔其实是窃听器。',
+    command: '让洛德知道钢笔是窃听器',
+  },
+  {
+    id: 'reveal-anya-telepath',
+    label: '透露安雅读心',
+    description: '让约尔知道安雅拥有读心超能力。',
+    command: '把安雅的读心秘密透露给约尔',
+  },
+  {
+    id: 'reveal-loid-twilight',
+    label: '揭示洛德身份',
+    description: '让安雅知道洛德是西国间谍「黄昏」。',
+    command: '把洛德是间谍的秘密透露给安雅',
+  },
+];
+
+// ---------------------------------------------------------------------------
 // 角色
 // ---------------------------------------------------------------------------
 

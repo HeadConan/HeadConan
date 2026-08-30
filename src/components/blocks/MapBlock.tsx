@@ -186,18 +186,20 @@ export const MapBlock: React.FC<UIBlockProps> = ({ block, world, onAction, onOpe
               <div className="mt-4 space-y-2 border-t border-zinc-100 pt-3">
                 <button
                   id={`action-dispatch-${selectedLocation.id}`}
-                  onClick={() => onAction(`Dispatch an investigative detachment to ${selectedLocation.name}`)}
+                  onClick={() => onAction(`前往${selectedLocation.name}`)}
                   className="flex w-full items-center justify-center gap-2 rounded-lg bg-zinc-900 px-3 py-2 text-xs font-medium text-zinc-50 transition-colors hover:bg-zinc-800"
                 >
                   <Eye className="size-3.5" strokeWidth={1.75} />
-                  <span>Survey {selectedLocation.name.split(' ')[0]}</span>
+                  <span>前往{selectedLocation.name}</span>
                 </button>
                 <button
                   id={`action-fortify-${selectedLocation.id}`}
-                  onClick={() => onAction(`Establish heightened security protocol at ${selectedLocation.name}`)}
-                  className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+                  disabled
+                  title="W3 即将支持"
+                  className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs font-medium text-zinc-400"
                 >
                   Reinforce Sector
+                  <span className="rounded border border-zinc-300 bg-zinc-100 px-1 py-0.5 font-mono text-[9px] uppercase text-zinc-500">W3</span>
                 </button>
               </div>
             )}

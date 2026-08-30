@@ -3,18 +3,13 @@ import { WorldState, UIBlock } from '../../world/types';
 import { RoleSlot } from '../../roles/model';
 import {
   Wand2,
-  PlusCircle,
-  Flame,
   AlertTriangle,
+  Flame,
   ShieldAlert,
-  Sparkles,
-  Sliders,
-  Send,
   Zap,
-  Lock,
-  Layers,
-  BookOpen
+  Sparkles,
 } from 'lucide-react';
+import { DIRECTOR_REVEAL_DIRECTIVES } from '../../world/spyFamily/spyFamilyMin';
 
 interface DirectorConsoleBlockProps {
   block: UIBlock;
@@ -38,14 +33,12 @@ export const DirectorConsoleBlock: React.FC<DirectorConsoleBlockProps> = ({
   const handleDirectorSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!directorPrompt.trim() || !onAction) return;
-    onAction(`[DIRECTOR OVERRIDE] ${directorPrompt.trim()}`);
+    onAction(directorPrompt.trim());
     setDirectorPrompt('');
   };
 
   const handleSpawnAction = (actionText: string) => {
-    if (onAction) {
-      onAction(`[DIRECTOR INTERVENTION] ${actionText}`);
-    }
+    if (onAction) onAction(actionText);
   };
 
   const tabButton = (tab: 'spawn' | 'factions' | 'rules', label: string) => (
@@ -61,6 +54,15 @@ export const DirectorConsoleBlock: React.FC<DirectorConsoleBlockProps> = ({
     </button>
   );
 
+  const w3Badge = () => (
+    <span className="ml-1.5 rounded border border-zinc-300 bg-zinc-100 px-1 py-0.5 font-mono text-[9px] uppercase text-zinc-500">
+      W3
+    </span>
+  );
+
+  const directiveIcons = [AlertTriangle, Flame, ShieldAlert, Zap];
+  const directiveColors = ['text-amber-600', 'text-rose-600', 'text-indigo-600', 'text-cyan-600'];
+
   return (
     <div className="relative overflow-hidden rounded-xl border border-zinc-200 bg-white p-5 shadow-card">
       {/* Background glow */}
@@ -74,20 +76,20 @@ export const DirectorConsoleBlock: React.FC<DirectorConsoleBlockProps> = ({
           </div>
           <div>
             <h3 className="flex items-center gap-2 font-mono text-sm font-bold uppercase tracking-wider text-zinc-900">
-              <span>{isArchitect ? 'World Ontological Rules & Axioms' : 'World Director & Narrative Spawning'}</span>
+              <span>{isArchitect ? 'World Ontological Rules & Axioms' : 'World Director & Secret Injection'}</span>
               <span className="rounded-full border border-purple-200 bg-purple-50 px-2 py-0.5 font-mono text-[10px] text-purple-700">
                 {isArchitect ? 'SYSTEM ARCHITECT' : 'WORLD-LEVEL AGENCY'}
               </span>
             </h3>
             <p className="mt-0.5 font-sans text-xs text-zinc-500">
-              Direct narrative tension, mutate global variables, or spawn emergent crises
+              通过确定性内核把秘密注入角色认知（reveal_fact）
             </p>
           </div>
         </div>
 
         {/* Tab switcher */}
         <div className="flex items-center gap-1 rounded-lg border border-zinc-200 bg-zinc-100 p-1">
-          {tabButton('spawn', 'Spawn')}
+          {tabButton('spawn', 'Inject')}
           {tabButton('factions', 'Factions')}
           {tabButton('rules', 'Axioms')}
         </div>
@@ -100,7 +102,7 @@ export const DirectorConsoleBlock: React.FC<DirectorConsoleBlockProps> = ({
             type="text"
             value={directorPrompt}
             onChange={(e) => setDirectorPrompt(e.target.value)}
-            placeholder="Direct the world: 'Spawn a midnight assassination attempt on the Chancellor'..."
+            placeholder="把约尔的秘密透露给洛德"
             className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 pr-24 font-sans text-xs text-zinc-900 transition-all placeholder:text-zinc-400 focus:border-purple-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-200"
           />
           <button
@@ -109,78 +111,43 @@ export const DirectorConsoleBlock: React.FC<DirectorConsoleBlockProps> = ({
             className="absolute right-2 flex items-center gap-1 rounded-md bg-zinc-900 px-3 py-1.5 font-mono text-xs text-zinc-50 transition-colors hover:bg-zinc-800 disabled:opacity-40"
           >
             <Sparkles className="size-3.5" strokeWidth={1.75} />
-            <span>Cast</span>
+            <span>Inject</span>
           </button>
         </div>
       </form>
 
-      {/* Tab 1: Spawning Quick Interventions */}
+      {/* Tab 1: Secret Injection Quick Actions */}
       {activeTab === 'spawn' && (
         <div className="relative z-10 space-y-2.5">
           <div className="mb-1 font-mono text-[11px] uppercase tracking-wider text-zinc-500">
-            Pre-Engineered Directorial Interventions:
+            Secret Injection (reveal_fact):
           </div>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            <button
-              onClick={() => handleSpawnAction('Spawn an immediate communications blackout across all outer regions')}
-              className="group rounded-lg border border-purple-100 bg-purple-50/50 p-3 text-left transition-all hover:border-purple-200 hover:bg-purple-50"
-            >
-              <div className="flex items-center gap-2 text-xs font-bold text-purple-800">
-                <AlertTriangle className="size-3.5 text-amber-600" strokeWidth={1.75} />
-                <span>Sector Blackout</span>
-              </div>
-              <p className="mt-0.5 font-sans text-[10px] text-zinc-500">
-                Cut off telegraphs and intelligence dispatches for 24 hours.
-              </p>
-            </button>
-
-            <button
-              onClick={() => handleSpawnAction('Inject a leaked incriminating transcript compromising High Command')}
-              className="group rounded-lg border border-purple-100 bg-purple-50/50 p-3 text-left transition-all hover:border-purple-200 hover:bg-purple-50"
-            >
-              <div className="flex items-center gap-2 text-xs font-bold text-purple-800">
-                <Flame className="size-3.5 text-rose-600" strokeWidth={1.75} />
-                <span>Leaked Treason Cable</span>
-              </div>
-              <p className="mt-0.5 font-sans text-[10px] text-zinc-500">
-                Create a high-urgency intelligence file in the dossier.
-              </p>
-            </button>
-
-            <button
-              onClick={() => handleSpawnAction('Trigger sudden violent border skirmish forcing emergency defense mobilization')}
-              className="group rounded-lg border border-purple-100 bg-purple-50/50 p-3 text-left transition-all hover:border-purple-200 hover:bg-purple-50"
-            >
-              <div className="flex items-center gap-2 text-xs font-bold text-purple-800">
-                <ShieldAlert className="size-3.5 text-indigo-600" strokeWidth={1.75} />
-                <span>Border Skirmish</span>
-              </div>
-              <p className="mt-0.5 font-sans text-[10px] text-zinc-500">
-                Escalate regional tension metric by +25 points.
-              </p>
-            </button>
-
-            <button
-              onClick={() => handleSpawnAction('Reveal an underground conspirator safehouse under the capital')}
-              className="group rounded-lg border border-purple-100 bg-purple-50/50 p-3 text-left transition-all hover:border-purple-200 hover:bg-purple-50"
-            >
-              <div className="flex items-center gap-2 text-xs font-bold text-purple-800">
-                <Zap className="size-3.5 text-cyan-600" strokeWidth={1.75} />
-                <span>Reveal Secret Location</span>
-              </div>
-              <p className="mt-0.5 font-sans text-[10px] text-zinc-500">
-                Adds a hidden facility to the spatial map.
-              </p>
-            </button>
+            {DIRECTOR_REVEAL_DIRECTIVES.map((d, i) => {
+              const Icon = directiveIcons[i % directiveIcons.length];
+              return (
+                <button
+                  key={d.id}
+                  onClick={() => handleSpawnAction(d.command)}
+                  className="group rounded-lg border border-purple-100 bg-purple-50/50 p-3 text-left transition-all hover:border-purple-200 hover:bg-purple-50"
+                >
+                  <div className="flex items-center gap-2 text-xs font-bold text-purple-800">
+                    <Icon className={`size-3.5 ${directiveColors[i % directiveColors.length]}`} strokeWidth={1.75} />
+                    <span>{d.label}</span>
+                  </div>
+                  <p className="mt-0.5 font-sans text-[10px] text-zinc-500">{d.description}</p>
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
 
-      {/* Tab 2: Factions Balance Controller */}
+      {/* Tab 2: Factions Balance Controller（只读 + W3） */}
       {activeTab === 'factions' && (
         <div className="relative z-10 space-y-3">
-          <div className="mb-1 font-mono text-[11px] uppercase tracking-wider text-zinc-500">
-            Mutate Faction Equilibrium:
+          <div className="mb-1 flex items-center font-mono text-[11px] uppercase tracking-wider text-zinc-500">
+            Faction Equilibrium {w3Badge()}
           </div>
           <div className="space-y-2">
             {world.factions?.map((fac) => (
@@ -196,16 +163,18 @@ export const DirectorConsoleBlock: React.FC<DirectorConsoleBlockProps> = ({
                 </div>
                 <div className="flex items-center gap-1.5">
                   <button
-                    onClick={() => handleSpawnAction(`Shift ${fac.name} stance to hostile and decrease loyalty by 15`)}
-                    className="rounded border border-rose-200 bg-rose-50 px-2 py-1 font-mono text-[10px] text-rose-700 transition-colors hover:bg-rose-100"
+                    disabled
+                    title="W3 即将支持"
+                    className="cursor-not-allowed rounded border border-zinc-200 bg-zinc-100 px-2 py-1 font-mono text-[10px] text-zinc-400"
                   >
-                    Antagonize
+                    Antagonize {w3Badge()}
                   </button>
                   <button
-                    onClick={() => handleSpawnAction(`Grant diplomatic concessions to ${fac.name}, boosting loyalty by 15`)}
-                    className="rounded border border-emerald-200 bg-emerald-50 px-2 py-1 font-mono text-[10px] text-emerald-700 transition-colors hover:bg-emerald-100"
+                    disabled
+                    title="W3 即将支持"
+                    className="cursor-not-allowed rounded border border-zinc-200 bg-zinc-100 px-2 py-1 font-mono text-[10px] text-zinc-400"
                   >
-                    Appease
+                    Appease {w3Badge()}
                   </button>
                 </div>
               </div>
@@ -214,11 +183,11 @@ export const DirectorConsoleBlock: React.FC<DirectorConsoleBlockProps> = ({
         </div>
       )}
 
-      {/* Tab 3: Ontological Axioms / Rules */}
+      {/* Tab 3: Ontological Axioms / Rules（只读 + W3） */}
       {activeTab === 'rules' && (
         <div className="relative z-10 space-y-2.5">
-          <div className="mb-1 font-mono text-[11px] uppercase tracking-wider text-zinc-500">
-            Active World Axioms & Constraints:
+          <div className="mb-1 flex items-center font-mono text-[11px] uppercase tracking-wider text-zinc-500">
+            Active World Axioms & Constraints {w3Badge()}
           </div>
           <div className="space-y-2">
             {(world.rules && world.rules.length > 0 ? world.rules : [
@@ -242,10 +211,11 @@ export const DirectorConsoleBlock: React.FC<DirectorConsoleBlockProps> = ({
                   </p>
                 </div>
                 <button
-                  onClick={() => handleSpawnAction(`Invert / toggle world rule "${rule.name}"`)}
-                  className="shrink-0 rounded border border-purple-200 bg-purple-50 px-2 py-1 font-mono text-[10px] text-purple-700 transition-colors hover:bg-purple-100"
+                  disabled
+                  title="W3 即将支持"
+                  className="shrink-0 cursor-not-allowed rounded border border-zinc-200 bg-zinc-100 px-2 py-1 font-mono text-[10px] text-zinc-400"
                 >
-                  Modify Rule
+                  Modify Rule {w3Badge()}
                 </button>
               </div>
             ))}

@@ -40,7 +40,7 @@ export const ActionDock: React.FC<ActionDockProps> = ({
   const isObserver = activeRole?.type === 'OBSERVER';
 
   const defaultPlaceholder = isDirector
-    ? "Direct the world (e.g. 'Spawn sudden crisis', 'Invert faction stance', 'Plant incriminating letter')..."
+    ? "把约尔的秘密透露给洛德，或输入「让洛德知道钢笔是窃听器」..."
     : isObserver
     ? "Ask the world simulation a question or request an omniscient retrospective..."
     : worldStyle?.interactionGrammar?.placeholder || "What do you want to do in this world?";

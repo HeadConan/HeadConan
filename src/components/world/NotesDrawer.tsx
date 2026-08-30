@@ -88,12 +88,12 @@ export const NotesDrawer: React.FC<NotesDrawerProps> = ({
                 {onActionFromNote && (
                   <button
                     onClick={() => {
-                      onActionFromNote(`Act upon recorded deduction: "${note.content}"`);
+                      onActionFromNote(note.content);
                       onClose();
                     }}
                     className="block pt-1 font-mono text-[11px] text-amber-700 underline decoration-amber-300 hover:text-amber-900"
                   >
-                    Translate into active action →
+                    以此内容作为行动 →
                   </button>
                 )}
               </div>

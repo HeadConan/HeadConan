@@ -279,7 +279,7 @@ export function applyEvent(
       if (opts.roleOf && def.actorEligibilityRoles.length > 0) {
         const roles = opts.roleOf(event.actorId) ?? [];
         if (!roles.some(r => def.actorEligibilityRoles.includes(r))) {
-          return fail(`资格不满足：${event.actorId} 不具有动作所需的角色（${def.actorEligibilityRoles.join('/')}）。`);
+          return fail(`资格不满足：${entityName(world, event.actorId)} 不具有动作所需的角色（${def.actorEligibilityRoles.join('/')}）。`);
         }
       }
 
@@ -329,7 +329,7 @@ export function applyEvent(
     case 'speech_act': {
       for (const targetId of event.targetIds) {
         if (!isCoPresent(next, event.actorId, targetId)) {
-          return fail(`共现前提不满足：${event.actorId} 与 ${targetId} 不在同一地点。`);
+          return fail(`共现前提不满足：${entityName(world, event.actorId)} 与 ${entityName(world, targetId)} 不在同一地点。`);
         }
       }
 
@@ -414,17 +414,26 @@ function collectAffected(event: KernelEvent): EntityId[] {
   }
 }
 
+/** 实体 ID → 用户可读名（短中文名）；查无则回退原 ID，避免把内部 ID 泄漏给界面 */
+function entityName(world: WorldDefinition, id: string): string {
+  const ch = world.characters?.find(c => c.id === id);
+  if (ch) return ch.name.split('（')[0].split('·')[0];
+  const loc = world.locations?.find(l => l.id === id);
+  if (loc) return loc.name;
+  return id;
+}
+
 function buildDescription(world: WorldDefinition, event: KernelEvent): string {
   switch (event.type) {
     case 'action': {
       const def = world.actions.find(a => a.id === event.actionId);
-      return `${event.actorId} 执行「${def?.name ?? event.actionId}」（目标: ${event.targetIds.join(', ') || '无'}）`;
+      return `${entityName(world, event.actorId)} 执行「${def?.name ?? event.actionId}」（目标: ${event.targetIds.map(t => entityName(world, t)).join(', ') || '无'}）`;
     }
     case 'speech_act':
-      return `${event.actorId} 对 ${event.targetIds.join(', ')} 说: "${event.utterance}"（意图: ${event.intentTag}${event.topic ? ` / 话题: ${event.topic}` : ''}）`;
+      return `${entityName(world, event.actorId)} 对 ${event.targetIds.map(t => entityName(world, t)).join(', ')} 说: "${event.utterance}"（意图: ${event.intentTag}${event.topic ? ` / 话题: ${event.topic}` : ''}）`;
     case 'reveal_fact': {
       const fact = world.groundTruthFacts.find(f => f.id === event.factId);
-      return `事实「${fact?.statement ?? event.factId}」注入 ${event.targetId} 的认知（来源: ${event.source}）。`;
+      return `事实「${fact?.statement ?? event.factId}」注入 ${entityName(world, event.targetId)} 的认知（来源: ${event.source}）。`;
     }
   }
 }

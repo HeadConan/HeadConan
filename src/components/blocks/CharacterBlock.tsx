@@ -3,6 +3,11 @@ import { UIBlockProps } from '../../ui/types';
 import { Users, User, ShieldAlert, MessageSquare, Sparkles, ChevronRight, Camera, Image as ImageIcon } from 'lucide-react';
 import { Character } from '../../world/types';
 
+/** 提取中文短名（"约尔·福杰（Yor Forger）" → "约尔"），供真实解析指令使用 */
+function shortName(fullName: string): string {
+  return fullName.split('（')[0].split('·')[0];
+}
+
 export const CharacterBlock: React.FC<UIBlockProps> = ({ block, world, onAction, onOpenVisualStudio }) => {
   const [selectedChar, setSelectedChar] = useState<Character | null>(world.characters[0] || null);
 
@@ -183,19 +188,21 @@ export const CharacterBlock: React.FC<UIBlockProps> = ({ block, world, onAction,
             <div className="mt-4 space-y-2 border-t border-zinc-100 pt-3">
               <button
                 id={`interact-confront-${selectedChar.id}`}
-                onClick={() => onAction(`Summon ${selectedChar.name} for a private audience regarding their loyalties and recent decisions`)}
+                onClick={() => onAction(`问${shortName(selectedChar.name)}：你最近在忙什么？`)}
                 className="flex w-full items-center justify-center gap-2 rounded-lg bg-zinc-900 px-3 py-2 text-xs font-medium text-zinc-50 transition-colors hover:bg-zinc-800"
               >
                 <MessageSquare className="size-3.5" strokeWidth={1.75} />
-                <span>Interrogate {selectedChar.name.split(' ')[0]}</span>
+                <span>问{shortName(selectedChar.name)}：你最近在忙什么？</span>
               </button>
               <button
                 id={`interact-surveil-${selectedChar.id}`}
-                onClick={() => onAction(`Initiate discrete surveillance on ${selectedChar.name} and audit private communications`)}
-                className="flex w-full items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+                disabled
+                title="W3 即将支持"
+                className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs font-medium text-zinc-400"
               >
-                <ShieldAlert className="size-3.5 text-amber-600" strokeWidth={1.75} />
+                <ShieldAlert className="size-3.5 text-zinc-400" strokeWidth={1.75} />
                 <span>Audit Secret Communications</span>
+                <span className="rounded border border-zinc-300 bg-zinc-100 px-1 py-0.5 font-mono text-[9px] uppercase text-zinc-500">W3</span>
               </button>
             </div>
           )}
