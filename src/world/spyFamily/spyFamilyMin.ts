@@ -22,7 +22,7 @@ import type { SocialNorm, LawOrStatute } from '../representation/types/social';
 import type { PowerRelation } from '../representation/types/power';
 import type { CapabilityDefinition } from '../representation/types/ontology';
 import type { ExperienceProfile } from '../representation/types/experience';
-import type { ProvenanceMeta } from '../representation/types/primitives';
+import type { ProvenanceMeta, FactId } from '../representation/types/primitives';
 
 const AUTH: ProvenanceMeta = { source: 'authored', sourceConfidence: 1, createdTurn: 0 };
 
@@ -98,6 +98,19 @@ export const DIRECTOR_REVEAL_DIRECTIVES: DirectorRevealDirective[] = [
     description: '让安雅知道洛德是西国间谍「黄昏」。',
     command: '把洛德是间谍的秘密透露给安雅',
   },
+];
+
+// ---------------------------------------------------------------------------
+// 秘密短语表（W2.3 公开话语披露单一来源）
+// 内核只做传播，不做内容判定（架构红线：解释在解析层、写入在内核）。
+// W3 由代理循环判定"是否值得说破"；本表为确定性回退。
+// ---------------------------------------------------------------------------
+
+export const SPY_FAMILY_SECRET_UTTERANCES: { pattern: RegExp; factId: FactId }[] = [
+  { pattern: /约尔是杀手|荆棘公主/, factId: SPYF.factYorAssassin },
+  { pattern: /洛德是间谍|黄昏/, factId: SPYF.factLoidTwilight },
+  { pattern: /安雅会读心|超能力/, factId: SPYF.factAnyaTelepath },
+  { pattern: /钢笔是窃听器|监听设备/, factId: SPYF.factPenSurveillance },
 ];
 
 // ---------------------------------------------------------------------------

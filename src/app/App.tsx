@@ -16,7 +16,7 @@ import { computeUIPlan } from '../interface/director';
 import { RoleSlot } from '../roles/model';
 import { Sparkles } from 'lucide-react';
 
-import { SPY_FAMILY_MIN, SPY_FAMILY_SCENARIOS, SPYF } from '../world/spyFamily/spyFamilyMin';
+import { SPY_FAMILY_MIN, SPY_FAMILY_SCENARIOS, SPYF, SPY_FAMILY_SECRET_UTTERANCES } from '../world/spyFamily/spyFamilyMin';
 import { spyFamilyRelationResolver, spyFamilyRoleOf, spyFamilyReaction } from '../world/spyFamily/spyFamilyReactions';
 import { instantiate } from '../world/runtime/instantiate';
 import { applyEvent, tickScheduler, type KernelOptions, type KernelEvent } from '../world/runtime/kernel2';
@@ -29,6 +29,9 @@ const KERNEL_OPTS: KernelOptions = {
   relationResolver: spyFamilyRelationResolver,
   roleOf: spyFamilyRoleOf,
   reactions: spyFamilyReaction,
+  // W2.3 观察闭环：公开话语披露 → 解析层判定命中哪些秘密，内核只执行传播
+  discloseFactResolver: (_world, event) =>
+    SPY_FAMILY_SECRET_UTTERANCES.filter(({ pattern }) => pattern.test(event.utterance)).map(({ factId }) => factId),
 };
 
 const LS_KERNEL_STATE = 'headconan_kernel_state_v3';

@@ -104,6 +104,8 @@ export interface KernelOptions {
   roleOf?: (entityId: EntityId) => string[];
   /** 语音反应引擎；缺省 = 无反应 */
   reactions?: ReactionEngine;
+  /** 观察闭环：speech_act 公开话语披露时，判定该话语披露了哪些事实（W2 确定性；W3 由代理循环判定） */
+  discloseFactResolver?: (world: WorldDefinition, event: Extract<KernelEvent, { type: 'speech_act' }>) => FactId[];
 }
 
 /** 对话意图对关系的确定性增量（对话的"物理"） */
@@ -141,6 +143,29 @@ function pushKnownFact(state: WorldStateInstance, entityId: EntityId, factId: Fa
     return true;
   }
   return false;
+}
+
+/**
+ * 观察闭环：事实在披露现场公开后，向共现实体广播（受 visibilityScope 约束）。
+ * - cosmic_truth 不传播（无人可知）；其余类型仅在披露现场传播给在场见证者。
+ * - 已持有者（pushKnownFact 幂等）与现场实体（coPresentEntities 排除）不重复广播。
+ * 返回新增的观察记录。
+ */
+function propagateFactToCoPresent(
+  world: WorldDefinition,
+  state: WorldStateInstance,
+  factId: FactId,
+  atEntityId: EntityId
+): ObservationRecord[] {
+  const fact = world.groundTruthFacts.find(f => f.id === factId);
+  if (!fact || fact.visibilityScope === 'cosmic_truth') return [];
+  const records: ObservationRecord[] = [];
+  for (const w of coPresentEntities(state, atEntityId)) {
+    if (pushKnownFact(state, w, factId)) {
+      records.push({ observerId: w, factIdsRevealed: [factId], turn: state.clock.turnNumber });
+    }
+  }
+  return records;
 }
 
 function makeEventId(state: WorldStateInstance, type: string): string {
@@ -368,6 +393,12 @@ export function applyEvent(
           turn: next.clock.turnNumber,
         });
       }
+
+      // 观察闭环：公开话语披露 → 在场听者认知更新（W2 确定性短语判定；W3 代理循环）
+      const disclosed = opts.discloseFactResolver?.(world, event) ?? [];
+      for (const factId of disclosed) {
+        observations.push(...propagateFactToCoPresent(world, next, factId, event.actorId));
+      }
       break;
     }
 
@@ -380,6 +411,8 @@ export function applyEvent(
           turn: next.clock.turnNumber,
         });
       }
+      // 观察闭环：披露现场共现者广播（在场者知道 / 缺席者不知道）
+      observations.push(...propagateFactToCoPresent(world, next, event.factId, event.targetId));
       break;
     }
 
