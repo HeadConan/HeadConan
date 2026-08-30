@@ -1058,6 +1058,7 @@ export const SPY_FAMILY_INITIAL_STATE: WorldStateInstance = {
     seed: 0xc0ffee,
     nextSeq: 0
   },
+  scene: { current: 'everyday', inScene: {} },
   recentEvents: [
     {
       id: 'evt:sf:001',

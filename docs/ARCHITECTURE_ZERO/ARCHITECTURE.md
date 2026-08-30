@@ -38,6 +38,7 @@ Precise definitions (honesty rule):
 
 ## 3. Design Principles
 
+0. **LLM-first, State-grounded, Constraint-bounded** (POSITIONING.md §4). The LLM holds *interpretive authority* (what does it mean); the world holds *ontological authority* (what becomes true). Interpretation is a first-class stage between action and state change.
 1. **Single writer.** All state change enters through `applyEvent`. No exceptions, no Host bypass.
 2. **Projection-only reads.** UI, LLM context, and tools receive projections, never raw truth.
 3. **Recorded-input determinism.** Non-deterministic inputs (LLM, user, RNG) are recorded in the log; replay is deterministic.
@@ -189,22 +190,20 @@ Host = perspective (omniscient projection) + permission set (privileged `interve
 One action traced (user: "I secretly follow Yor"):
 
 ```
-USER INTENT
-  → intent interpretation (LLM proposes; deterministic entity/verb resolution; low-confidence → clarify)
-  → candidate event action(follow, target=yor, mode=covert)
-  → VALIDATE (deterministic: location, capability, permission, secrecy rules)   [sync, deterministic]
-  → applyEvent: effects (player location/activity; yor unaware)                 [sync, deterministic]
-  → observations: witnesses/visibility → knowledge updates (only via side-effects) [sync, deterministic]
-  → consequences queued (e.g., scheduled_trigger: yor's next contact)          [async, scheduler]
-  → log append (+ record LLM inputs if any)                                    [sync]
-  → derive: situation + significance + story fragment                         [derived]
-  → projectPerspective(player) → scene → UI plan → render                     [derived]
-  → world tick may interleave (other agents act; same kernel)                  [async]
+USER ACTION                                    ── interpretive authority (LLM)
+  → INTERPRETATION (first-class stage, POSITIONING.md §6)
+      what happened? what does it mean? who is affected? what may change?
+  → PROPOSED REALITY (candidate events / state / knowledge / observations)   [LLM + deterministic resolve]
+  → VALIDATE (deterministic: location, capability, permission, secrecy, continuity)  [sync, deterministic]
+  → WORLD COMMIT (applyEvent: effects + observations + consequences + log)   [sync, deterministic; ontological authority]
+  → derive: situation + significance + story fragment                       [derived]
+  → projectPerspective(player) → scene → UI plan → render                   [derived]
+  → world tick may interleave (other agents act; same kernel)               [async]
 ```
 
-**Sync/deterministic:** validate, transition, observe, log, replay.
+**Sync/deterministic:** validate, commit, observe, log, replay.
 **Async:** scheduler, world tick.
-**Probabilistic/LLM:** intent interpretation, character dialogue, prose. All recorded.
+**Interpretive (LLM):** meaning/interpretation, intent, character dialogue, prose. All *recorded* — the LLM imagines the next possible reality; the world decides whether to remember it (POSITIONING.md §5, §8).
 
 ---
 

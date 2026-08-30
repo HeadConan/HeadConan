@@ -738,6 +738,7 @@ export const GAME_OF_THRONES_INITIAL_STATE: WorldStateInstance = {
     seed: 0xc0ffee,
     nextSeq: 0
   },
+  scene: { current: 'everyday', inScene: {} },
   recentEvents: [],
   eventChronicleLog: []
 };

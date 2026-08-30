@@ -21,8 +21,9 @@ import { spyFamilyRelationResolver, spyFamilyRoleOf, spyFamilyReaction } from '.
 import { instantiate } from '../world/runtime/instantiate';
 import { applyEvent, tickScheduler, type KernelOptions, type KernelEvent } from '../world/runtime/kernel2';
 import { resolveUserAction, resolveDirectorAction } from '../world/runtime/kernel2Resolver';
+import { deriveScene, type SceneIntentHint } from '../world/runtime/scene';
 import { projectLegacyWorld } from '../world/runtime/legacyAdapter';
-import type { WorldStateInstance } from '../world/representation/types/state';
+import type { WorldStateInstance, SceneType } from '../world/representation/types/state';
 import type { EntityId } from '../world/representation/types/primitives';
 
 const KERNEL_OPTS: KernelOptions = {
@@ -78,6 +79,13 @@ function isWorldStateInstance(v: unknown): v is WorldStateInstance {
 function entityName(id: string): string {
   return SPY_FAMILY_MIN.characters.find(c => c.id === id)?.name ?? id;
 }
+
+const SCENE_LABELS: Record<SceneType, string> = {
+  conversation: '对话',
+  everyday: '日常',
+  exploration: '探索',
+  world_editing: '世界编辑',
+};
 
 export const App: React.FC = () => {
   // App Phase: 'prompt' | 'genesis' | 'workspace'
@@ -148,7 +156,7 @@ export const App: React.FC = () => {
     return displayWorld.roles.find(r => r.id === activeRoleId) || displayWorld.roles[0];
   }, [displayWorld, activeRoleId]);
 
-  // Compute UI Plan dynamically from Projected World State + Role Slot
+  // Compute UI Plan dynamically from Projected World State + Role Slot + Scene
   const activeUiPlan: UIPlanning = useMemo(() => {
     if (!displayWorld) {
       return { activeLayout: 'workspace', suggestedInteractions: [], blocks: [] };
@@ -156,8 +164,9 @@ export const App: React.FC = () => {
     return computeUIPlan(displayWorld, {
       activeRole,
       isDirectorOverlayActive: isDirectorOverlayOpen,
+      scene: kernelState?.scene.current, // W3.1：场景驱动界面重组
     });
-  }, [displayWorld, activeRole, isDirectorOverlayOpen]);
+  }, [displayWorld, activeRole, isDirectorOverlayOpen, kernelState?.scene.current]);
 
   // Load initial local storage if present
   useEffect(() => {
@@ -172,6 +181,10 @@ export const App: React.FC = () => {
           // W2.1: 旧 v3 快照无 scheduler 字段 → 补默认，避免恢复后 tickScheduler 崩溃
           if (!parsed.scheduler) {
             parsed.scheduler = { queue: [], budgetPerTurn: 3, seed: 0xc0ffee, nextSeq: 0 };
+          }
+          // W3.1: 旧快照无 scene 字段 → 补默认场景
+          if (!parsed.scene) {
+            parsed.scene = { current: 'everyday', inScene: {} };
           }
           setKernelState(parsed);
           if (savedChronicle) setChronicle(JSON.parse(savedChronicle));
@@ -273,6 +286,7 @@ export const App: React.FC = () => {
       const isDirector = observerEntityId === null || isDirectorOverlayOpen;
       const parts: string[] = [];
       let next = kernelState;
+      let sceneHint: SceneIntentHint | undefined;
 
       if (isDirector) {
         const d = resolveDirectorAction(action, SPY_FAMILY_MIN);
@@ -287,6 +301,7 @@ export const App: React.FC = () => {
         }
       } else {
         const resolved = resolveUserAction(action, SPY_FAMILY_MIN, observerEntityId as EntityId, next);
+        sceneHint = resolved.sceneHint;
         if (resolved.confidence < 0.85) {
           parts.push('（未识别为具体指令，已当作对约尔的一句闲聊）');
         }
@@ -308,6 +323,9 @@ export const App: React.FC = () => {
         if (last) parts.push(`[世界] ${last.description}`);
         if (r.rejected && r.reason) parts.push(`[世界拒绝] ${r.reason}`);
       }
+
+      // W3.1：场景推导（用户意图 + 地点节奏 + 导演视角）
+      next.scene = deriveScene(SPY_FAMILY_MIN, next, observerEntityId, sceneHint);
 
       setKernelState(next);
       const narrative = parts.join('\n');
@@ -478,6 +496,19 @@ export const App: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {/* W3.1: 场景徽标（当前场景 + 切换原因） */}
+            <div className="mb-4 flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1 font-mono text-[11px] uppercase tracking-wider text-zinc-600 shadow-sm">
+                <span className="size-1.5 rounded-full bg-zinc-900" />
+                场景 · {SCENE_LABELS[kernelState.scene.current]}
+              </span>
+              {kernelState.scene.lastTransition && (
+                <span className="text-[11px] text-zinc-400">
+                  {kernelState.scene.lastTransition.reason}（Turn #{kernelState.scene.lastTransition.turn}）
+                </span>
+              )}
+            </div>
 
             {/* Dynamic Composition Surface (World Canvas Renderer) */}
             <WorldCanvasRenderer

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>World Model Phase 1 — MD3 Review</title>
+<style>
+:root{
+  --md-primary:#6750A4; --md-on-primary:#FFFFFF;
+  --md-primary-container:#EADDFF; --md-on-primary-container:#21005D;
+  --md-secondary:#625B71; --md-secondary-container:#E8DEF8; --md-on-secondary-container:#1D192B;
+  --md-tertiary:#7D5260; --md-tertiary-container:#FFD8E4; --md-on-tertiary-container:#31111D;
+  --md-error:#B3261E; --md-error-container:#F9DEDC;
+  --md-surface:#FEF7FF; --md-surface-dim:#DED8E1; --md-surface-container-lowest:#FFFFFF;
+  --md-surface-container:#F3EDF7; --md-surface-container-high:#ECE6F0; --md-surface-variant:#E7E0EC;
+  --md-on-surface:#1D1B20; --md-on-surface-variant:#49454F; --md-outline:#79747E; --md-outline-variant:#CAC4D0;
+  --md-inverse-surface:#322F35;
+  --shadow-1:0 1px 2px rgba(0,0,0,.3),0 1px 3px 1px rgba(0,0,0,.15);
+  --shadow-2:0 1px 2px rgba(0,0,0,.3),0 2px 6px 2px rgba(0,0,0,.15);
+  --radius-card:16px; --radius-chip:8px; --radius-sheet:28px;
+  --state-primary:color-mix(in srgb,var(--md-primary) 8%,transparent);
+  --state-primary-strong:color-mix(in srgb,var(--md-primary) 12%,transparent);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--md-surface);color:var(--md-on-surface);
+  line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:960px;margin:0 auto;padding:0 20px 120px}
+/* app bar */
+.appbar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--md-surface) 88%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--md-outline-variant)}
+.appbar-inner{max-width:960px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.2px}
+.brand-dot{width:30px;height:30px;border-radius:10px;background:var(--md-primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.chip{font:500 13px/1 Roboto,sans-serif;color:var(--md-on-surface-variant);text-decoration:none;border:1px solid var(--md-outline-variant);border-radius:var(--radius-chip);padding:8px 14px;background:var(--md-surface);transition:background .15s}
+.chip:hover{background:var(--state-primary)}
+.chip-active{background:var(--md-secondary-container);color:var(--md-on-secondary-container);border-color:transparent}
+/* hero */
+.hero{background:var(--md-surface-container);border-radius:var(--radius-sheet);padding:40px 32px;margin:28px 0 24px;box-shadow:var(--shadow-1)}
+.hero .eyebrow{color:var(--md-primary);font:700 12px/1.6 Roboto,sans-serif;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px}
+.hero h1{font:400 40px/1.2 Roboto,sans-serif;letter-spacing:-.5px;margin-bottom:10px}
+.hero .lede{color:var(--md-on-surface-variant);font-size:16px;max-width:70ch}
+/* sections as cards */
+section.md-card{background:var(--md-surface-container-lowest);border:1px solid var(--md-outline-variant);border-radius:var(--radius-card);padding:30px 32px;margin:24px 0;box-shadow:var(--shadow-1)}
+h2{font:400 26px/1.3 Roboto,sans-serif;letter-spacing:0;margin-bottom:6px;color:var(--md-on-surface)}
+h2 .sec-no{display:inline-flex;min-width:30px;height:30px;border-radius:10px;background:var(--md-primary-container);color:var(--md-on-primary-container);align-items:center;justify-content:center;font-size:14px;font-weight:600;margin-right:12px;vertical-align:middle}
+h3{font:500 19px/1.4 Roboto,sans-serif;color:var(--md-on-surface);margin:26px 0 10px}
+h4{font:500 15px/1.4 Roboto,sans-serif;margin:20px 0 8px;color:var(--md-on-surface)}
+p{margin:12px 0;color:var(--md-on-surface)}
+strong{font-weight:600}
+ul,ol{margin:10px 0;padding-left:24px}
+li{margin:5px 0}
+li::marker{color:var(--md-primary)}
+code{font:500 13px/1.5 "Roboto Mono",ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--md-surface-variant);border-radius:6px;padding:2px 6px;color:var(--md-on-surface)}
+pre{background:var(--md-surface-container-high);border:1px solid var(--md-outline-variant);border-radius:12px;padding:18px 20px;overflow-x:auto;margin:14px 0}
+pre code{background:none;padding:0;font:400 13px/1.6 "Roboto Mono",ui-monospace,monospace}
+table{border-collapse:separate;border-spacing:0;width:100%;margin:16px 0;font-size:14px;overflow:hidden;border-radius:12px;border:1px solid var(--md-outline-variant)}
+th,td{padding:12px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--md-outline-variant)}
+thead th{background:var(--md-secondary-container);color:var(--md-on-secondary-container);font-weight:600}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--state-primary)}
+blockquote{background:var(--md-primary-container);border-radius:12px;padding:16px 20px;margin:16px 0;border-left:4px solid var(--md-primary)}
+blockquote p{margin:4px 0;color:var(--md-on-primary-container)}
+hr{border:none;border-top:1px solid var(--md-outline-variant);margin:28px 0}
+/* verdict cards */
+.verdict-card{border-radius:var(--radius-card);padding:22px 24px;margin:14px 0;border:1px solid var(--md-outline-variant)}
+.verdict-now{background:var(--md-primary-container)}
+.verdict-now .vt{color:var(--md-on-primary-container);font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:12px}
+.verdict-next{background:var(--md-secondary-container)}
+.verdict-next .vt{color:var(--md-on-secondary-container);font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:12px}
+.verdict-no{background:var(--md-error-container)}
+.verdict-no .vt{color:var(--md-error);font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:12px}
+/* FAB */
+.fab{position:fixed;right:26px;bottom:26px;width:56px;height:56px;border-radius:16px;background:var(--md-primary-container);color:var(--md-on-primary-container);border:none;box-shadow:var(--shadow-2);font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:box-shadow .15s}
+.fab:hover{box-shadow:0 3px 3px -1px rgba(0,0,0,.3),0 6px 12px 2px rgba(0,0,0,.2)}
+@media(max-width:640px){.hero h1{font-size:32px}.hero{padding:28px 22px}section.md-card{padding:24px 20px}.chips{display:none}}
+</style>
+</head>
+<body>
+<div class="appbar">
+  <div class="appbar-inner">
+    <div class="brand"><span class="brand-dot">H</span> HeadConan · World Model Phase 1</div>
+    <div class="chips"><a class="chip" href="#a-the-10-minute-experience">A. The 10-Minute Experience</a><a class="chip" href="#b-reality-moments">B. Reality Moments</a><a class="chip" href="#c-reverse-engineering">C. Reverse Engineering</a><a class="chip" href="#d-proposed-minimum-model">D. Proposed Minimum Model</a><a class="chip" href="#e-what-we-should-not-build">E. What We Should NOT Build</a><a class="chip" href="#f-open-questions">F. Open Questions</a><a class="chip" href="#final-recommendation">Final Recommendation</a></div>
+  </div>
+</div>
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">Design Review · Anti-Overengineering</div>
+    <h1>World Model Phase 1</h1>
+    <p class="lede">从 10 分钟体验出发，反推最小世界模型——5 个概念，16 项不构建。设计评审（Material 3 风格审阅版）。</p>
+  </header>
+  <section class="md-card" id="a-the-10-minute-experience"><h2><span class="sec-no">01</span>A. The 10-Minute Experience</h2><h2 id="a-the-10-minute-experience">A. The 10-Minute Experience</h2>
+<p>The user enters a world through one sentence: <em>"A family breakfast where one member is secretly an assassin."</em> The system starts them at a table. (SPY × FAMILY, Loid's first person — but the structure generalizes.)</p>
+<p><strong>0:00 — Enter.</strong> A short description: a living room, a woman pouring tea, a child watching TV. The user is told who they are, where they are, who is present. Two or three things they could do are shown. No tutorial.</p>
+<p><strong>0:40 — Talk.</strong> The user compliments Yor. She reacts warmly — <em>slightly</em> awkwardly. The user feels the moment was noticed, not scripted.</p>
+<p><strong>2:00 — Ask.</strong> The user asks where Yor was last night. Her answer is a little too fast; the description of her hands tightens on the cup. The user thinks: <em>she's hiding something.</em></p>
+<p><strong>3:30 — Interrupt.</strong> Anya, unprompted, says something that only makes sense if she knows more than a child should. Yor laughs it off. The user files it away.</p>
+<p><strong>4:30 — Decide.</strong> The user decides to follow Yor tonight instead of going to work. The story does not object; it just notes the plan.</p>
+<p><strong>6:00 — Follow.</strong> The scene shifts to evening streets. The user tails Yor and sees her meet a shadowed contact. The user gains one concrete fact: <em>Yor is not what she says.</em></p>
+<p><strong>7:30 — Consequences recur.</strong> Back at the breakfast table, Yor is distant and guarded. The user's earlier question and the tailing are both <em>present in the room</em>. The user thinks: <em>this world remembers what I did.</em></p>
+<p><strong>9:30 — Discovery.</strong> A drawer the user opens contains a record that confirms the suspicion — information they were not supposed to have at the start. The user leaves with a secret and knows they know it.</p>
+<p><strong>Feeling:</strong> <em>I entered a world that exists beyond this AI's response.</em></p>
+<hr />
+</section><section class="md-card" id="b-reality-moments"><h2><span class="sec-no">02</span>B. Reality Moments</h2><h2 id="b-reality-moments">B. Reality Moments</h2>
+<p>The moments that make the world feel alive, ranked by importance (not by feature value — by how much they create the "world exists" feeling):</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Moment</th>
+<th>User's thought</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Yor reacts differently at 7:30 because of what happened at 2:00 and 6:00</td>
+<td><em>"This world remembered what I did."</em></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Anya knows something Loid doesn't, and it leaks through her behavior</td>
+<td><em>"This character knows something I don't."</em></td>
+</tr>
+<tr>
+<td>3</td>
+<td>Following Yor produces a <em>new fact</em> the user didn't start with</td>
+<td><em>"I discovered something real."</em></td>
+</tr>
+<tr>
+<td>4</td>
+<td>The user's choice (follow vs. not) changes later scenes, visibly</td>
+<td><em>"My decision changed something."</em></td>
+</tr>
+<tr>
+<td>5</td>
+<td>The user learns they are holding a secret others don't know they hold</td>
+<td><em>"There is information asymmetry and I'm inside it."</em></td>
+</tr>
+<tr>
+<td>6</td>
+<td>The world acknowledges absence/downtime (what happened while I wasn't looking)</td>
+<td><em>"The world continues without me."</em> (weakest — defer)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Ranking note:</strong> #6 is consciously deferred. It is the least load-bearing for the 10-minute loop and the most expensive.</p>
+<hr />
+</section><section class="md-card" id="c-reverse-engineering"><h2><span class="sec-no">03</span>C. Reverse Engineering</h2><h2 id="c-reverse-engineering">C. Reverse Engineering</h2>
+<p>For each important reality moment: experience → behavior → information → state → capability.</p>
+<table>
+<thead>
+<tr>
+<th>Moment</th>
+<th>Required behavior</th>
+<th>Required information</th>
+<th>Minimum state</th>
+<th>Minimum capability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Memory of actions</td>
+<td>Later scenes reference earlier user actions and their effects</td>
+<td>What the user did, in order</td>
+<td>A <strong>causal record</strong> of actions + their effects</td>
+<td>Append-only <strong>event log</strong>; the log <em>is</em> the memory</td>
+</tr>
+<tr>
+<td>2. Knowledge asymmetry</td>
+<td>A character behaves as if knowing something the player doesn't</td>
+<td>Which facts each observer actually knows</td>
+<td>Per-observer set of <strong>known facts</strong></td>
+<td><strong>Known-facts sets</strong> per observer, distinct from truth</td>
+</tr>
+<tr>
+<td>3. Discovery of new facts</td>
+<td>Following / searching yields facts the user didn't start with</td>
+<td>The world contains facts not yet revealed to the user</td>
+<td>Facts with a <strong>visibility</strong> label vs. the observer's known set</td>
+<td>A fact exists independently of who knows it</td>
+</tr>
+<tr>
+<td>4. Choices change later scenes</td>
+<td>Consequences of a decision appear again later</td>
+<td>What the decision was, and its effect</td>
+<td>The event log (again) + changed state (location/activity/relationship)</td>
+<td>Consequences are real state changes, not text</td>
+</tr>
+<tr>
+<td>5. Holding a secret</td>
+<td>The user knows something others don't, and it stays hidden</td>
+<td>Who knows what, per fact</td>
+<td>Known-facts sets + projection</td>
+<td><strong>Projection</strong> is the only read path (no leaks)</td>
+</tr>
+<tr>
+<td>6. World continues (deferred)</td>
+<td>Off-screen events exist on return</td>
+<td>What happened while absent</td>
+<td>Scheduled events / world tick</td>
+<td><strong>Deferred to TEST NEXT</strong> — not required for the loop</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Pattern in the table:</strong> everything reduces to four things — <em>what is true</em> (state), <em>what happened</em> (events), <em>who knows what</em> (knowledge), and <em>who is looking</em> (projection). Nothing else appears.</p>
+<hr />
+</section><section class="md-card" id="d-proposed-minimum-model"><h2><span class="sec-no">04</span>D. Proposed Minimum Model</h2><h2 id="d-proposed-minimum-model">D. Proposed Minimum Model</h2>
+<p>Five concepts survive the deletion test. Every other concept in the design vocabulary was either merged into these, stored as ordinary state, or deleted.</p>
+<h3 id="1-world-definition">1. World Definition</h3>
+<ul>
+<li><strong>Purpose:</strong> the <em>content</em> of a world — who/what exists, initial facts, initial relationships, the opening situation text.</li>
+<li><strong>What user experience requires it:</strong> without a definition, there is no world to enter; the "table, tea, TV" opening is authored content.</li>
+<li><strong>What breaks without it:</strong> nothing to instantiate; every session would start from nothing.</li>
+<li><strong>Why it cannot be derived from another concept:</strong> it is the input, not a computation.</li>
+<li><strong>Deliberate minimalism:</strong> it is <strong>plain data</strong>, not a schema system. No ontology, no typed-category taxonomy, no rules engine. Fields are whatever the slice needs (a character has: name, description, location, one relationship value, initial known-facts). <em>Do not design a universal schema.</em></li>
+</ul>
+<h3 id="2-world-instance-the-state">2. World Instance (the state)</h3>
+<ul>
+<li><strong>Purpose:</strong> "what is true right now" — one mutable object: entity locations/activities, relationship values (a small set of scalars like affinity/trust/suspicion), each observer's known-facts.</li>
+<li><strong>What user experience requires it:</strong> "Yor is distant and guarded at 7:30" must be <em>true</em> now because of earlier events.</li>
+<li><strong>What breaks without it:</strong> the world cannot change; every turn would re-roll from scratch.</li>
+<li><strong>Why it cannot be derived from another concept:</strong> it is the projection target of the log — recomputable, but you need the current value at all times; the log is the <em>why</em>, the instance is the <em>what is</em>.</li>
+<li><strong>Deliberate minimalism:</strong> entities, relationships, and knowledge are <strong>fields inside the instance</strong>, not separate subsystems. No graph database, no ECS, no entity registry.</li>
+</ul>
+<h3 id="3-fact-with-visibility">3. Fact (with visibility)</h3>
+<ul>
+<li><strong>Purpose:</strong> an atomic truth ("Yor is Thorn Princess") that exists independently of who knows it, labeled with a visibility scope (secret → public).</li>
+<li><strong>What user experience requires it:</strong> discovery (moment 3) and holding-a-secret (moment 5) both require facts that exist <em>unrevealed</em>.</li>
+<li><strong>What breaks without it:</strong> secrets, misunderstanding, and discovery collapse; "I found out something real" becomes fake.</li>
+<li><strong>Why it cannot be derived from another concept:</strong> truth ≠ knowledge. A fact can be true while zero observers know it; visibility ≠ actual knowledge (a character may know a secret but never tell).</li>
+<li><strong>Deliberate minimalism:</strong> one visibility label per fact is enough for the slice. Do not build an access-control lattice or an epistemic logic engine.</li>
+</ul>
+<h3 id="4-event-the-log">4. Event (the log)</h3>
+<ul>
+<li><strong>Purpose:</strong> the record of every change — "the user asked, Yor answered, the user followed, a fact was revealed". The only writer of the instance.</li>
+<li><strong>What user experience requires it:</strong> memory of actions (moment 1) and choices affecting later scenes (moment 4) both require a causal record that persists across turns.</li>
+<li><strong>What breaks without it:</strong> the world forgets; consequences cannot be explained or replayed; debugging is impossible.</li>
+<li><strong>Why it cannot be derived from another concept:</strong> it is the <em>causal</em> dimension that state alone lacks (state says <em>what</em>, log says <em>why</em> and <em>in what order</em>).</li>
+<li><strong>Deliberate minimalism:</strong> an append-only array of events with a small payload. <strong>No event-sourcing framework, no CQRS, no bitemporal database.</strong> A plain list is the whole mechanism.</li>
+</ul>
+<h3 id="5-projection">5. Projection</h3>
+<ul>
+<li><strong>Purpose:</strong> "what a given observer may see right now" — the only read path. Produces: a short situation description, the visible facts, who is present, and a small set of valid actions.</li>
+<li><strong>What user experience requires it:</strong> knowledge asymmetry (moment 2) and no-leak (moment 5) both require that the user/UI/LLM see the world <em>through</em> an observer, never raw truth.</li>
+<li><strong>What breaks without it:</strong> epistemic leakage; a character's "knowledge" becomes decorative; the player sees what they shouldn't.</li>
+<li><strong>Why it cannot be derived from another concept:</strong> it is the <em>function</em> that turns state + observer into experience; without it nothing can be shown safely.</li>
+<li><strong>Deliberate minimalism:</strong> Projection absorbs <strong>Perspective, Experience, and Scene</strong> (they are parameters and outputs of this function, not stored systems). No significance engine, no scene state machine.</li>
+</ul>
+<p><strong>What got merged/deleted in this pass:</strong>
+- Perspective, Experience, Role, Scene, Situation → parameters/outputs of <strong>Projection</strong>.
+- Character, Entity, Relationship, Resource → <strong>ordinary fields of the Instance</strong>.
+- Rules, Rules Engine → <strong>validation logic inside the event writer</strong>, not a separate subsystem.
+- Knowledge boundary "system" → the <strong>known-facts sets + Projection</strong> (no logic engine).
+- Significance, salience, scheduler, NPC autonomy, drama manager → <strong>DO NOT BUILD YET</strong> (below).</p>
+<hr />
+</section><section class="md-card" id="e-what-we-should-not-build"><h2><span class="sec-no">05</span>E. What We Should NOT Build</h2><h2 id="e-what-we-should-not-build">E. What We Should NOT Build</h2>
+<p>Aggressive list of tempting abstractions, deliberately postponed. Reason = "what user experience breaks if we postpone it" → answer: none in the 10-minute loop.</p>
+<table>
+<thead>
+<tr>
+<th>Abstraction</th>
+<th>Why it's tempting</th>
+<th>Why postpone</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Universal world schema / ontology</td>
+<td>"Every world is different"</td>
+<td>The slice needs ~4 fields per character; a schema system serves no current experience. Write plain data.</td>
+</tr>
+<tr>
+<td>Rules / storylet engine</td>
+<td>"Clean causality"</td>
+<td>Validation is a few <code>if</code>s in the event writer. Extract only after a second world repeats the pattern.</td>
+</tr>
+<tr>
+<td>Event-sourcing framework / CQRS / bitemporal DB</td>
+<td>"Audit &amp; time travel"</td>
+<td>An append-only array delivers memory + replay for the slice. Add machinery only when the log becomes a bottleneck.</td>
+</tr>
+<tr>
+<td>Scene state machine</td>
+<td>"Interfaces differ per world"</td>
+<td>Scene = output of Projection. If the UI needs scene <em>states</em>, that's a UI problem, discovered by testing.</td>
+</tr>
+<tr>
+<td>Significance / salience engine</td>
+<td>"What matters right now"</td>
+<td>The slice can use "present observers + focus" heuristics. No new layer.</td>
+</tr>
+<tr>
+<td>Scheduler / world tick</td>
+<td>"World keeps living"</td>
+<td>Reality moment #6 is deferred; the 10-minute loop is player-driven.</td>
+</tr>
+<tr>
+<td>NPC autonomy loop</td>
+<td>"Believable characters"</td>
+<td>Reactions (prompt-based, grounded in the NPC's known-facts) are enough; full autonomy is a later experiment.</td>
+</tr>
+<tr>
+<td>Knowledge access lattice / epistemic logic</td>
+<td>"Precise secrecy"</td>
+<td>One visibility label + known-facts sets already yields secrets, irony, deception.</td>
+</tr>
+<tr>
+<td>Relationship/psychology simulation</td>
+<td>"Deep NPCs"</td>
+<td>A handful of scalars (affinity/trust/suspicion) suffices; simulate only if the user demands more.</td>
+</tr>
+<tr>
+<td>Memory system (semantic/vector)</td>
+<td>"Remembering across sessions"</td>
+<td>The event log <em>is</em> memory for the session. Cross-session memory is a different product question.</td>
+</tr>
+<tr>
+<td>World editor / Host tools</td>
+<td>"Players create worlds"</td>
+<td>The definition is a text file; editing can wait until authoring is an observed need.</td>
+</tr>
+<tr>
+<td>Multi-world / multi-user / scale</td>
+<td>"The platform"</td>
+<td>Optimizing for 2+ worlds before one world feels real is premature (Trap D: causal depth &gt; content volume).</td>
+</tr>
+<tr>
+<td>Plot / quest / drama-manager engine</td>
+<td>"Guarantee good stories"</td>
+<td>Story is an emergent consequence (VISION.md); a curator layer belongs to a later, evidence-driven phase.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+</section><section class="md-card" id="f-open-questions"><h2><span class="sec-no">06</span>F. Open Questions</h2><h2 id="f-open-questions">F. Open Questions</h2>
+<p>Uncertainties that theory cannot settle. Each has the smallest experiment that resolves it.</p>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Smallest experiment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Q1. Do NPC knowledge boundaries need an <em>explicit</em> known-facts model, or is prompt-only enough?</td>
+<td>Create one secret shared asymmetrically between three characters; let the user probe each. If prompt-only reliably leaks or forgets within 5 probes, the explicit model is required (expected: it leaks).</td>
+</tr>
+<tr>
+<td>Q2. Do relationship values need <em>explicit scalar state</em>, or can the LLM track them from context?</td>
+<td>Compliment a character, then ask an unrelated question 3 turns later about how they feel. If the LLM doesn't consistently recall the earlier interaction, explicit scalars are required.</td>
+</tr>
+<tr>
+<td>Q3. Is a single visibility label (secret/public) enough, or do we need graded levels?</td>
+<td>Author two secrets with different exposure rules (one known to a bystander, one not). If the single label can't express the cases users actually probe, add one more level.</td>
+</tr>
+<tr>
+<td>Q4. Is the <em>event log</em> necessary, or would a natural-language "session summary" give the same memory?</td>
+<td>Run the same 10-minute experience twice: once with a structured log as memory, once with a prose summary as memory. Compare consequence consistency (does the world reference the right details in the right order?).</td>
+</tr>
+<tr>
+<td>Q5. Does the world need to acknowledge off-screen time for the loop to feel real?</td>
+<td>Ship without it; after 3 user sessions, check whether anyone says "nothing happened while I was away". Only then build a scheduler.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+</section><section class="md-card" id="final-recommendation"><h2><span class="sec-no">07</span>Final Recommendation</h2><h2 id="final-recommendation">Final Recommendation</h2>
+<p><strong>BUILD NOW</strong>
+- The 5-concept model: <strong>World Definition</strong> (plain data) + <strong>World Instance</strong> (state) + <strong>Fact</strong> (visibility) + <strong>Event</strong> (append-only log, only writer) + <strong>Projection</strong> (only read path).
+- One concrete slice (SPY × FAMILY breakfast) implementing: talk → ask → decide → follow → discover → consequences recur.
+- The event writer, the projection function, and the known-facts sets. No other subsystem.</p>
+<p><strong>TEST NEXT</strong>
+- Q1 experiment: explicit known-facts vs. prompt-only knowledge boundaries (expect: prompt-only leaks).
+- Q2 experiment: explicit relationship scalars vs. LLM-from-context (expect: scalars needed).
+- Q4 experiment: structured event log vs. prose summary as memory (expect: log wins on consistency).
+- Reality moment #6 (world continues without you) — only if user sessions demand it.</p>
+<p><strong>DO NOT BUILD YET</strong>
+- Universal schema / ontology · rules engine · event-sourcing framework · CQRS · bitemporal DB · scene state machine · significance engine · scheduler/world-tick · NPC autonomy loop · knowledge access lattice · psychology simulation · memory system · world editor · multi-world/multi-user · plot/quest/drama-manager · graph database.</p>
+<blockquote>
+<p>The 10-minute experience demands exactly four data shapes — <em>state, events, facts+knowledge, projection</em> — and one content file. Everything else is architecture waiting for evidence.</p>
+</blockquote></section>
+</div>
+<button class="fab" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="返回顶部">↑</button>
+</body>
+</html>

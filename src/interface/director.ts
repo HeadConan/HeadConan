@@ -1,18 +1,21 @@
 import { WorldState, UIBlock, UIPlanning } from '../world/types';
 import { RoleSlot } from '../roles/model';
+import type { SceneType } from '../world/representation/types/state';
 import { DIRECTOR_REVEAL_DIRECTIVES } from '../world/spyFamily/spyFamilyMin';
 
 export interface UIDirectorOptions {
   activeRole: RoleSlot;
   focusedEntityId?: string;
   isDirectorOverlayActive?: boolean;
+  /** W3.1：当前场景类型（conversation→角色主面 / exploration→地图主面） */
+  scene?: SceneType;
 }
 
 export function computeUIPlan(
   world: WorldState,
   options: UIDirectorOptions
 ): UIPlanning {
-  const { activeRole, isDirectorOverlayActive } = options;
+  const { activeRole, isDirectorOverlayActive, scene } = options;
   const style = world.style;
   const isDirector = activeRole.type === 'DIRECTOR' || activeRole.type === 'ARCHITECT' || isDirectorOverlayActive;
   const isObserver = activeRole.type === 'OBSERVER';
@@ -21,7 +24,30 @@ export function computeUIPlan(
   const maxSurfaces = style.attentionBudget?.maxVisibleSurfaces || 6;
 
   // 1. Primary Centerpiece Surface according to World Grammar
-  if (style.primarySurfaceType === 'evidence-board' && world.clues && world.clues.length > 0) {
+  //    W3.1：场景驱动主面——conversation 以角色为主面，exploration 以地图为主面
+  if (scene === 'conversation' && world.characters && world.characters.length > 0) {
+    plannedBlocks.push({
+      id: 'surface-characters-main',
+      type: 'character',
+      title: style.visualLanguage === 'archival-investigative'
+        ? 'Suspects & Persons of Interest'
+        : style.visualLanguage === 'personal-social'
+        ? 'Social Circle & Active Encounters'
+        : 'Imperial Cabinet & Key Figures',
+      priority: 'primary',
+      colSpan: 2,
+    });
+  } else if (scene === 'exploration' && world.locations && world.locations.length > 0) {
+    plannedBlocks.push({
+      id: 'surface-tactical-map',
+      type: 'map',
+      title: style.visualLanguage === 'institutional-bureaucratic'
+        ? 'Strategic Theater & Garrison Territories'
+        : 'Spatial Layout & Key Locations',
+      priority: 'primary',
+      colSpan: 2,
+    });
+  } else if (style.primarySurfaceType === 'evidence-board' && world.clues && world.clues.length > 0) {
     plannedBlocks.push({
       id: 'surface-evidence-board',
       type: 'evidence-board',

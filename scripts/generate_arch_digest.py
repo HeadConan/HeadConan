@@ -19,10 +19,11 @@ OUT = ROOT / "docs" / "ARCHITECTURE_ZERO" / "ARCHITECTURE_DIGEST.html"
 
 GROUPS = [
     {
-        "name": "产品定位 — Product Vision",
+        "name": "产品定位 — Positioning & Vision",
         "accent": "yellow",
         "files": [
-            ("VISION.md — 定位与愿景（防漂移权威文件）", "docs/VISION.md", True),
+            ("POSITIONING.md — 官方定位（AI-native imagined world engine）", "docs/POSITIONING.md", True),
+            ("VISION.md — 愿景与品牌（Imagination Runtime）", "docs/VISION.md", True),
         ],
     },
     {
@@ -32,6 +33,7 @@ GROUPS = [
             ("ARCHITECTURE.md — 24 节实施就绪架构", "docs/ARCHITECTURE_ZERO/ARCHITECTURE.md", True),
             ("RESEARCH_LOG.md — 研究日志与证据表", "docs/ARCHITECTURE_ZERO/RESEARCH_LOG.md", False),
             ("ARCHITECTURE_MIGRATION.md — 代码迁移图", "docs/ARCHITECTURE_ZERO/ARCHITECTURE_MIGRATION.md", False),
+            ("WORLD_MODEL_PHASE1.md — 最小世界模型反过度工程评审", "docs/WORLD_MODEL_PHASE1.md", True),
         ],
     },
     {

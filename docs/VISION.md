@@ -4,6 +4,8 @@
 > If any other document contradicts it, that document is drifting — fix it, not this file.
 > Written 2026-08-29. Keep this file updated whenever the positioning changes.
 
+> **UPDATE (2026-08-30):** an official, authoritative positioning document now exists at **[`docs/POSITIONING.md`](POSITIONING.md)** — *HeadConan is an **AI-native imagined world engine** (LLM-first, State-grounded, Constraint-bounded)*. This file remains the **brand/vision layer** (Imagination Runtime framing, World × Agency × Perspective, Make imagination executable). Where the two differ in wording, **POSITIONING.md wins**; this file carries the vision language. The core formula below (World × Agency × Perspective) maps 1:1 onto POSITIONING.md §1–3, §11.
+
 ---
 
 ## One-Line Definition

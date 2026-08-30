@@ -57,6 +57,18 @@ export interface SchedulerState {
   nextSeq: number;            // 确定性 ID 序号
 }
 
+/** 场景类型（W3.1）：玩家"当下在做什么"的体验配置 */
+export type SceneType = 'conversation' | 'everyday' | 'exploration' | 'world_editing';
+
+/** 场景状态（W3.1）：可序列化，随快照持久化，刷新后场景与场景内状态不丢 */
+export interface SceneState {
+  current: SceneType;
+  /** 场景内可序列化状态（对话轮次、聚焦对象、已收集线索） */
+  inScene: Record<string, unknown>;
+  /** 上次切换原因（可解释性：玩家视角 = 叙事线索 + UI 过渡） */
+  lastTransition?: { from: SceneType; to: SceneType; reason: string; turn: number };
+}
+
 export interface WorldStateInstance {
   instanceId: string;
   definitionId: string;
@@ -76,6 +88,9 @@ export interface WorldStateInstance {
   
   // W2: 世界自发事件调度（延迟/周期/概率级联）
   scheduler: SchedulerState;
+
+  // W3.1: 场景状态机（玩家"当下在做什么"；可序列化）
+  scene: SceneState;
   
   // History & Incidents
   recentEvents: SimulationEvent[];

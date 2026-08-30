@@ -15,6 +15,7 @@ import type { WorldDefinition } from '../representation/types/definition';
 import type { WorldStateInstance } from '../representation/types/state';
 import type { EntityId } from '../representation/types/primitives';
 import type { KernelEvent, SpeechIntentTag } from './kernel2';
+import type { SceneIntentHint } from './scene';
 import { SPYF } from '../spyFamily/spyFamilyMin';
 
 export interface ResolvedKernelAction {
@@ -25,6 +26,8 @@ export interface ResolvedKernelAction {
   resolution: string;
   /** 无需内核写入的提示（如导演通道的未支持说明） */
   notice?: string;
+  /** W3.1：场景切换意图（travel→exploration / talk→conversation / inspect→exploration） */
+  sceneHint?: SceneIntentHint;
 }
 
 export interface ResolvedDirectorAction {
@@ -98,6 +101,7 @@ export function resolveUserAction(
       events,
       confidence: 1,
       resolution: `意图=检查钢笔（${atCorridor ? '已在走廊' : '先前往走廊'}）。`,
+      sceneHint: { type: 'inspect' },
     };
   }
 
@@ -108,6 +112,7 @@ export function resolveUserAction(
       events: [{ type: 'action', actionId: 'act:spyf:travel', actorId, targetIds: [loc] }],
       confidence: 1,
       resolution: `意图=前往 ${loc}。`,
+      sceneHint: { type: 'travel', targetId: loc },
     };
   }
 
@@ -126,6 +131,7 @@ export function resolveUserAction(
       events: [{ type: 'action', actionId: 'act:spyf:confront', actorId, targetIds: [targetId ?? SPYF.yor] }],
       confidence: 1,
       resolution: `意图=摊牌，目标=${targetId ?? SPYF.yor}。`,
+      sceneHint: { type: 'talk', targetId: targetId ?? SPYF.yor },
     };
   }
 
@@ -135,6 +141,7 @@ export function resolveUserAction(
       events: [{ type: 'action', actionId: 'act:spyf:reveal_identity', actorId, targetIds: [targetId ?? SPYF.yor] }],
       confidence: 0.95,
       resolution: `意图=坦白身份，目标=${targetId ?? SPYF.yor}。`,
+      sceneHint: { type: 'talk', targetId: targetId ?? SPYF.yor },
     };
   }
 
@@ -153,6 +160,7 @@ export function resolveUserAction(
       ],
       confidence: 1,
       resolution: `意图=询问昨晚去向，目标=${targetId ?? SPYF.yor}。`,
+      sceneHint: { type: 'talk', targetId: targetId ?? SPYF.yor },
     };
   }
 
@@ -164,6 +172,7 @@ export function resolveUserAction(
       ],
       confidence: 0.9,
       resolution: `意图=夸奖，目标=${targetId ?? SPYF.yor}。`,
+      sceneHint: { type: 'talk', targetId: targetId ?? SPYF.yor },
     };
   }
 
@@ -175,6 +184,7 @@ export function resolveUserAction(
       ],
       confidence: 0.95,
       resolution: `意图=询问安雅学校情况。`,
+      sceneHint: { type: 'talk', targetId: SPYF.anya },
     };
   }
 
@@ -186,6 +196,7 @@ export function resolveUserAction(
       ],
       confidence: 0.85,
       resolution: `意图=向 ${targetId} 提问。`,
+      sceneHint: { type: 'talk', targetId },
     };
   }
 
@@ -202,6 +213,7 @@ export function resolveUserAction(
     ],
     confidence: 0.4,
     resolution: `兜底：视为对 ${targetId ?? SPYF.yor} 说的一句话。`,
+    sceneHint: { type: 'talk', targetId: targetId ?? SPYF.yor },
   };
 }
 
