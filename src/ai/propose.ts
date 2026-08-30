@@ -49,7 +49,7 @@ function buildWorldSummary(world: WorldDefinition) {
 }
 
 /** 投影纪律：只含 actor 自身已知事实 + 各实体位置 + 最近事件（不泄漏他者认知账本） */
-function buildStateSummary(world: WorldDefinition, state: WorldStateInstance, actorId: EntityId) {
+function buildStateSummary(world: WorldDefinition, state: WorldStateInstance, actorId: EntityId, targetId?: EntityId) {
   return {
     turn: state.clock.turnNumber,
     actor: {
@@ -57,6 +57,13 @@ function buildStateSummary(world: WorldDefinition, state: WorldStateInstance, ac
       locationId: state.entityStates[actorId]?.currentLocationId,
       knownFactIds: state.epistemics.entityKnownFacts[actorId] ?? [],
     },
+    target: targetId
+      ? {
+          id: targetId,
+          name: world.characters.find(c => c.id === targetId)?.name ?? targetId,
+          locationId: state.entityStates[targetId]?.currentLocationId,
+        }
+      : undefined,
     entities: Object.entries(state.entityStates).map(([id, s]) => ({
       id,
       locationId: s.currentLocationId,
@@ -172,10 +179,10 @@ export async function proposeUserEvents(
   world: WorldDefinition,
   state: WorldStateInstance,
   actorId: EntityId,
-  opts: { provider: AIProviderId; fallback: typeof resolveUserAction }
+  opts: { provider: AIProviderId; fallback: typeof resolveUserAction; targetId?: EntityId }
 ): Promise<ProposedAction> {
   if (opts.provider === 'procedural') {
-    return toDeterministic(opts.fallback(text, world, actorId, state));
+    return toDeterministic(opts.fallback(text, world, actorId, state, opts.targetId));
   }
 
   const targetConfig = AI_PROVIDERS.find(p => p.id === opts.provider) || AI_PROVIDERS[0];
@@ -187,7 +194,7 @@ export async function proposeUserEvents(
       body: JSON.stringify({
         action: text,
         worldSummary: buildWorldSummary(world),
-        stateSummary: buildStateSummary(world, state, actorId),
+        stateSummary: buildStateSummary(world, state, actorId, opts.targetId),
         provider: opts.provider === 'auto' ? 'auto' : targetConfig.provider,
         model: targetConfig.model,
       }),
@@ -221,5 +228,5 @@ export async function proposeUserEvents(
     console.warn('[Propose] LLM 提议不可用，回退确定性解析:', err);
   }
 
-  return toDeterministic(opts.fallback(text, world, actorId, state));
+  return toDeterministic(opts.fallback(text, world, actorId, state, opts.targetId));
 }

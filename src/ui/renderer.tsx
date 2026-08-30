@@ -7,6 +7,8 @@ interface WorldCanvasRendererProps {
   blocks: UIBlock[];
   onAction: (action: string) => void;
   onAddNote: (content: string) => void;
+  onSelectTarget?: (charId: string) => void;
+  selectedTargetId?: string;
 }
 
 export const WorldCanvasRenderer: React.FC<WorldCanvasRendererProps> = ({
@@ -14,6 +16,8 @@ export const WorldCanvasRenderer: React.FC<WorldCanvasRendererProps> = ({
   blocks,
   onAction,
   onAddNote,
+  onSelectTarget,
+  selectedTargetId,
 }) => {
   return (
     <div id="world-canvas-grid" className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -45,6 +49,8 @@ export const WorldCanvasRenderer: React.FC<WorldCanvasRendererProps> = ({
               world={world}
               onAction={onAction}
               onAddNote={onAddNote}
+              onSelectTarget={onSelectTarget}
+              selectedTargetId={selectedTargetId}
             />
           </div>
         );

@@ -8,7 +8,7 @@ function shortName(fullName: string): string {
   return fullName.split('（')[0].split('·')[0];
 }
 
-export const CharacterBlock: React.FC<UIBlockProps> = ({ block, world, onAction, onOpenVisualStudio }) => {
+export const CharacterBlock: React.FC<UIBlockProps> = ({ block, world, onAction, onOpenVisualStudio, onSelectTarget, selectedTargetId }) => {
   const [selectedChar, setSelectedChar] = useState<Character | null>(world.characters[0] || null);
 
   return (
@@ -39,6 +39,7 @@ export const CharacterBlock: React.FC<UIBlockProps> = ({ block, world, onAction,
         <div className="w-1/2 divide-y divide-zinc-100 overflow-y-auto border-r border-zinc-100">
           {world.characters.map((char) => {
             const isSelected = selectedChar?.id === char.id;
+            const isTarget = selectedTargetId === char.id;
             const loyaltyColor =
               char.loyalty >= 75 ? 'text-emerald-700 bg-emerald-50 border-emerald-200' :
               char.loyalty >= 50 ? 'text-amber-700 bg-amber-50 border-amber-200' :
@@ -48,12 +49,15 @@ export const CharacterBlock: React.FC<UIBlockProps> = ({ block, world, onAction,
               <div
                 key={char.id}
                 id={`char-card-${char.id}`}
-                onClick={() => setSelectedChar(char)}
+                onClick={() => {
+                  setSelectedChar(char);
+                  onSelectTarget?.(char.id);
+                }}
                 className={`cursor-pointer p-3.5 transition-all ${
                   isSelected
                     ? 'border-l-2 border-l-zinc-900 bg-zinc-50 pl-3'
                     : 'hover:bg-zinc-50'
-                }`}
+                } ${isTarget ? 'bg-zinc-50 ring-1 ring-inset ring-zinc-900/50' : ''}`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2.5">
@@ -74,9 +78,16 @@ export const CharacterBlock: React.FC<UIBlockProps> = ({ block, world, onAction,
                       <p className="mt-0.5 text-[11px] text-zinc-500">{char.role}</p>
                     </div>
                   </div>
-                  <span className={`rounded border px-1.5 py-0.5 font-mono text-[10px] tabular-nums ${loyaltyColor}`}>
-                    {char.loyalty}%
-                  </span>
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    {isTarget && (
+                      <span className="rounded border border-zinc-900 bg-zinc-900 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-zinc-50">
+                        对话目标
+                      </span>
+                    )}
+                    <span className={`rounded border px-1.5 py-0.5 font-mono text-[10px] tabular-nums ${loyaltyColor}`}>
+                      {char.loyalty}%
+                    </span>
+                  </div>
                 </div>
 
                 {char.faction && (
@@ -186,6 +197,12 @@ export const CharacterBlock: React.FC<UIBlockProps> = ({ block, world, onAction,
 
           {selectedChar && onAction && (
             <div className="mt-4 space-y-2 border-t border-zinc-100 pt-3">
+              {selectedTargetId === selectedChar.id && (
+                <div className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-zinc-500">
+                  <MessageSquare className="size-3" strokeWidth={1.75} />
+                  <span>正在对 {shortName(selectedChar.name)} 说话——输入框已定向该角色</span>
+                </div>
+              )}
               <button
                 id={`interact-confront-${selectedChar.id}`}
                 onClick={() => onAction(`问${shortName(selectedChar.name)}：你最近在忙什么？`)}

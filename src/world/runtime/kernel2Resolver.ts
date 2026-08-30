@@ -78,9 +78,12 @@ export function resolveUserAction(
   text: string,
   worldDef: WorldDefinition,
   actorId: EntityId,
-  state?: WorldStateInstance
+  state?: WorldStateInstance,
+  /** W3.3：显式对话目标（点击角色卡片注入）；文本指名优先于显式目标 */
+  explicitTargetId?: EntityId
 ): ResolvedKernelAction {
-  const targetId = resolveTarget(text, KNOWN_CHARACTERS);
+  const textTarget = resolveTarget(text, KNOWN_CHARACTERS);
+  const targetId = textTarget ?? explicitTargetId ?? SPYF.yor;
   const lower = text.toLowerCase();
 
   // 1. 检查钢笔（Step 8）—— 若不在走廊，自动规划"先前往走廊"
@@ -105,8 +108,8 @@ export function resolveUserAction(
     };
   }
 
-  // 2. 移动/前往
-  if (/(前往|去|走到|移动到|travel|move to|go to|去.*(走廊|街道|学园|医务室|客厅))/i.test(lower)) {
+  // 2. 移动/前往（「去」后接「哪」为提问而非移动，如「你昨晚去哪了？」）
+  if (/(前往|走到|移动到|travel|move to|go to|去(?!哪))/i.test(lower)) {
     const loc = resolveTarget(lower, KNOWN_LOCATIONS) ?? SPYF.living;
     return {
       events: [{ type: 'action', actionId: 'act:spyf:travel', actorId, targetIds: [loc] }],
@@ -128,20 +131,20 @@ export function resolveUserAction(
   // 4. 摊牌 / 质问（信息不对称强制：不知道秘密会被内核拒绝）
   if (/(摊牌|质问|指控|你就是.*杀手|confront|accuse|i know you)/i.test(lower)) {
     return {
-      events: [{ type: 'action', actionId: 'act:spyf:confront', actorId, targetIds: [targetId ?? SPYF.yor] }],
+      events: [{ type: 'action', actionId: 'act:spyf:confront', actorId, targetIds: [targetId] }],
       confidence: 1,
-      resolution: `意图=摊牌，目标=${targetId ?? SPYF.yor}。`,
-      sceneHint: { type: 'talk', targetId: targetId ?? SPYF.yor },
+      resolution: `意图=摊牌，目标=${targetId}。`,
+      sceneHint: { type: 'talk', targetId },
     };
   }
 
   // 5. 坦白身份（把间谍身份注入目标认知）
   if (/(坦白|我是间谍|我是.*(黄昏|twilight)|reveal.*(identity|spy)|confess)/i.test(lower)) {
     return {
-      events: [{ type: 'action', actionId: 'act:spyf:reveal_identity', actorId, targetIds: [targetId ?? SPYF.yor] }],
+      events: [{ type: 'action', actionId: 'act:spyf:reveal_identity', actorId, targetIds: [targetId] }],
       confidence: 0.95,
-      resolution: `意图=坦白身份，目标=${targetId ?? SPYF.yor}。`,
-      sceneHint: { type: 'talk', targetId: targetId ?? SPYF.yor },
+      resolution: `意图=坦白身份，目标=${targetId}。`,
+      sceneHint: { type: 'talk', targetId },
     };
   }
 
@@ -152,15 +155,15 @@ export function resolveUserAction(
         {
           type: 'speech_act',
           actorId,
-          targetIds: [targetId ?? SPYF.yor],
+          targetIds: [targetId],
           utterance: text,
           intentTag: 'ask',
           topic: 'last night',
         },
       ],
       confidence: 1,
-      resolution: `意图=询问昨晚去向，目标=${targetId ?? SPYF.yor}。`,
-      sceneHint: { type: 'talk', targetId: targetId ?? SPYF.yor },
+      resolution: `意图=询问昨晚去向，目标=${targetId}。`,
+      sceneHint: { type: 'talk', targetId },
     };
   }
 
@@ -168,11 +171,11 @@ export function resolveUserAction(
   if (/(夸|夸奖|真好看|真棒|温柔|贤惠|谢谢|compliment|thank|nice|beautiful)/i.test(lower)) {
     return {
       events: [
-        { type: 'speech_act', actorId, targetIds: [targetId ?? SPYF.yor], utterance: text, intentTag: 'compliment' },
+        { type: 'speech_act', actorId, targetIds: [targetId], utterance: text, intentTag: 'compliment' },
       ],
       confidence: 0.9,
-      resolution: `意图=夸奖，目标=${targetId ?? SPYF.yor}。`,
-      sceneHint: { type: 'talk', targetId: targetId ?? SPYF.yor },
+      resolution: `意图=夸奖，目标=${targetId}。`,
+      sceneHint: { type: 'talk', targetId },
     };
   }
 
@@ -206,14 +209,14 @@ export function resolveUserAction(
       {
         type: 'speech_act',
         actorId,
-        targetIds: [targetId ?? SPYF.yor],
+        targetIds: [targetId],
         utterance: text,
         intentTag: 'say',
       },
     ],
     confidence: 0.4,
-    resolution: `兜底：视为对 ${targetId ?? SPYF.yor} 说的一句话。`,
-    sceneHint: { type: 'talk', targetId: targetId ?? SPYF.yor },
+    resolution: `兜底：视为对 ${targetId} 说的一句话。`,
+    sceneHint: { type: 'talk', targetId },
   };
 }
 

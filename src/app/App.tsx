@@ -22,6 +22,7 @@ import { instantiate } from '../world/runtime/instantiate';
 import { applyEvent, tickScheduler, type KernelOptions, type KernelEvent } from '../world/runtime/kernel2';
 import { resolveUserAction, resolveDirectorAction } from '../world/runtime/kernel2Resolver';
 import { deriveScene, type SceneIntentHint } from '../world/runtime/scene';
+import { recordDialogueTurn } from '../world/runtime/dialogue';
 import { proposeUserEvents } from '../ai/propose';
 import { projectLegacyWorld } from '../world/runtime/legacyAdapter';
 import type { WorldStateInstance, SceneType } from '../world/representation/types/state';
@@ -81,6 +82,10 @@ function entityName(id: string): string {
   return SPY_FAMILY_MIN.characters.find(c => c.id === id)?.name ?? id;
 }
 
+function shortName(fullName: string): string {
+  return fullName.split('（')[0].split('·')[0];
+}
+
 const SCENE_LABELS: Record<SceneType, string> = {
   conversation: '对话',
   everyday: '日常',
@@ -116,6 +121,9 @@ export const App: React.FC = () => {
   const [isProcessingAction, setIsProcessingAction] = useState<boolean>(false);
   const [latestNarrativeOutcome, setLatestNarrativeOutcome] = useState<string | null>(null);
   const [chronicle, setChronicle] = useState<ChronicleEntry[]>([]);
+
+  // W3.3: 对话目标（conversation 场景点击角色卡片后设置；定向后续话语）
+  const [dialogueTargetId, setDialogueTargetId] = useState<EntityId | null>(null);
 
   // Modals
   const [showChronicleModal, setShowChronicleModal] = useState(false);
@@ -157,6 +165,14 @@ export const App: React.FC = () => {
     return displayWorld.roles.find(r => r.id === activeRoleId) || displayWorld.roles[0];
   }, [displayWorld, activeRoleId]);
 
+  // W3.3: 对话目标（id + 短名，供 ActionDock / 建议话语使用）
+  const dialogueTarget = useMemo(() => {
+    if (!dialogueTargetId) return null;
+    const c = SPY_FAMILY_MIN.characters.find(ch => ch.id === dialogueTargetId);
+    if (!c) return null;
+    return { id: c.id, name: shortName(c.name) };
+  }, [dialogueTargetId]);
+
   // Compute UI Plan dynamically from Projected World State + Role Slot + Scene
   const activeUiPlan: UIPlanning = useMemo(() => {
     if (!displayWorld) {
@@ -166,8 +182,9 @@ export const App: React.FC = () => {
       activeRole,
       isDirectorOverlayActive: isDirectorOverlayOpen,
       scene: kernelState?.scene.current, // W3.1：场景驱动界面重组
+      dialogueTargetName: dialogueTarget?.name, // W3.3：对话目标定向建议话语
     });
-  }, [displayWorld, activeRole, isDirectorOverlayOpen, kernelState?.scene.current]);
+  }, [displayWorld, activeRole, isDirectorOverlayOpen, kernelState?.scene.current, dialogueTarget?.name]);
 
   // Load initial local storage if present
   useEffect(() => {
@@ -277,7 +294,8 @@ export const App: React.FC = () => {
   };
 
   // Handler: User performs an action → 确定性解析 → 内核应用（拒绝即事件）
-  const handleDispatchAction = async (action: string) => {
+  // W3.3: targetId 为显式对话目标（点击角色卡片注入）；缺省回退当前 dialogueTargetId
+  const handleDispatchAction = async (action: string, targetId?: string) => {
     if (!kernelState || isProcessingAction) return;
 
     setIsProcessingAction(true);
@@ -285,9 +303,11 @@ export const App: React.FC = () => {
 
     try {
       const isDirector = observerEntityId === null || isDirectorOverlayOpen;
+      const effectiveTarget = (targetId ?? dialogueTargetId) as EntityId | undefined;
       const parts: string[] = [];
       let next = kernelState;
       let sceneHint: SceneIntentHint | undefined;
+      let dialogueTurns = 0;
 
       if (isDirector) {
         const d = resolveDirectorAction(action, SPY_FAMILY_MIN);
@@ -305,6 +325,7 @@ export const App: React.FC = () => {
         const proposed = await proposeUserEvents(action, SPY_FAMILY_MIN, next, observerEntityId as EntityId, {
           provider: selectedEngine,
           fallback: resolveUserAction,
+          targetId: effectiveTarget,
         });
         sceneHint = proposed.sceneHint;
         if (proposed.source === 'clarify') {
@@ -319,6 +340,8 @@ export const App: React.FC = () => {
           for (const ev of proposed.events) {
             const r = applyEvent(SPY_FAMILY_MIN, next, ev, KERNEL_OPTS);
             next = r.nextState;
+            // W3.3: 成功 speech_act 计入对话轮次（场景内状态递增）
+            if (!r.rejected && ev.type === 'speech_act') dialogueTurns += 1;
             const last = next.eventChronicleLog.at(-1);
             if (last) parts.push(last.description);
             for (const resp of r.responses) parts.push(`${entityName(resp.from)}：${resp.text}`);
@@ -338,8 +361,16 @@ export const App: React.FC = () => {
 
       // W3.1：场景推导（用户意图 + 地点节奏 + 导演视角）
       next.scene = deriveScene(SPY_FAMILY_MIN, next, observerEntityId, sceneHint);
+      // W3.3：对话轮次记账（成功 speech_act 递增场景内 dialogueTurn，随快照持久化）
+      if (dialogueTurns > 0) {
+        next.scene = recordDialogueTurn(next.scene, dialogueTurns);
+      }
 
       setKernelState(next);
+      // W3.3：离开 conversation 场景 → 清除对话目标（目标只在对话场景有意义）
+      if (next.scene.current !== 'conversation') {
+        setDialogueTargetId(null);
+      }
       const narrative = parts.join('\n');
       setLatestNarrativeOutcome(narrative);
       const newEntry: ChronicleEntry = {

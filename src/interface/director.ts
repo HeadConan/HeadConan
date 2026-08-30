@@ -2,6 +2,7 @@ import { WorldState, UIBlock, UIPlanning } from '../world/types';
 import { RoleSlot } from '../roles/model';
 import type { SceneType } from '../world/representation/types/state';
 import { DIRECTOR_REVEAL_DIRECTIVES } from '../world/spyFamily/spyFamilyMin';
+import { suggestedUtterances } from '../world/runtime/dialogue';
 
 export interface UIDirectorOptions {
   activeRole: RoleSlot;
@@ -9,13 +10,15 @@ export interface UIDirectorOptions {
   isDirectorOverlayActive?: boolean;
   /** W3.1：当前场景类型（conversation→角色主面 / exploration→地图主面） */
   scene?: SceneType;
+  /** W3.3：对话目标名（conversation 场景内点击角色卡片后，建议话语定向该角色） */
+  dialogueTargetName?: string;
 }
 
 export function computeUIPlan(
   world: WorldState,
   options: UIDirectorOptions
 ): UIPlanning {
-  const { activeRole, isDirectorOverlayActive, scene } = options;
+  const { activeRole, isDirectorOverlayActive, scene, dialogueTargetName } = options;
   const style = world.style;
   const isDirector = activeRole.type === 'DIRECTOR' || activeRole.type === 'ARCHITECT' || isDirectorOverlayActive;
   const isObserver = activeRole.type === 'OBSERVER';
@@ -199,6 +202,12 @@ export function computeUIPlan(
       'Track movement of Northern Garrison over time',
       'Review complete chronological causality chain'
     ];
+  } else if (scene === 'conversation') {
+    // W3.3：场景绑定话语——conversation 场景建议对话；点击目标后定向该角色
+    suggestedInteractions = suggestedUtterances('conversation', dialogueTargetName);
+  } else if (scene === 'exploration') {
+    // W3.3：exploration 场景建议探索类动作
+    suggestedInteractions = suggestedUtterances('exploration');
   } else if (activeRole.suggestedPrompts && activeRole.suggestedPrompts.length > 0) {
     suggestedInteractions = activeRole.suggestedPrompts;
   }

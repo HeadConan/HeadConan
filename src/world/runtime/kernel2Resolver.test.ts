@@ -61,6 +61,26 @@ describe('kernel2Resolver — 玩家解析', () => {
     }
   });
 
+  it('「去客厅」→ travel 动作（去 + 具体地点）', () => {
+    const r = resolveUserAction('去客厅', SPY_FAMILY_MIN, actor);
+    const ev = r.events[0];
+    expect(ev.type).toBe('action');
+    if (ev.type === 'action') {
+      expect(ev.actionId).toBe('act:spyf:travel');
+      expect(ev.targetIds).toContain(SPYF.living);
+    }
+  });
+
+  it('「你昨晚去哪了？」→ 提问 speech_act（不被 travel 规则误判）', () => {
+    const r = resolveUserAction('你昨晚去哪了？', SPY_FAMILY_MIN, actor);
+    const ev = r.events[0];
+    expect(ev.type).toBe('speech_act');
+    if (ev.type === 'speech_act') {
+      expect(ev.intentTag).toBe('ask');
+      expect(ev.targetIds).toContain(SPYF.yor);
+    }
+  });
+
   it('无意义输入 → 兜底分支，confidence < 0.85', () => {
     const r = resolveUserAction('量子力学与香蕉果冻', SPY_FAMILY_MIN, actor);
     expect(r.confidence).toBeLessThan(0.85);
