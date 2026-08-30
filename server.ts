@@ -265,6 +265,76 @@ Respond with JSON matching:
   "suggestedNextActions": ["string", "string", "string"]
 }`;
 
+const SYSTEM_PROPOSE_EVENTS = `You are HeadConan's intent interpreter. The user performs an open-ended action in an ongoing imagined world.
+Interpret the user's literal intent and propose 1-3 structured kernel events that the world kernel can execute.
+You MUST output ONLY a valid JSON object matching this structure:
+{
+  "events": [
+    {
+      "type": "action",
+      "actionId": "string — must be one of the action ids provided in the World Summary",
+      "actorId": "string — must be one of the entity ids provided",
+      "targetIds": ["string — entity ids"],
+      "params": {} (optional)
+    }
+    // or
+    {
+      "type": "speech_act",
+      "actorId": "string — must be one of the entity ids provided",
+      "targetIds": ["string — entity ids"],
+      "utterance": "string — what the actor says",
+      "intentTag": "ask | compliment | say | confess | probe | insult",
+      "topic": "string (optional)"
+    }
+  ],
+  "confidence": 0.0-1.0,
+  "resolution": "string — human-readable explanation of the interpretation"
+}
+Rules:
+- Use ONLY entity ids, action ids, and fact ids provided in the World Summary. Never invent ids.
+- speech_act requires the actor and target to be in the same location (check State Summary).
+- Do NOT propose reveal_fact events (host-only).
+- If the user's intent is ambiguous or cannot be mapped to a valid event, set confidence below 0.6.
+- Propose minimum sufficient events (1-3).`;
+
+const SPEECH_INTENT_TAGS = ['ask', 'compliment', 'say', 'confess', 'probe', 'insult'];
+
+/** 服务端 schema 校验：LLM 输出必须为合法 KernelEvent 形状；非法即拒绝（ADR-008：LLM 只提议） */
+function validateProposedEvents(parsed: any): { events: any[]; confidence: number; resolution: string } | null {
+  if (!parsed || typeof parsed !== 'object') return null;
+  const { events, confidence, resolution } = parsed;
+  if (!Array.isArray(events) || events.length === 0 || events.length > 3) return null;
+  if (typeof confidence !== 'number' || confidence < 0 || confidence > 1) return null;
+  if (typeof resolution !== 'string' || resolution.length === 0) return null;
+
+  const valid = events.filter((ev: any) => {
+    if (!ev || typeof ev !== 'object') return false;
+    switch (ev.type) {
+      case 'action':
+        return (
+          typeof ev.actionId === 'string' &&
+          typeof ev.actorId === 'string' &&
+          Array.isArray(ev.targetIds) &&
+          ev.targetIds.every((t: any) => typeof t === 'string')
+        );
+      case 'speech_act':
+        return (
+          typeof ev.actorId === 'string' &&
+          Array.isArray(ev.targetIds) &&
+          ev.targetIds.every((t: any) => typeof t === 'string') &&
+          typeof ev.utterance === 'string' &&
+          ev.utterance.length > 0 &&
+          SPEECH_INTENT_TAGS.includes(ev.intentTag)
+        );
+      default:
+        return false; // 玩家提议路径只接受 action / speech_act
+    }
+  });
+
+  if (valid.length === 0) return null;
+  return { events: valid, confidence, resolution };
+}
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   const hasGemini = !!process.env.GEMINI_API_KEY;
@@ -482,6 +552,95 @@ Calculate consequence and state updates.`;
     fallback: true,
     message: 'No active AI key found. Utilizing client simulation engine.'
   });
+});
+
+// LLM 提议意图解析端点（W3.2，第一提议者）
+app.post('/api/propose-events', async (req, res) => {
+  const { action, worldSummary, stateSummary, provider = 'auto', model } = req.body;
+  if (!action || typeof action !== 'string') {
+    return res.status(400).json({ error: 'Action is required' });
+  }
+
+  const hasDeepSeek = !!process.env.DEEPSEEK_API_KEY;
+  const hasGemini = !!process.env.GEMINI_API_KEY;
+
+  let targetProvider = provider;
+  if (provider === 'auto') {
+    targetProvider = hasDeepSeek ? 'deepseek' : hasGemini ? 'gemini' : 'procedural';
+  }
+
+  const promptText = `World Summary:
+${JSON.stringify(worldSummary ?? {}, null, 2)}
+
+State Summary:
+${JSON.stringify(stateSummary ?? {}, null, 2)}
+
+User Action / Intent:
+"${action}"
+
+Propose structured kernel events.`;
+
+  // 1. DeepSeek
+  if (targetProvider === 'deepseek' || targetProvider === 'deepseek-chat' || targetProvider === 'deepseek-reasoner') {
+    if (hasDeepSeek) {
+      try {
+        const selectedModel = model || (targetProvider.startsWith('deepseek-') ? targetProvider : 'deepseek-chat');
+        const deepseekRes = await callDeepSeek(
+          [
+            { role: 'system', content: SYSTEM_PROPOSE_EVENTS },
+            { role: 'user', content: promptText }
+          ],
+          { model: selectedModel, temperature: 0.3 }
+        );
+
+        const validated = validateProposedEvents(deepseekRes.parsed);
+        if (validated) {
+          return res.json({ ...validated, provider: 'deepseek', model: deepseekRes.model });
+        }
+        return res.status(200).json({ fallback: true, message: 'LLM 输出未通过 schema 校验。' });
+      } catch (err: any) {
+        console.error('[DeepSeek] Propose error:', err);
+        if (hasGemini) {
+          console.log('[AI Gateway] Falling back to Gemini for propose');
+          targetProvider = 'gemini';
+        } else {
+          return res.status(200).json({ fallback: true, message: `DeepSeek call failed: ${err.message}. Using deterministic parser.` });
+        }
+      }
+    } else if (hasGemini) {
+      targetProvider = 'gemini';
+    }
+  }
+
+  // 2. Gemini
+  if (targetProvider === 'gemini' || targetProvider === 'gemini-3.7-flash') {
+    const ai = getGeminiClient();
+    if (ai) {
+      try {
+        const response = await ai.models.generateContent({
+          model: 'gemini-3.7-flash',
+          contents: promptText,
+          config: {
+            systemInstruction: SYSTEM_PROPOSE_EVENTS,
+            responseMimeType: 'application/json',
+            temperature: 0.3,
+          }
+        });
+
+        const parsed = cleanAndParseJSON(response.text || '{}');
+        const validated = validateProposedEvents(parsed);
+        if (validated) {
+          return res.json({ ...validated, provider: 'gemini', model: 'gemini-3.7-flash' });
+        }
+        return res.status(200).json({ fallback: true, message: 'LLM 输出未通过 schema 校验。' });
+      } catch (err: any) {
+        console.error('[Gemini] Propose error:', err);
+      }
+    }
+  }
+
+  // 3. Fallback
+  res.status(200).json({ fallback: true, message: 'No active AI key found. Using deterministic parser.' });
 });
 
 // Route aliases

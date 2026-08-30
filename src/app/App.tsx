@@ -22,6 +22,7 @@ import { instantiate } from '../world/runtime/instantiate';
 import { applyEvent, tickScheduler, type KernelOptions, type KernelEvent } from '../world/runtime/kernel2';
 import { resolveUserAction, resolveDirectorAction } from '../world/runtime/kernel2Resolver';
 import { deriveScene, type SceneIntentHint } from '../world/runtime/scene';
+import { proposeUserEvents } from '../ai/propose';
 import { projectLegacyWorld } from '../world/runtime/legacyAdapter';
 import type { WorldStateInstance, SceneType } from '../world/representation/types/state';
 import type { EntityId } from '../world/representation/types/primitives';
@@ -300,18 +301,29 @@ export const App: React.FC = () => {
           if (r.rejected && r.reason) parts.push(`[世界拒绝] ${r.reason}`);
         }
       } else {
-        const resolved = resolveUserAction(action, SPY_FAMILY_MIN, observerEntityId as EntityId, next);
-        sceneHint = resolved.sceneHint;
-        if (resolved.confidence < 0.85) {
-          parts.push('（未识别为具体指令，已当作对约尔的一句闲聊）');
-        }
-        for (const ev of resolved.events) {
-          const r = applyEvent(SPY_FAMILY_MIN, next, ev, KERNEL_OPTS);
-          next = r.nextState;
-          const last = next.eventChronicleLog.at(-1);
-          if (last) parts.push(last.description);
-          for (const resp of r.responses) parts.push(`${entityName(resp.from)}：${resp.text}`);
-          if (r.rejected && r.reason) parts.push(`[世界拒绝] ${r.reason}`);
+        // W3.2：LLM 提议为主通道；确定性解析为回退（LLM 不可用/解析失败/低置信 → 永不硬阻塞）
+        const proposed = await proposeUserEvents(action, SPY_FAMILY_MIN, next, observerEntityId as EntityId, {
+          provider: selectedEngine,
+          fallback: resolveUserAction,
+        });
+        sceneHint = proposed.sceneHint;
+        if (proposed.source === 'clarify') {
+          parts.push(proposed.notice ?? '（意图不够明确，请说得更具体一些）');
+        } else {
+          if (proposed.source === 'llm') {
+            parts.push(`（LLM 提议 · 置信 ${Math.round(proposed.confidence * 100)}%）`);
+          }
+          if (proposed.confidence < 0.85) {
+            parts.push('（未识别为具体指令，已当作对约尔的一句闲聊）');
+          }
+          for (const ev of proposed.events) {
+            const r = applyEvent(SPY_FAMILY_MIN, next, ev, KERNEL_OPTS);
+            next = r.nextState;
+            const last = next.eventChronicleLog.at(-1);
+            if (last) parts.push(last.description);
+            for (const resp of r.responses) parts.push(`${entityName(resp.from)}：${resp.text}`);
+            if (r.rejected && r.reason) parts.push(`[世界拒绝] ${r.reason}`);
+          }
         }
       }
 
