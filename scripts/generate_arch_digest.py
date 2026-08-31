@@ -34,6 +34,7 @@ GROUPS = [
             ("RESEARCH_LOG.md — 研究日志与证据表", "docs/ARCHITECTURE_ZERO/RESEARCH_LOG.md", False),
             ("ARCHITECTURE_MIGRATION.md — 代码迁移图", "docs/ARCHITECTURE_ZERO/ARCHITECTURE_MIGRATION.md", False),
             ("WORLD_MODEL_PHASE1.md — 最小世界模型反过度工程评审", "docs/WORLD_MODEL_PHASE1.md", True),
+            ("ROUTING_PLAN.md — 路由系统严苛执行计划", "docs/ROUTING_PLAN.md", True),
         ],
     },
     {
