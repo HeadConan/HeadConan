@@ -10,8 +10,9 @@
  */
 
 import type { EntityId } from '../representation/types/primitives';
-import type { ReactionContext, SpeechReaction } from '../runtime/kernel2';
+import type { ReactionContext, SpeechReaction, KernelEvent } from '../runtime/kernel2';
 import type { StateEffect } from '../representation/types/dynamics';
+import type { AgentContext, NpcPerception } from '../runtime/agentLoop';
 import { SPYF } from './spyFamilyMin';
 
 // ---------------------------------------------------------------------------
@@ -140,4 +141,42 @@ export function spyFamilyReaction(ctx: ReactionContext): SpeechReaction {
     effects: [],
     response: '嗯？怎么了？',
   };
+}
+
+// ---------------------------------------------------------------------------
+// 代理循环确定性回退（W3.4）：NPC 自主事件生成
+// 区别于 spyFamilyReaction 的"回应生成"：本函数让 NPC 作为 actor 生成候选事件。
+// 投影隔离内建：只依据 perception.knownFactIds（NPC 自身认知）与刺激判定，绝不使用他者认知。
+// 范围纪律：仅对话决策点（speech_act），不自主移动。
+// ---------------------------------------------------------------------------
+
+export function spyFamilyAgentReaction(ctx: AgentContext, perception: NpcPerception): KernelEvent[] {
+  const { npcId, stimulus } = ctx;
+
+  // Step 3：Anya 自主插话——她知道自己妈妈是杀手（投影内 factYorAssassin），
+  // 若 Yor 刚被问及昨晚去向（可疑 cover 场景）→ 冒失插话。
+  // 触发条件全部落在 Anya 自身投影内：已知 factYorAssassin + 现场听到对 Yor 的追问。
+  if (
+    npcId === SPYF.anya &&
+    perception.knownFactIds.includes(SPYF.factYorAssassin) &&
+    stimulus.type === 'speech_act'
+  ) {
+    const targetId = stimulus.targetIds[0];
+    const text = stimulus.utterance.toLowerCase();
+    const isAboutLastNight = /(昨晚|昨天晚上|昨晚去哪|last night|where were you)/i.test(text);
+    if (targetId === SPYF.yor && stimulus.intentTag === 'ask' && isAboutLastNight) {
+      return [
+        {
+          type: 'speech_act',
+          actorId: SPYF.anya,
+          targetIds: [SPYF.yor],
+          utterance: '妈妈又杀人了吗？',
+          intentTag: 'ask',
+          topic: 'mom secret',
+        },
+      ];
+    }
+  }
+
+  return [];
 }

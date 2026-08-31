@@ -17,13 +17,14 @@ import { RoleSlot } from '../roles/model';
 import { Sparkles } from 'lucide-react';
 
 import { SPY_FAMILY_MIN, SPY_FAMILY_SCENARIOS, SPYF, SPY_FAMILY_SECRET_UTTERANCES } from '../world/spyFamily/spyFamilyMin';
-import { spyFamilyRelationResolver, spyFamilyRoleOf, spyFamilyReaction } from '../world/spyFamily/spyFamilyReactions';
+import { spyFamilyRelationResolver, spyFamilyRoleOf, spyFamilyReaction, spyFamilyAgentReaction } from '../world/spyFamily/spyFamilyReactions';
 import { instantiate } from '../world/runtime/instantiate';
 import { applyEvent, tickScheduler, type KernelOptions, type KernelEvent } from '../world/runtime/kernel2';
 import { resolveUserAction, resolveDirectorAction } from '../world/runtime/kernel2Resolver';
 import { deriveScene, type SceneIntentHint } from '../world/runtime/scene';
 import { recordDialogueTurn } from '../world/runtime/dialogue';
 import { proposeUserEvents } from '../ai/propose';
+import { runAgentLoop, type ProposeFn } from '../world/runtime/agentLoop';
 import { projectLegacyWorld } from '../world/runtime/legacyAdapter';
 import type { WorldStateInstance, SceneType } from '../world/representation/types/state';
 import type { EntityId } from '../world/representation/types/primitives';
@@ -36,6 +37,9 @@ const KERNEL_OPTS: KernelOptions = {
   discloseFactResolver: (_world, event) =>
     SPY_FAMILY_SECRET_UTTERANCES.filter(({ pattern }) => pattern.test(event.utterance)).map(({ factId }) => factId),
 };
+
+// W3.4：NPC LLM 提议（最小版暂不接入，走确定性回退；接口就绪，W4 可接 /api/propose-events）
+const proposeNpcEvents: ProposeFn = async () => null;
 
 const LS_KERNEL_STATE = 'headconan_kernel_state_v3';
 const LS_CHRONICLE = 'headconan_kernel_chronicle_v3';
@@ -308,6 +312,8 @@ export const App: React.FC = () => {
       let next = kernelState;
       let sceneHint: SceneIntentHint | undefined;
       let dialogueTurns = 0;
+      // W3.4：代理循环的触发刺激（最后一次成功应用的玩家事件）
+      let lastPlayerEvent: KernelEvent | undefined;
 
       if (isDirector) {
         const d = resolveDirectorAction(action, SPY_FAMILY_MIN);
@@ -342,10 +348,16 @@ export const App: React.FC = () => {
             next = r.nextState;
             // W3.3: 成功 speech_act 计入对话轮次（场景内状态递增）
             if (!r.rejected && ev.type === 'speech_act') dialogueTurns += 1;
-            const last = next.eventChronicleLog.at(-1);
-            if (last) parts.push(last.description);
-            for (const resp of r.responses) parts.push(`${entityName(resp.from)}：${resp.text}`);
-            if (r.rejected && r.reason) parts.push(`[世界拒绝] ${r.reason}`);
+            // W3.4: 记录最后一次成功应用的玩家事件作为代理循环刺激
+            if (!r.rejected) lastPlayerEvent = ev;
+            // 拒绝时内核已追加 REJECTED 日志，只推一次拒绝原因，避免与 [世界拒绝] 重复
+            if (r.rejected) {
+              if (r.reason) parts.push(`[世界拒绝] ${r.reason}`);
+            } else {
+              const last = next.eventChronicleLog.at(-1);
+              if (last) parts.push(last.description);
+              for (const resp of r.responses) parts.push(`${entityName(resp.from)}：${resp.text}`);
+            }
           }
         }
       }
@@ -354,9 +366,31 @@ export const App: React.FC = () => {
       const tick = tickScheduler(next, SPY_FAMILY_MIN, KERNEL_OPTS);
       next = tick.nextState;
       for (const r of tick.executed) {
-        const last = r.nextState.eventChronicleLog.at(-1);
-        if (last) parts.push(`[世界] ${last.description}`);
-        if (r.rejected && r.reason) parts.push(`[世界拒绝] ${r.reason}`);
+        if (r.rejected && r.reason) {
+          parts.push(`[世界拒绝] ${r.reason}`);
+        } else {
+          const last = r.nextState.eventChronicleLog.at(-1);
+          if (last) parts.push(`[世界] ${last.description}`);
+        }
+      }
+
+      // W3.4：代理循环——玩家动作后，对现场共现 NPC 逐个决策（预算内，仅对话决策点）
+      if (!isDirector && observerEntityId && lastPlayerEvent) {
+        const agent = await runAgentLoop(next, SPY_FAMILY_MIN, observerEntityId, lastPlayerEvent, {
+          propose: proposeNpcEvents,
+          fallback: spyFamilyAgentReaction,
+          kernelOpts: KERNEL_OPTS,
+        });
+        next = agent.nextState;
+        for (const r of agent.applied) {
+          if (r.rejected && r.reason) {
+            parts.push(`[自主拒绝] ${r.reason}`);
+          } else {
+            const last = r.nextState.eventChronicleLog.at(-1);
+            if (last) parts.push(`[自主] ${last.description}`);
+            for (const resp of r.responses) parts.push(`${entityName(resp.from)}：${resp.text}`);
+          }
+        }
       }
 
       // W3.1：场景推导（用户意图 + 地点节奏 + 导演视角）
