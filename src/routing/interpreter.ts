@@ -32,6 +32,12 @@ export interface InterpretOptions {
   provider: AIProviderId;
   /** Explicit dialogue target (click-injected); text naming still wins (kernel2Resolver). */
   targetId?: EntityId;
+  /**
+   * End-to-end trace id, propagated from the router (Stage A6: "traceId propagates:
+   * user action → route record → interpretation → commit"). Defaults to a fresh one
+   * when the interpreter runs standalone.
+   */
+  traceId?: string;
 }
 
 export interface InterpretationResult {
@@ -62,7 +68,7 @@ export async function interpret(
   actorId: EntityId,
   opts: InterpretOptions
 ): Promise<InterpretationResult> {
-  const traceId = nextTraceId();
+  const traceId = opts.traceId ?? nextTraceId();
   const t0 = performance.now();
 
   const proposed = await proposeUserEvents(text, world, state, actorId, {

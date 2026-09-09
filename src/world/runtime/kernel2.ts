@@ -209,9 +209,10 @@ function appendLog(state: WorldStateInstance, entry: SimulationEvent): void {
 
 // ---------------------------------------------------------------------------
 // 前提判定（7 类，全部确定性）
+// 导出供路由校验器（Stage A3）复用——适配，不重写（docs/ROUTING_PLAN.md §1.1）。
 // ---------------------------------------------------------------------------
 
-function checkPrecondition(
+export function checkPrecondition(
   world: WorldDefinition,
   state: WorldStateInstance,
   p: { type: string; targetKey: string; expectedValue: unknown; failureMessage: string },
