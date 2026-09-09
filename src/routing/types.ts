@@ -12,8 +12,14 @@
  *   1. No traceId → no commit. Every proposal and decision carries a traceId.
  *   2. Vocabularies are frozen (input classes, paths, outcomes, reason codes).
  *   3. Zero `any`. The contract is the narrowest thing in the system.
- *   4. Interpretation produces ProposedReality; it never mutates state (structural, not enforced here).
+ *   - Interpretation produces ProposedReality; it never mutates state (structural, not enforced here).
  */
+
+/* ============================================================
+   Type imports
+   ============================================================ */
+
+import type { KernelEvent } from '../world/runtime/kernel2';
 
 /* ============================================================
    Frozen vocabularies
@@ -162,17 +168,22 @@ export interface Observation {
 /**
  * Output of the interpretation stage.
  * Purely a proposal: creating it must not mutate world state.
+ * A2-2 contract amendment: change-arrays are kernel-derived at commit —
+ * the interpreter emits them empty (docs/ROUTING_PLAN.md Stage A2).
  */
 export interface ProposedReality {
   /** Trace this proposal belongs to. No traceId → the kernel must refuse it. */
   traceId: string;
-  /** Proposed events (typed, validated in later stages). */
-  events: string[];
-  /** Proposed state changes. */
+  /**
+   * Proposed events (KernelEvent-shaped; validated in later stages).
+   * A2-1 contract amendment: events: string[] → KernelEvent[].
+   */
+  events: KernelEvent[];
+  /** Proposed state changes (kernel-derived at commit; empty in proposals). */
   stateChanges: StateChange[];
-  /** Proposed knowledge changes (observation-derived). */
+  /** Proposed knowledge changes (kernel-derived at commit; empty in proposals). */
   knowledgeChanges: KnowledgeChange[];
-  /** Proposed observations — who saw what. */
+  /** Proposed observations — who saw what (kernel-derived at commit; empty in proposals). */
   observations: Observation[];
   /** Interpreter confidence in [0,1]. Compared against θ. */
   confidence: number;
